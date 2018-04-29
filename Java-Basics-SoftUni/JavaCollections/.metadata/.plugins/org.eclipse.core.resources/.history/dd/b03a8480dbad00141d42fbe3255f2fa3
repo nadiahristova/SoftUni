@@ -1,0 +1,75 @@
+package Exam4;
+
+import java.util.Scanner;
+
+public class _03_MovingArrows {
+	private static char[][] theMat;
+
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		int n = Integer.parseInt(input.nextLine());
+		String line = input.nextLine();
+		char[][] matrix = new char[n][line.length()];
+		int counter = 0;
+		for (int colmn = 0; colmn < line.length(); colmn++) {
+			matrix[0][colmn] = line.charAt(colmn);
+			if (line.charAt(colmn) == '<' || line.charAt(colmn) == '>'
+					|| line.charAt(colmn) == 'v' || line.charAt(colmn) == '^') {
+				counter++;
+			}
+		}
+
+		for (int row = 1; row < matrix.length; row++) {
+			String roww = input.nextLine();
+			for (int colmn = 0; colmn < line.length(); colmn++) {
+				matrix[row][colmn] = roww.charAt(colmn);
+				if (roww.charAt(colmn) == '<' || roww.charAt(colmn) == '>'
+						|| roww.charAt(colmn) == 'v'
+						|| roww.charAt(colmn) == '^') {
+					counter++;
+				}
+			}
+		}
+		theMat = matrix;
+
+		// boolean isMoving = true;
+		int currCounter;
+		do {
+			currCounter = 0;
+			for (int row = 0; row < matrix.length; row++) {
+				for (int colmn = 0; colmn < line.length(); colmn++) {
+					char currChar = matrix[row][colmn];
+					if (currChar == '<' || currChar == '>' || currChar == 'v'
+							|| currChar == '^') {
+						switch (currChar) {
+						case '<': {
+							if ((colmn > 0 && matrix[row][colmn - 1] == 'o')) {
+								matrix[row][colmn-1] = '<';
+								matrix[row][colmn] = 'o';
+							} else counter++;								
+						}break;
+						case '>': {
+							if ((colmn < line.length()-1 && matrix[row][colmn + 1] == 'o')) {
+								matrix[row][colmn+1] = '>';
+								matrix[row][colmn] = 'o';
+							} else counter++;								
+						}break;
+						case '^': {
+							if ((row > 0 && matrix[row-1][colmn] == 'o')) {
+								matrix[row-1][colmn] = '^';
+								matrix[row][colmn] = 'o';
+							} else counter++;								
+						}break;
+						case 'v': {
+							if ((row < matrix.length-1 && matrix[row+1][colmn] == 'o')) {
+								matrix[row+1][colmn] = 'v';
+								matrix[row][colmn] = 'o';
+							} else counter++;								
+						}break;
+						}
+					}
+				}
+			}
+		} while (!(currCounter == counter));
+	}
+}

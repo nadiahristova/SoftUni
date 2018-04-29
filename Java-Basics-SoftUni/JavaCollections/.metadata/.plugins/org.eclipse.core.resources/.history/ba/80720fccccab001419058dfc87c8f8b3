@@ -1,0 +1,18 @@
+import java.util.*;
+
+
+public class Prob10_ExtractAllUniqueWords {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String line = "Welcome to SoftUni. Welcome to Java.";
+		
+		String[] strArrList1 = line.trim().split("\\s+");		
+		Set<String> set = new HashSet<>();
+		
+		Collections.addAll(set, strArrList1);		
+		
+		for (String word : set) {
+			System.out.print(word + " ");
+		}
+	}	
+}

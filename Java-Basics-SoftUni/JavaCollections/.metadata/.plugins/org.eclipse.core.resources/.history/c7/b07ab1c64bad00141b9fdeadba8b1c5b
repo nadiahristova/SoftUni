@@ -1,0 +1,24 @@
+package exam2;
+
+public class _03_Largest3Rectangulars {
+	public static void main(String[] args) {
+		String input ="[3 x 3] [3 x 2] [4 x 3] [1 x 4] [5 x 3] [3 x 1]".replace(" ", "");
+		String[] rectang = input.split("[\\[\\]x]+");
+		int maxArea = 1;
+		
+		for (int i = 1; i < rectang.length-5; i++) {
+			int a = Integer.parseInt(rectang[i]);
+			int b = Integer.parseInt(rectang[i+1]);
+			int area = a*b;
+			for (int j = 0; j < 2; j++) {
+				int currA = Integer.parseInt(rectang[i+j*2+1]);
+				int currB = Integer.parseInt(rectang[i+j*2+2]);
+				area +=currA * currB;
+			}
+			
+			if (area> maxArea) {
+				maxArea = area;			}
+		}
+		System.out.println(maxArea);
+	}
+}

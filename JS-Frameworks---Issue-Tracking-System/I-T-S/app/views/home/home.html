@@ -1,0 +1,64 @@
+<div class="row" id="home-holder">
+    <div id="home-basic">
+        <div class="well bs-component" id="form-container">
+            <h4 id="nav-tabs">Welcome to Issue Tracker</h4>
+            <hr/>
+            <div class="bs-component">
+                <ul class="nav nav-tabs">
+                    <li class='active'><a href="#login" data-toggle="tab" aria-expanded="false">Login</a></li>
+                    <li><a href="#register" data-toggle="tab" aria-expanded="false">Register</a></li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <br/>
+                    <div class="tab-pane fade in active" id="login">
+                        <form class="form-horizontal" name="loginForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for="loginEmail" class="col-lg-2 control-label">Email</label>
+                                    <div class="col-lg-10">
+                                        <input type="email" ng-model="loginUser.email" id="loginEmail" class="form-control" required="required" placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="loginPassword" class="col-lg-2 control-label">Password</label>
+                                    <div class="col-lg-10">
+                                        <input type="password" ng-model="loginUser.password" class="form-control" id="loginPassword" required="required" minlength="6" maxlength="100" placeholder="Password">
+                                    </div>
+                                </div>
+                                <br/>
+                                <br/>
+                                <button class="btn btn-primary form-btn" ng-click="login(loginUser)" ng-disabled="loginForm.$invalid">Login</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="register">
+                        <form class="form-horizontal" name="registerForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for="registerEmail" class="col-lg-2 control-label">Email</label>
+                                    <div class="col-lg-10">
+                                        <input type="email" ng-model="registerUser.email" class="form-control" id="registerEmail" required="required" placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="registerPassword" class="col-lg-2 control-label">Password</label>
+                                    <div class="col-lg-10">
+                                        <input type="password" ng-model="registerUser.password" class="form-control" id="registerPassword" required="required" minlength="6" maxlength="100" placeholder="Password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="registerConfirmPassword" class="col-lg-2 control-label">Confirm Password</label>
+                                    <div class="col-lg-10">
+                                        <input type="password" ng-model="registerUser.confirmPassword" class="form-control" id="registerConfirmPassword" required="required" minlength="6" maxlength="100" placeholder="Password">
+                                    </div>
+                                </div>
+                                <br/>
+                                <button class="btn btn-primary form-btn" ng-click="register(registerUser)" ng-disabled="registerForm.$invalid || registerUser.confirmPassword != registerUser.password">Register</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

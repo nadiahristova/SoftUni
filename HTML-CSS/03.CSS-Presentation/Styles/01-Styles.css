@@ -1,0 +1,106 @@
+body, div, span, p {
+	padding:0;
+	margin:0;
+	box-sizing: border-box;
+}
+
+div {
+	display:inline-block;
+	text-align:center;	
+}
+
+body > div:first-of-type  {
+	border-top: 5px dotted yellow;
+	border-right: 11px solid green;
+	border-left: 5px dashed red;
+	border-bottom: 7px double blue;
+	margin:20px;
+	padding:5px 20px 20px 20px;	
+	font-family: calibri, monospace;	
+	box-shadow: 15px 15px 5px #3f3f3f;
+	width:515px;	
+}
+
+body > div:first-of-type >  div {
+	border: 2px solid blue;
+	margin-top:15px;
+}
+
+body > div:first-of-type > div > div {
+	border: 2px solid green;	
+}
+
+body > div:first-of-type > div > div > div {
+	border: 2px solid yellow;		
+}
+
+#inner-div{
+	border: 2px solid red;
+	text-transform:none;
+	padding:10px;
+	font-size:1rem;
+	font-weight:normal;
+	letter-spacing:-1px;
+	word-spacing:1pt;
+}
+
+#inner-div > p{	
+	width:100%;
+	display:inline-block;
+	font-size:1.3rem;
+	margin-bottom:10px;		
+}
+
+#inner-div > div{	
+	background-color:#D8921A;
+	margin:1.5px;
+	padding:0 15px 0 15px;
+	border-color:#D8921A;
+	line-height:1.1em;
+	border-style:outset;
+}
+
+body > div:not(#big-div) > span {
+	text-transform:uppercase;
+	font-size:2.6em;
+	text-shadow: 9px 9px 10px #808080;	
+}
+
+.round-borders, #inner-div, .floating-divs  {
+	border-radius:60px;
+}
+
+.floating-divs{
+	background-color:#A0A0A0;
+	opacity:0.75;
+	position:absolute;
+	border: 2px dashed white;
+	box-shadow: 0 0 0 5px #A0A0A0;
+}
+
+#little-bubble {
+	width:17px;
+	height:17px;
+	top:135px;
+	left:415px;	
+}
+
+#middle-bubble {
+	width:25px;
+	height:25px;
+	top:100px;
+	left:455px;	
+}
+
+#big-bubble {
+	color:white;		
+	font-family: tahoma,  monospace;	
+	font-weight: 900;	
+	font-size:1.05rem;	
+	width:100px;
+	height:55px;	
+	top:50px;
+	left:495px;
+	padding-top:5px;	
+	line-height:1.1em;
+}

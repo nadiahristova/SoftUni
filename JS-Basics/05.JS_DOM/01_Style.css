@@ -1,0 +1,52 @@
+* {
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+form{
+	margin: auto;
+	width:25%;
+	min-width:200px;	
+	font-family:Arial;	
+}
+
+	form>header{
+		font-weight:bold;
+		margin-bottom:35px;
+	}
+	
+	form>div {
+		display:block;
+		width:100%; 
+		font-size:0.8em;
+	}
+	
+		input[type=text] {
+			width:100%;
+			display:block;
+		}
+		
+		input[type=date] {
+			width:80%;
+			display:block;
+		}
+		
+		span{
+			color:red;
+		}
+		
+		input[type=submit]{
+			padding:0 5px;
+			margin-right:5px;
+			display:inline-block;
+		}
+		
+		input[type=reset]{		
+			display:inline-block;
+			padding:0 5px;		
+		}
+	
+	#invisible {
+		opacity:0;
+	}

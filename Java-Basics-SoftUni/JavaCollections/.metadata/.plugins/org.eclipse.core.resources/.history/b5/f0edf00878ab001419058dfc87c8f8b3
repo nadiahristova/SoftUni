@@ -1,0 +1,32 @@
+
+public class Prob04_LongestIncreasingSequence {
+	public static void main(String[] args) {
+		String line = "8 9 9 9 -1 5 2 3";
+		String[] strArr = line.trim().split("\\s+");
+		int maxSeqLen = 1;
+		String longestSeq = strArr + " ";		
+		
+		for (int i = 0; i < strArr.length; i++) {
+			int sequenceLength = 1;
+			int counter = 0;
+			int startNum = Integer.parseInt(strArr[i]);
+			String seq = strArr[i] + " ";
+			for (int j = i+1; j < strArr.length; j++) {
+				int currNum = Integer.parseInt(strArr[j]);				 
+				if (startNum < currNum) {
+					seq += strArr[j] + " ";
+					sequenceLength++;
+					if (maxSeqLen < sequenceLength) {
+						maxSeqLen = sequenceLength;
+						longestSeq = seq;
+						counter++;
+					}
+				} else break;
+				startNum = currNum;
+				i+=counter;
+			}
+			System.out.println(seq);
+		}
+		System.out.println("Longest: " + longestSeq);
+	}
+}

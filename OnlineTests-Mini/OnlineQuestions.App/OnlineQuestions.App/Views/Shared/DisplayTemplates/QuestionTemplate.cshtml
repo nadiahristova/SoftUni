@@ -1,0 +1,23 @@
+﻿@model OnlineQuestions.Models.Question
+
+@{
+    ViewBag.Title = "View";
+}
+
+
+<h4 style="margin-top:30px; ">
+    @Html.DisplayFor(model => model.Content)
+</h4>
+<hr/>
+
+<ol type="A">
+    @foreach (var item in Model.Answers)
+    {
+        <li class="btn btn-primary" style="margin:3px">
+            <input type="radio" id="@item.Id" name="toggle" class="toggle-btns-in-group">
+            <span class="glyphicon glyphicon-ok-circle"></span>
+            <label for="@item.Id">@item.Content</label>
+        </li>
+        <br />
+    }
+</ol>

@@ -1,0 +1,23 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
+
+public class aaaaaaaaaaaaa {
+	public static void main(String[] args) {
+		ArrayList<String> listOfUrlsInRecursio = new ArrayList<>(Arrays.asList("1","2","7")); 
+		ArrayList<String> listOfUrls = new ArrayList<>(Arrays.asList("1","5","3"));
+
+		
+		ArrayList<String> mediatorList = new ArrayList<>();			
+		mediatorList.addAll(listOfUrlsInRecursio);		
+		
+		mediatorList.retainAll(listOfUrls);
+		listOfUrlsInRecursio.removeAll(mediatorList);
+		listOfUrls.addAll(listOfUrlsInRecursio);
+		
+//		for(String URL: listOfUrlsInRecursio){
+//			answers.add(String.format("%d level - %s", level, URL));
+//		}
+	}
+
+}

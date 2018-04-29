@@ -1,0 +1,18 @@
+package exam2;
+
+import java.util.Scanner;
+
+public class _01_VideoDurations {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String input = scan.nextLine();
+		int minutes = 0;
+		while (input.equals("End")) {
+			String[] time = input.split("[\\s+:]+");
+			minutes+=Integer.parseInt(time[0])*60 + Integer.parseInt(time[1]);			
+		}
+		
+		System.out.printf("%d:%s",minutes/60,String.format("%2d",minutes%60).replace(" ", "0"));
+	}
+
+}

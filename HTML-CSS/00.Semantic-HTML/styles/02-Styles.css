@@ -1,0 +1,65 @@
+header, body, article, section, ul, li, a, figure {
+	margin:0;
+	padding:0;
+}
+
+main {
+	font-family:Calibri;
+	font-weight:bold;
+	background-color:#FFC0CB;
+	margin:10px;
+	border-radius:10px;
+	overflow:auto;
+	display:block;
+	float:left;
+}
+
+header {
+	font-size:1.4em;
+	font-weight:normal;
+	width: 100%;
+	margin-bottom:2px;	
+}
+
+body main > header {    
+	font-size:2em;
+	font-weight:bold;	
+	text-align:center;
+}
+
+main  > section > figure a > img {
+	width:240px;
+	height:200px;
+}
+
+main > section  {	
+	margin-bottom:10px;
+	float:left;	
+	padding-right:15px;	
+}
+
+main > section:first-of-type  {			
+	padding-left:15px;	
+}
+
+ul li{
+	list-style:none;
+	display:block;
+	width:305px;
+	padding-left:5px;	
+}
+
+ul li:hover, li:active{
+	background-color:black;
+	height:100px;
+	padding-top:25px;
+}
+
+meter {
+	width:200px;
+	height:25px;
+}
+
+audio {	
+	box-shadow: 15px 15px 20px rgba(0,0, 0, 0.4);	
+}

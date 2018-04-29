@@ -1,0 +1,20 @@
+package Exam6;
+
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+
+public class _01_DateTime {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		DateTimeFormatter formatt = DateTimeFormatter.ofPattern("H:mm:ss");
+		LocalTime firs = LocalTime.parse(input.nextLine().trim(),formatt);
+		LocalTime second = LocalTime.parse(input.nextLine().trim(),formatt);
+		long between = Duration.between(second, firs).toMinutes();	
+		System.out.printf("%d:%02d:%02d",between/3600000, (between/3600000)/6000,between%1000);
+		 
+	}
+
+}

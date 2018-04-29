@@ -1,0 +1,48 @@
+div, body {
+	margin:0;
+	padding:0;
+	box-sizing:box-sizing;
+}
+
+@font-face {
+	font-family:Animated;
+	src:url('../img/Animated.ttf');
+}
+
+body > div{
+	width:900px;	
+	height:600px;	
+	background-color:rgba(254, 255, 251, 1);
+	background: -moz-radial-gradient(20% 26%, circle , rgba(254, 255, 251, 1), rgba(0, 98, 219, 1) 72%);
+	background: -webkit-radial-gradient(20% 26%, circle , rgba(254, 255, 251, 1), rgba(0, 98, 219, 1) 72%);
+	background: -o-radial-gradient(20% 26%, circle , rgba(254, 255, 251, 1),  rgba(0, 98, 219, 1) 72%);
+	background: -ms-radial-gradient(20% 26%, circle , rgba(254, 255, 251,1),  rgba(0, 98, 219, 1) 72%);
+	background: radial-gradient(20% 26%, circle , rgba(254, 255, 251, 1),  rgba(0, 98, 219, 1) 72%);
+	background-position: left top;
+	background-repeat:no-repeat;	
+}
+
+div > div {
+	width:900px;	
+	height:600px;
+	background-image: 
+						url('../img/TediHula.png'), 
+						url('../img/AlexHula.png'), 
+						url('../img/VladoKHula.png'), 
+						url('../img/PetiaHula.png'), 
+						url('../img/NakovHula.png'), 
+						url('../img/VladoGHula.png'),
+						url('../img/HawaiiBackground.png');	
+	background-position: 35% 95%, 74% 90%, 97.5% 93%, 28% 85%, 60% 80%, 7% 89%, bottom;
+	background-repeat:no-repeat;		
+}
+
+span {
+	display:inline-block;
+	font-family:animated;
+	font-size:3.1em;
+	color:#FDBC21;
+	margin:10px auto auto 52%;
+	
+}
+

@@ -1,0 +1,33 @@
+package exam2;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class _04_Couple {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String input = scan.nextLine().trim();
+		String[] numsStr = input.split("\\s+");
+		HashMap<String,Integer> couples = new LinkedHashMap<>();
+		int repetit = 0;
+		
+		for (int i = 0; i < numsStr.length-1; i++) {
+			String couple = numsStr[i] + " " + numsStr[i+1];
+			repetit++;
+			if (!couples.containsKey(couple)) {
+				couples.put(couple, 1);
+			} else{
+				int count = couples.get(couple) +1;
+				couples.put(couple, count);
+			}			
+		}
+		
+		for(Map.Entry<String, Integer> info : couples.entrySet()){
+			String couple = info.getKey();
+			int times = info.getValue();
+			System.out.println(String.format("%s -> %.2f%%",couple,times*100.00/repetit));
+		}
+	}
+}

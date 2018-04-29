@@ -1,0 +1,131 @@
+﻿@model OnlineQuestions.App.Models.ViewModels.TestViewModel
+@using PagedList.Mvc;
+@using Newtonsoft.Json
+@using System.Linq
+
+@section Styles {
+    <link href="@Url.Content("~/Content/PagedList.css")" rel="stylesheet" type="text/css" />
+
+    <style type='text/css'>
+        input[type="radio"] {
+            display: none;
+        }
+
+            input[type="radio"]:checked + span + label {
+                font-size: larger;
+                margin-left: 5px;
+            }
+
+        span {
+            visibility: hidden;
+        }
+
+        input[type="radio"]:checked + span {
+            visibility: visible;
+        } 
+
+        #submit-tes #questions-container {
+            float: none;
+            margin: 0 auto;
+        }
+
+        #form-submit {
+            background-color:lightyellow;
+        }
+    </style>
+}
+
+@{
+    ViewBag.Title = "Test";
+}
+
+    <h2 class="text-center">@Model.TestTitle</h2>
+
+<div id="questions-container">
+    @foreach (var item in Model.Questions)
+    {
+        @Html.DisplayFor(modelItem => item, "QuestionTemplate")
+    }
+
+    Page @(Model.Questions.PageCount < Model.Questions.PageNumber ? 0 : Model.Questions.PageNumber) of @Model.Questions.PageCount
+    @Html.PagedListPager(Model.Questions, page => Url.Action("GetTestQuestions", new { testId = Model.TestId, page = page }))
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    <input type="submit" onclick="return submit()" class="btn alert-info" id="form-submit" value="Submit test" disabled/>
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+            var testInfo = JSON.parse(sessionStorage.getItem("testInfo")) || {};
+            var answerId = testInfo[@Model.Questions.FirstOrDefault().Id];
+            if (answerId) {
+                $('#' + answerId).prop("checked", true);
+            }
+
+            checkForTestCompletion();
+        });
+
+        $("input[type=radio]").change(function () {
+            if (this.checked) {
+                var testInfo = JSON.parse(sessionStorage.getItem("testInfo")) || {};
+                testInfo[@Model.Questions.FirstOrDefault().Id] = parseInt($(this).attr('id'));
+                sessionStorage.setItem("testInfo", JSON.stringify(testInfo));
+            }
+
+            checkForTestCompletion();
+         });
+
+        function checkForTestCompletion() {
+            var testInfo = JSON.parse(sessionStorage.getItem("testInfo")) || { };
+            var answeredQuestions = [];
+            $.each(testInfo, function (key, value) {
+                answeredQuestions.push(parseInt(key));
+            });
+
+            var allQuestions = @Html.Raw(JsonConvert.SerializeObject(Model.QuestionIds));
+            var areAllQuestionsAnswered = answeredQuestions.filter(function (elem) {
+                return allQuestions.indexOf(elem) > -1;
+            }).length == allQuestions.length;
+
+            if (areAllQuestionsAnswered) {
+                $("#form-submit").prop('disabled', false).css("background-color", "#E6F3FA");
+            }
+        }
+
+        function submit() {
+
+            var answers = [];
+            $.each(JSON.parse(sessionStorage.getItem("testInfo")), function (key, value) {
+                answers.push(
+                    {
+                        questionId: parseInt(key),
+                        answerId: value
+                    }
+                )
+            });
+
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+
+            $.ajax({
+                type: "POST",
+                url: "/Test/SubmitTest",
+                data: {
+                    __RequestVerificationToken: token,
+                    testId: parseInt(@Model.TestId),
+                    answers: answers
+                },
+                dataType: "json",
+                success: function (data, textStatus) {
+                    alert("Test successfully finished.");
+                    window.location.href = data.url;
+                }
+            });
+        }
+    </script>
+    }

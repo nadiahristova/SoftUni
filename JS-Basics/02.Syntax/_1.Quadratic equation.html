@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Data Types and Variables</title>
+</head>
+
+<body>
+	<h1>Take a look at the Console</h1>
+	<script>
+	var val1 = prompt("a:");
+	var val2 = prompt("b:");
+	var val3 = prompt("c:");
+	function euqationSolver(a,b,c){
+		var d = Math.pow(b, 2)-4*a*c;
+		if(d<0){
+			alert("The equation has no real roots.");
+		} else if(d==0) {
+			var x = (-b)/(2*a);
+			alert("x = " + x);
+		} else {
+			var x1 = (-b+Math.pow(d,0.5))/(2*a);
+			var x2 = (-b-Math.pow(d,0.5))/(2*a);
+			alert("x1 = " + x1 + ", x2 = " + x2);
+		}		
+	}
+	
+	euqationSolver(val1,val2,val3);
+	</script>
+</body>
+
+</html>

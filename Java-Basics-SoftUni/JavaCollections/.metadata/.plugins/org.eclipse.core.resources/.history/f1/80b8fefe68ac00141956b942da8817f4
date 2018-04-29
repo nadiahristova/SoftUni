@@ -1,0 +1,39 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
+
+public class aaaaaaaaaaaaa {
+	public static void main(String[] args) {
+		ArrayList<String> listOfUrlsInRecursio = new ArrayList<>(Arrays.asList("1","2","7")); 
+		ArrayList<String> listOfUrls = new ArrayList<>(Arrays.asList("1","5","3"));
+//		ArrayList<String> listOfUrlsPerCurrURL = retrieveUrls(listOfUrlsInRecursio);
+//		listOfUrlsInRecursio.clear();
+//		for(String subURL : listOfUrlsPerCurrURL){
+//			listOfUrlsInRecursio.add(subURL);
+//		}
+		
+//		ArrayList<String> joinedList = new ArrayList<>();		
+//		ArrayList<String> arrList2 = new ArrayList<>();
+//		ArrayList<String> middleList = new ArrayList<>();
+//		
+//		joinedList.addAll(Arrays.asList(strArrList1));
+//		arrList2.addAll(Arrays.asList(strArrList2));
+//		middleList.addAll(Arrays.asList(strArrList2));		
+//		
+//		arrList2.retainAll(joinedList);
+//		middleList.removeAll(arrList2);
+//		joinedList.addAll(middleList);
+		
+		ArrayList<String> mediatorList = new ArrayList<>();			
+		mediatorList.addAll(listOfUrlsInRecursio);		
+		
+		mediatorList.retainAll(listOfUrls);
+		listOfUrlsInRecursio.removeAll(mediatorList);
+		listOfUrls.addAll(listOfUrlsInRecursio);
+		
+//		for(String URL: listOfUrlsInRecursio){
+//			answers.add(String.format("%d level - %s", level, URL));
+//		}
+	}
+
+}

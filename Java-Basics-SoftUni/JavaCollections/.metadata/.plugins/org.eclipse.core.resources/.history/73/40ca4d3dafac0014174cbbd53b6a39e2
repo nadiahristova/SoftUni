@@ -1,0 +1,47 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Prob14_StuckNumbers {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		
+		int countNum = Integer.parseInt(input.nextLine());		
+		int[] nums = new int[countNum];
+		int counter = 0;
+		for (int i = 0; i < countNum; i++) {
+			nums[i] = input.nextInt();
+		}		
+
+		for (int ia = 0; ia < nums.length; ia++) {
+			for (int ib = 0; ib < nums.length; ib++) {
+				for (int ic = 0; ic < nums.length; ic++) {
+					for (int id = 0; id < nums.length; id++) {
+						int a = nums[ia];
+						int b = nums[ib];
+						int c = nums[ic];
+						int d = nums[id];
+						if (a != b && a != c & a != d && b != c && b != d
+								&& c != d) {
+							String first = "" + a + b;
+							String second = "" + c + d;
+							if (first.equals(second)) {
+								System.out.println(nums[ia] + "|" + nums[ib]
+										+ "==" + nums[ic] + "|" + nums[id]);
+								counter++;
+							}
+
+						}
+					}
+				}
+			}
+		}
+		
+		if (counter == 0) {
+			System.out.println("No");
+		}
+	}
+}

@@ -1,0 +1,41 @@
+package Exam4;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class _01_Pyramid {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		int n = Integer.parseInt(scan.nextLine());
+		int num = Integer.MIN_VALUE;
+		ArrayList<Integer> answers = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			String[] strArr = scan.nextLine().split("\\s+");
+			boolean found =false;
+			int currNum = Integer.parseInt(strArr[1]);
+			for (int j = 2; j < strArr.length; j++) {				
+				if ((currNum > num)) {
+					found = true;
+				}
+				int bla = Integer.parseInt(strArr[j]);
+				if (bla<currNum) {
+					currNum = bla;
+				}
+			}
+			if (!found) {
+				num++;
+			} else {
+				num = currNum;
+				answers.add(num);
+			}
+		}
+		boolean first = true;
+		for (int nums:answers) {
+			if(!first){
+				System.out.print(", ");
+			}
+			System.out.print(nums);
+			first=false;
+		}
+	}
+}

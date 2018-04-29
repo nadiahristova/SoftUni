@@ -1,0 +1,9 @@
+
+public class Prob05_CountAllWords {
+	public static void main(String[] args) {
+		String text = "Java is a set of several computer software products and specifications from Oracle Corporation that provides a system for developing application software and deploying it in a cross-platform computing environment. Java is used in a wide variety of computing platforms from embedded devices and mobile phones on the low end, to enterprise servers and supercomputers on the high end.";
+		String[] words = text.trim().split("\\W+");
+		//String[] words = text.trim().split("[^a-zA-z]+");
+		System.out.println(words.length);
+	}	
+}

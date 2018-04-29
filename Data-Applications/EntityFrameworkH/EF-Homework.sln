@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1.EF-Homework", "EF-Homework\1.EF-Homework.csproj", "{F7A1FFD2-3E90-4C6A-88A5-937BC1E5813A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "3.DatabaseSearchQueries", "DatabaseSearchQueries\3.DatabaseSearchQueries.csproj", "{E637E2B2-84D3-4891-B6F0-6FBC8BCF6042}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2.DAO_Test", "2.DAO_Test\2.DAO_Test.csproj", "{68F2AD8E-E5ED-457F-B6DC-D57F2459B694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4.NativeSQLQuery", "4.NativeSQLQuery\4.NativeSQLQuery.csproj", "{D1DF5840-9E1C-4794-9378-C3DC49F3DC47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5.ConcurrentDatabaseChangesEF", "5.ConcurrentDatabaseChangesEF\5.ConcurrentDatabaseChangesEF.csproj", "{702C4A68-26D8-4CEB-A864-2744DCD23777}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "6.CallStoredProcedure", "6.CallStoredProcedure\6.CallStoredProcedure.csproj", "{A2D92D33-98CF-4125-B54F-E7ADC6BEBE67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7A1FFD2-3E90-4C6A-88A5-937BC1E5813A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7A1FFD2-3E90-4C6A-88A5-937BC1E5813A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7A1FFD2-3E90-4C6A-88A5-937BC1E5813A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7A1FFD2-3E90-4C6A-88A5-937BC1E5813A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E637E2B2-84D3-4891-B6F0-6FBC8BCF6042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E637E2B2-84D3-4891-B6F0-6FBC8BCF6042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E637E2B2-84D3-4891-B6F0-6FBC8BCF6042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E637E2B2-84D3-4891-B6F0-6FBC8BCF6042}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68F2AD8E-E5ED-457F-B6DC-D57F2459B694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68F2AD8E-E5ED-457F-B6DC-D57F2459B694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68F2AD8E-E5ED-457F-B6DC-D57F2459B694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68F2AD8E-E5ED-457F-B6DC-D57F2459B694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1DF5840-9E1C-4794-9378-C3DC49F3DC47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1DF5840-9E1C-4794-9378-C3DC49F3DC47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1DF5840-9E1C-4794-9378-C3DC49F3DC47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1DF5840-9E1C-4794-9378-C3DC49F3DC47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{702C4A68-26D8-4CEB-A864-2744DCD23777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{702C4A68-26D8-4CEB-A864-2744DCD23777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{702C4A68-26D8-4CEB-A864-2744DCD23777}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{702C4A68-26D8-4CEB-A864-2744DCD23777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2D92D33-98CF-4125-B54F-E7ADC6BEBE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2D92D33-98CF-4125-B54F-E7ADC6BEBE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2D92D33-98CF-4125-B54F-E7ADC6BEBE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2D92D33-98CF-4125-B54F-E7ADC6BEBE67}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

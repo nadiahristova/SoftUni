@@ -1,0 +1,76 @@
+<div class="row">
+    <div id="home-basic4"">
+        <div class="well bs-component">
+            <h5 id="nav-tabs">View issue</h5>
+            <hr/>
+            <form class="form-horizontal" name="addIssueForm">
+                <fieldset>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <div class="infoP">
+                            {{issue.Title}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Description</label>
+                        <div class="infoP">
+                            {{issue.Description}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Assignee <span>(current ID: {{issue.Assignee.Id}})</span></label>
+                        <div class="infoP">
+                            {{issue.Assignee.Username}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Priority <span>(current ID: {{issue.Priority.Id}})</span></label>
+                        <div class="infoP">
+                            {{issue.Priority.Name}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Due Date</label>
+                        <div class="infoP">
+                            {{issue.DueDate}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Author</label>
+                        <div class="infoP">
+                            {{issue.Author.Username}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Project</label>
+                        <div class="infoP">
+                            {{issue.Project.Name}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label >Labels</label>
+                        <div class="infoP">
+                            {{labels}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="status" >Status</label>
+                        <div ng-show="statuses.length > 1">
+                            <select id="status"
+                                    ng-options="status.Name for status in statuses track by status.Id"
+                                    ng-model="currStatus"></select>
+                            </select>
+                        </div>
+                        <div class="infoP" ng-show="statuses.length <= 1">
+                            {{currStatus.Name}}
+                        </div>
+                    </div>
+                    <br/>
+                    <button class="btn btn-primary" ng-click="changeIssueStatus()"
+                            ng-disabled="statuses.length <= 1 || !(isCurrUserAdmin || userID == assigneeId || userID == projectLeader)">Change Status</button>
+                    <a class="btn btn-success" ng-if="isCurrUserAdmin || userID === projectLeader" href="#/issues/{{issue.Id}}/edit">Edit Issue</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

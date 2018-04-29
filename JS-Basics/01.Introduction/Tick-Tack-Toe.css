@@ -1,0 +1,46 @@
+*, table{
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+input[type="button"] {
+	width:100%;
+	font-size:80px;
+	background-color:white;
+	border:5px solid black;		
+	outline:none;
+	height:100px;
+}
+
+input[type="button"]:hover {
+	cursor:pointer;
+}
+
+table, section {	
+	float:left;
+}
+
+section {
+	width:250px;
+	margin-left:45px;
+}
+
+p,h1{
+	padding-top:25px;
+	position:relative;	
+	font-family:Tahoma;	
+	font-weight:bold;
+	text-align:center;
+}
+
+p > span {
+	color:#02CF07;
+}
+
+span.player {
+	color:gray;
+	text-transform: capitalize;
+	text-shadow: 2px 2px 2px #009FFF;
+	font-size:1.2em;
+}

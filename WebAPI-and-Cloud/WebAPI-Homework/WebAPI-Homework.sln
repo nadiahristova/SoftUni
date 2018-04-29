@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookShopSystem.Models", "BookShopSystem.Models\BookShopSystem.Models.csproj", "{F709FF9B-4D64-45E9-851C-767284C2D5D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookShopSystem.Data", "BookShopSystem.Data\BookShopSystem.Data.csproj", "{EAD9D41B-78F7-4EE8-BF0D-B1E11D638C43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookShopSystem.Services.WebAPI", "BookShopSystem.Services.WebAPI\BookShopSystem.Services.WebAPI.csproj", "{ACD78C8C-F9B1-4F6C-B3F9-A2DF59C3FC1B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F709FF9B-4D64-45E9-851C-767284C2D5D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F709FF9B-4D64-45E9-851C-767284C2D5D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F709FF9B-4D64-45E9-851C-767284C2D5D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F709FF9B-4D64-45E9-851C-767284C2D5D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD9D41B-78F7-4EE8-BF0D-B1E11D638C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD9D41B-78F7-4EE8-BF0D-B1E11D638C43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD9D41B-78F7-4EE8-BF0D-B1E11D638C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD9D41B-78F7-4EE8-BF0D-B1E11D638C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACD78C8C-F9B1-4F6C-B3F9-A2DF59C3FC1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACD78C8C-F9B1-4F6C-B3F9-A2DF59C3FC1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACD78C8C-F9B1-4F6C-B3F9-A2DF59C3FC1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACD78C8C-F9B1-4F6C-B3F9-A2DF59C3FC1B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,24 @@
+import java.util.regex.Pattern;
+
+
+public class Prob06_CountSpecifiedWord {
+	public static void main(String[] args) {
+		String line = "Welcome to the Software University (SoftUni)! Welcome to programming.";
+		String wordToMatch = "welcome";
+		String[] words = line.trim().split("\\W+");
+		int count = 0;// var1
+		String regex = ".*"+wordToMatch.toLowerCase()+".*"; // var2
+		int countMatch = 0;//var2
+		for (int i = 0; i < words.length; i++) {			
+			if (words[i].toLowerCase().contains(wordToMatch.toLowerCase())) { //var1
+				count++;
+			}			
+			if (Pattern.matches(regex, words[i].toLowerCase())) {//var2
+				countMatch++;
+			}
+		}
+		System.out.println(count);//var1
+		System.out.println(countMatch);//var2
+	}
+
+}

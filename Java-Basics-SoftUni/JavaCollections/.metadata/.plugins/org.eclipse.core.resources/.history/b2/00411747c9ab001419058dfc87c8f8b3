@@ -1,0 +1,29 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.*;
+
+
+public class gddgfgd {
+	public static void main(String[] args) {
+		String list1 = "h e l l o";
+		String list2 = "l o w";
+		String[] strArrList1 = list1.trim().split("\\s+");		
+		String[] strArrList2 = list2.trim().split(" ");
+		
+		ArrayList<String> joinedList = new ArrayList<>();
+		ArrayList<String> l1 = new ArrayList<>();
+		ArrayList<String> l2 = new ArrayList<>();		
+		l1.addAll(Arrays.asList(strArrList1));
+		l2.addAll(Arrays.asList(strArrList2));
+		//joinedList.addAll(Arrays.asList(strArrList2));
+		l1.retainAll(Arrays.asList(strArrList2));
+		l2.removeAll(l1);
+		joinedList.addAll(l2);
+		
+		for (String letter:joinedList) {
+			System.out.println(letter + " ");
+		}
+	}	
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>WordPress Theme</title>
+		<meta charset="UTF-8">
+		<link href="Styles/04-Styles.css" rel="stylesheet">
+	</head>
+	
+	<body>
+		<form method="get" action="#">
+			<header>
+				<h1>fakebook<span>&#174;</span></h1>
+				<h3>Registration</h3>
+				<h5>It is safe and it will olways be!</h5>
+			</header>
+				<section>
+					<fieldset>
+						<legend>None-Important Information</legend>
+						<input type="text" placeholder="First Name" id="first-name" name="first-name" pattern="[a-zA-Z]+" autocomplete onfocus/>
+						<input type="text" placeholder="Last Name" id="last-name" name="last-name" pattern="[a-zA-Z]+"   autocomplete/>
+						
+						<input type="email" placeholder="Your Email" id="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" autocomplete/>
+						<input type="tel" placeholder="Phone Number" id="phone" name="phone" pattern="00359[0-9]{9}" autocomplete/>
+						
+						<input type="pasword" placeholder="Password" id="password" name="password" autocomplete />
+						<input type="url" placeholder="Website" id="website" name="website" pattern="(https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]" autocomplete />
+						
+						<label for="BD">Birthday</label> <br />
+						<input type="datetime" id="BD" name="bd"> <br />
+						
+						<div>
+							<input type="radio" id="female" name="sex" value="f" class="inline-radio"/>
+							<label for="female" class="inline">Female</label>
+							<input type="radio" id="male" name="sex" value="m" class="inline-radio"/>
+							<label for="male" class="inline">Male</label>
+							<input type="radio" id="other" name="sex" value="other" checked="checked" class="inline-radio" />
+							<label for="other" class="inline">Other</label>
+						</div>
+					</fieldset>
+					
+					<input type="reset" value="Clear Form">
+				</section>
+				
+					<section>
+					<fieldset>
+						<legend>Important Information *required</legend>
+						<select name="country" id="country" required="true" tabindex="2">
+							<option disabled checked>Country</option>
+							<option>Bulgaria</option>
+							<option>England</option>
+							<option>Portugal</option>
+						<select>
+						<input type="text" placeholder="Village" id="village" name="village" pattern="[A-Z][a-z]+" autocomplete required="true" tabindex="3"/>
+						<input type="text" placeholder="District" id="district" name="district" pattern="[A-Z][a-z]+" autocomplete  required="true" tabindex="4"/>
+						
+						<input type="text" placeholder="Street" id="street" name="street" pattern="[A-Z][a-z ]+" autocomplete required="true" tabindex="5"/>
+						<input type="text" placeholder="Nr" id="nr" name="nr" pattern="[0-9]+" autocomplete  required="true" tabindex="6"/>
+						<input type="text" placeholder="Floor" id="floor" name="floor" pattern="[0-9]+" autocomplete required="true" tabindex="7"/>
+						<input type="text" placeholder="Ap Nr" id="ap-nr" name="ap-nr" pattern="[0-9]+[a-zA-Z]" autocomplete  required="true" tabindex="8"/>					
+						<label for="door-color">Door Color</label> <br />
+						<input type="color" id="door-color" value="#FF80C0" tabindex="9" />
+						<input type="text" placeholder="Water Meter Nr" id="wm-nr" name="wm-nr" pattern="[0-9]+" autocomplete  required="true" tabindex="1" tabindex="10"/>
+						<input type="number" id="anties" min="0" value="Aunt Panties'Size" required="true" tabindex="0">
+						
+						<label for="mooore">More Personal Information</label><br />
+						<textarea id="mooore" name="more-info" tabindex="11" required="true">Give us more information!!!</textarea>
+					</fieldset>
+					
+					<input type="submit" value="Register">
+				</section>
+		</form>
+	</body>
+</html>

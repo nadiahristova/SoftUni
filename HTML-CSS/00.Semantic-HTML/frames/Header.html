@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Header</title>
+	<style>
+	header, body, h1, button, input, form, ul, li {
+		padding:0;
+		margin:0;
+	}
+	body {
+		font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	}
+	h1{
+		font-weight:normal;		
+		margin:10px auto 25px 55px;
+	}
+	a {			
+		text-decoration:none;
+		color:gray;
+	}
+	ul li{
+		list-style:none;
+		display:inline;
+		padding-left:45px;
+	}
+	input[type="text"]{
+		text-indent:7px;
+		display:inline;
+		float:right;
+		width:150px;
+		height:20px;
+		border-right:none;
+			
+	}
+	button {		
+		height:25px;
+		width:25px;
+		float:right;
+		display:inline;		
+		border: solid 0.1em lightgray;
+			
+		margin-right:40px;
+		background-image: url("../img/glass.png");
+		background-repeat:no-repeat;	
+	}
+	nav {
+		width:100%;
+	}
+	form {
+		display:inline;		
+	}
+	hr {
+		color:lightgray;
+		size:1px;
+		width:95%;
+	}
+	</style>
+</head>
+
+<body>
+	<h1>BGJUG - Bulgarian Java User Group</h1>
+	
+	<nav>
+		<ul>
+			<li><a href="#">ABOUT</a></li>
+			<li><a href="#">EVENTS</a></li>
+			<li>
+				<a href="#">CONTACTS</a> 
+				<form>
+					<button type="submit"></button>
+					<input type="text" placeholder="Search">			
+				</form>
+			</li>		
+		</ul>		
+	</nav>
+	<hr />	
+</body>
+</html>

@@ -1,0 +1,150 @@
+form, label, div, input, button, table, tr, td, ul, li {
+	padding:0;
+	margin:0;
+	box-sizing:border-box;		
+}
+
+form {
+	background: rgba(162,191,221,1);
+	background: -moz-linear-gradient(top, rgba(162,191,221,1) 0%, rgba(162,191,221,1) 11%, rgba(255,255,255,1) 29%, rgba(191,213,237,1) 30%, rgba(191,213,237,1) 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(162,191,221,1)), color-stop(11%, rgba(162,191,221,1)), color-stop(29%, rgba(255,255,255,1)), color-stop(30%, rgba(191,213,237,1)), color-stop(100%, rgba(191,213,237,1)));
+	background: -webkit-linear-gradient(top, rgba(162,191,221,1) 0%, rgba(162,191,221,1) 11%, rgba(255,255,255,1) 29%, rgba(191,213,237,1) 30%, rgba(191,213,237,1) 100%);
+	background: -o-linear-gradient(top, rgba(162,191,221,1) 0%, rgba(162,191,221,1) 11%, rgba(255,255,255,1) 29%, rgba(191,213,237,1) 30%, rgba(191,213,237,1) 100%);
+	background: -ms-linear-gradient(top, rgba(162,191,221,1) 0%, rgba(162,191,221,1) 11%, rgba(255,255,255,1) 29%, rgba(191,213,237,1) 30%, rgba(191,213,237,1) 100%);
+	background: linear-gradient(to bottom, rgba(162,191,221,1) 0%, rgba(162,191,221,1) 11%, rgba(255,255,255,1) 29%, rgba(191,213,237,1) 30%, rgba(191,213,237,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a2bfdd', endColorstr='#bfd5ed', GradientType=0 );	
+	border-radius:5px;	
+	display:inline-block;
+	overflow:auto;
+	padding:7px;
+	float:left;
+	font-family:consolas;	
+}
+
+header >span {
+	
+}
+
+ul li {
+	list-style:none;
+	display:inline;
+	padding-left:5px;
+}
+
+div.wrapper ul li {
+	display:block;
+}
+
+a {
+	text-decoration:none;	
+	color:black;
+}
+
+label {
+	padding-left:3px;
+	color:#004FA7;
+	font-size:0.8rem;
+vertical-align:center;
+}
+
+input[type="radio"] {
+	margin-top:5px;
+}
+header button {
+	width:32px;
+	height:16px;
+	float:right;
+	padding-right:5px;
+}
+
+header > span::before {
+	content: url('../img/calc.png');
+	padding-right:5px;
+	float:left;
+}
+
+nav, div#upper, div#lower{
+	background-color:white;
+	width:100%;
+	float:left;
+	display:block;
+	border-radius:2px;
+}
+
+nav {
+	margin-bottom:2px;
+	display:inline-block;
+	overflow:auto;
+	float:left;
+}
+
+#display {
+	height:53px;
+	text-align:right;	
+	padding-right:5px;
+	font-size:1.8rem;
+	font-family:consolas;
+	margin-bottom:5px;	
+	border:1px solid rgba(65,105,160,0.4);
+	margin:7px;
+	display:block;
+}
+
+#upper:nth-child(2) {
+	border:1px solid rgba(65,105,160,0.4);
+	
+}
+
+div#upper > div div{
+	display:inline-block;
+	overflow:auto;
+	float:left;	
+	width:38px;
+	margin-left:7px;	
+}
+
+div#upper > div > div > input{
+	display:inline;
+	border:none;
+	height:17px;
+	width:35px;
+	margin-bottom:1px;
+	color:#004FA7;
+	font-family:consolas;	
+}
+
+div#lower > div {
+	float:left;
+	display:inline-block;
+	width:70px;	
+	margin:7px 7px 2px 7px;
+}
+
+#lower  div div {
+	float:left;	
+	width:100%;
+	margin-bottom:5px;
+	border:1pt solid gray;
+	border-radius:5px;
+}
+
+table {
+	float:left;
+	display:inline;
+	overflow:auto;
+}
+
+div.wrapper {
+	border:1px solid rgba(65,105,160,0.4);
+	margin:15px;
+	overflow:auto;
+}
+
+buttons {
+	width:100%;
+	height:100%;
+}
+
+td {
+	border:none;
+}

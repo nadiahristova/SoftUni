@@ -1,0 +1,130 @@
+form, span, p, input, label, header {
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+form {
+	background-image: url("../img/formBackground.jpg");
+	background-repeat:repeat-y;
+	border-radius:5px;	
+	display:inline-block;
+	overflow:auto;
+	font-family:calibri;
+	padding:15px;	
+}
+
+section {
+	margin-bottom:10px;
+}
+
+header {
+	color:white;
+	text-align:left;
+	font-weight:bold;
+	margin-bottom:10px;
+}
+
+div {
+	width:325px;
+	background-color: rgba(255, 255, 255, 0.4);
+	border-radius:5px;
+	border:1pt solid rgba(255, 255, 255, 0.5);
+	margin-bottom:2px;
+	vertical-align:center;
+	padding:7px 7px 5px 7px;
+	overflow:auto;		
+}
+
+div > label, div.checker > span{
+	float:left;	
+	font-size:0.9rem;
+	opacity:0.8;
+	letter-spacing:-1px;
+}
+
+input[type="tel"], input[type="email"], input[type="text"], textarea {
+	margin-right:45px;
+	border-radius:3px;
+	width:170px;
+	opacity:1;
+	text-indent: 5px;
+	background-color:white;
+	display:block;
+	float:right;
+	border:none;
+	transition: box-shadow 0.7s, border 0.3s;	
+}
+
+input:not([type="radio"]):not([type="button"]):focus, textarea:focus {
+	background: #fff;	
+    box-shadow: 0 0 0 1px orange, inset 0 2px 3px rgba( 0, 0, 0, 0.2 ), 0px 5px 5px rgba( 0, 0, 0, 0.15 );
+    outline: none;	
+}
+
+input:not([type="radio"]):not([type="button"]):hover, textarea:hover {
+	width:180px;
+	border:1px solid yellow;
+	margin-right:40px;
+}
+
+input[type="button"] {
+	outline:outline;
+}
+
+textarea {
+	height:75px;
+	margin-bottom:5px;
+	box-sizing:border-box;	
+}
+
+input {
+	height:1.6em;
+}
+
+input[type="button"] {
+	width:85px;
+	height:25px;
+	background-color:#04152F;
+	border-radius:55px;
+	color:rgba(255, 255, 255, 0.8);
+	border:#04152F;
+	font-size:0.75rem;	
+}
+
+div.checker > span{
+	text-align:left;
+	font-size:0.9rem;
+	opacity:0.8;
+	letter-spacing:-1px;
+	margin-bottom:7px;	
+}
+
+input#visa + label::before{
+	content: url("../img/visa.png");
+	float:left;
+	margin:auto 2px auto 2px;
+}
+
+input#amex + label::before{
+	content: url("../img/amex.png");
+	float:left;
+	margin:auto 2px auto 2px;
+}
+
+input#mastercard + label::before{
+	content: url("../img/mastercard.png");
+	float:left;
+	margin:auto 2px auto 2px;
+}
+
+input[type="radio"] {
+	float:left;
+	margin: -2px 0 0 28px;
+}
+
+div.checker > div {
+	float:right;
+	background-color:rgba(255, 255, 255, 0);
+	border:none;
+}

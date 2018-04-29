@@ -1,0 +1,35 @@
+package exam2;
+
+import java.util.Scanner;
+
+public class _02_PythagorianNums {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		int n = Integer.parseInt(input.nextLine());
+		int[] nums = new int[n];
+		boolean hasPythagor = false;
+		
+		for (int i = 0; i < n; i++) {
+			nums[i] = input.nextInt();
+		}
+		
+		for (int indexA = 0; indexA < nums.length; indexA++) {
+			for (int indexB = 0; indexB < nums.length; indexB++) {
+				for (int indexC = 0; indexC < nums.length; indexC++) {
+					if (nums[indexA] <= nums[indexB]
+							&& (nums[indexA] * nums[indexA] + nums[indexB]
+									* nums[indexB] == nums[indexC]
+									* nums[indexC])) {
+						System.out.printf("%1$d*%1$d + %2$d*%2$d = %3$d*%3$d\n",nums[indexA],nums[indexB],nums[indexC]);
+						hasPythagor = true;
+					}
+				}
+			}
+		}
+		
+		if (!hasPythagor) {
+			System.out.println("No");
+		}
+	}
+
+}

@@ -1,0 +1,39 @@
+package Exam6;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class hdhdh {
+public static void main(String[] args) {
+	ArrayList<Integer> list = new ArrayList<>();
+	Scanner scan = new Scanner(System.in);
+	int[] nums = new int[3];
+	int d = scan.nextInt();
+	scan.nextLine();
+	String line = scan.nextLine();
+	int maxSum = Integer.MIN_VALUE;
+	while (!line.equals("End")) {
+		list.add(Integer.parseInt(line));
+		line = scan.nextLine();
+	}
+	for (int i = 0; i < nums.length; i++) {
+		for (int f = i+1; f < nums.length; f++) {
+			for (int j = f+1; j < nums.length; j++) {
+				int a = list.get(i);
+				int b = list.get(f);
+				int c = list.get(j);
+				int sum = a+b+c;
+				if (sum % d == 0) {
+					if (sum>maxSum) {
+						nums[0] = a;
+						nums[1] = b;
+						nums[2] = c;
+						maxSum = sum;
+					}
+				}
+			}
+		}
+	}
+	System.out.printf("(%d + %d + %d) %% %d = 0",nums[0],nums[1],nums[2],d);
+}
+}

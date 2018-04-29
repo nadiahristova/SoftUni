@@ -1,0 +1,11 @@
+path of the folder that contains the source code ~> /home/nadia/java/Intro-Java-Homework/src
+First we enter this folder with the help of << The Terminal >> . The command is: cd /home/nadia/java/Intro-Java-Homework/src
+If we want to view the source code in the file we use the command: cat SumTwoNumbers.java
+
+Second we'll have to compile the existing SumTwoNumbers.java program in order to create an executable by Linux code.
+We use the command: javac SumTwoNumbers.java
+After this command a new file is created SumTwoNumbers.class. We can see it if we demand a list of the items in the currant folder.
+In order to do that we use the command: ls -al. 
+
+After we are convinced that the file SumTwoNumbers.class exists in the folder, we execute it. 
+The third command should be: java SumTwoNumbers

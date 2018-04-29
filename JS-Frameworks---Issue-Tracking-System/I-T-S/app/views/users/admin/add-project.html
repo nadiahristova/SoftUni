@@ -1,0 +1,52 @@
+<div class="row">
+    <div id="home-basic3">
+        <div class="well bs-component">
+            <h5 id="nav-tabs">New project</h5>
+            <hr/>
+            <form class="form-horizontal" name="addProjectForm">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="projectName">Name*</label>
+                        <div class="infoP">
+                            <input type="text" ng-model="project.Name" class="form-control" id="projectName" required="required" minlength="3" placeholder="Project Name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" >Description*</label>
+                        <div class="infoP">
+                            <input ng-model="project.Description" class="form-control" id="description" required="required" minlength="3" placeholder="Description">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectKey">ProjectKey</label>
+                        <div class="infoP">
+                            <input value="{{genProjectKey(project.Name) | uppercase}}" class="form-control" id="projectKey" required="required" placeholder="Project Key" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="labels">Labels</label>
+                        <div class="infoP">
+                            <input ng-model="project.Labels" class="form-control" id="labels" placeholder="Labels (separated by comma)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="priorities">Priorities</label>
+                        <div class="infoP">
+                            <input ng-model="rawPriorities" class="form-control" id="priorities" placeholder="Priorities (separated by comma)">
+                        </div>
+                    </div>
+                    <label for="priorities">Assign Leader</label><br/>
+                    <input-dropdown
+                            id="inp2"
+                            filter-list-method="filterInput(userInput)"
+                            selected-item="selectedDropdownItem"
+                            default-dropdown-items="availableOptions">
+                    </input-dropdown>
+                    <br/>
+                    <br/>
+                    <button class="btn btn-primary" ng-click="addProject(project)" ng-disabled="addProjectForm.$invalid">Add Project</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

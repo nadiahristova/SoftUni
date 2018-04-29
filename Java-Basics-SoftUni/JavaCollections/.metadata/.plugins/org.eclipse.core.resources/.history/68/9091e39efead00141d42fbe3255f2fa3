@@ -1,0 +1,21 @@
+package exam5;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _03_ValidUsernames {
+	public static void main(String[] args) {
+		String str = "ds3bhj y1ter/wfsdg 1nh_jgf ds2c_vbg\\4htref";
+		String[] usernames = str.split("[ \\.\\\\/()]+");
+		String regex = "[a-zA-z]+";
+		Pattern pattern = Pattern.compile(regex);
+		for (int i = 0; i < usernames.length; i++) {
+			Matcher match = pattern.matcher(usernames[i]);
+			if (match.find()) {
+				
+			
+		}
+		
+	}
+	}
+}

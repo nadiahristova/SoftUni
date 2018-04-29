@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Simple Form</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="Styles/01-Styles.css">
+	</head>
+	
+	<body>
+		<section>
+			<header>
+				<h2>Enter the system</h2>
+				<span>It is necessary to login in Your account in order to sign in for a course.</span>
+			</header>
+			
+			<div>
+				<form method="get" action="#" class="registration-form">
+					<fieldset>
+						<legend> <span>are you new?</span> register</legend>
+						<input type="text" placeholder="User name" id="username-created" name="username-created" /> 
+						<input type="email" placeholder="Email" id="email" name="email" /> 
+						<input type="password" placeholder="Password" id="password-created" name="password-created" />
+						<input type="password" placeholder="Confirm Password" id="password-created-confirmation" name="password-created-confirmation" />
+						<input type="submit" value="Register" id="create-new-account" name="create-new-account" />
+					</fieldset>
+				</form>
+			</div>
+			
+			<div>
+				<form method="get" action="#" class="login-form">
+					<fieldset>
+						<legend>already a student? login</legend>
+						<input type="text" placeholder="User name" id="login-username" name="login-username"/>
+						<input type="password" placeholder="Password" id="login-password" name="login-password"/>
+						<input type="checkbox" id="checkbox-remember-past-login" name="remember-past-login" value="yes"/>
+						<label for="checkbox-remember-past-login">Remember me?</label>
+						<div>
+							<input type="submit" value="Login" id="login" name="login" /> <br />
+							<a href="#">Forgot Password</a>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</section>
+	</body>
+</html>

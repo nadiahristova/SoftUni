@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Website Footer</title>
+		<meta charset="UTF-8" />
+		<link href="Styles/02-Styles.css" rel="stylesheet" />
+		<link href="img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	</head>
+
+	<body>		
+		<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/bg_BG/sdk.js#xfbml=1&version=v2.0";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+		</script>
+		
+		<footer>
+			<div>
+				<input type="button" value="Apply Now" onclick="parent.location='https://softuni.bg/users/candidate/register/'"/><input type="button" value="Fast track courses" onclick="parent.location='https://softuni.bg/trainings/specialized'"/>
+			</div>
+			
+			<div>
+				<header>about the university</header>
+				<ul>
+					<li><a href="https://softuni.bg/about">About</a></li>
+					<li><a href="https://softuni.bg/professions">Professions</a></li>
+					<li><a href="https://softuni.bg/plans">Plans</a></li>
+					<li><a href="https://softuni.bg/university/companies/partners">Partner Universities</a></li>
+					<li><a href="https://softuni.bg/trainers">Trainers</a></li>
+					<li><a href="https://softuni.bg/specialties">Dorms</a></li>
+					<li><a href="https://softuni.bg/apply">Apply</a></li>
+				</ul>
+			</div>
+			
+			<div>
+				<header>нашите приятели</header>
+				<ul>
+					<li><a href="http://nakov.com/">Svetlin Nakov Blog</a></li>
+					<li><a href="http://www.introprogramming.info/">C# book</a></li>					
+				</ul>
+			</div>
+			
+			<div>
+				<header>software university learning system - 1.0.5287</header>
+				<span>&copy; 2013-2014 - Software University. All Rights Reserved.</span><br />
+				<a href="https://twitter.com/softunibg" class="icons"><image src="img/twitter.png"></a>
+				<a href="https://www.facebook.com/SoftwareUniversity" class="icons"><image src="img/facebook.png"></a>
+				<a href="https://plus.google.com/+SoftuniBg/posts" class="icons"><image src="img/googleplus.png"></a>				
+			</div>			
+			<div class="fb-like-box" data-href="https://www.facebook.com/SoftwareUniversity" data-colorscheme="light" data-show-faces="true" data-header="true" data-stream="false" data-show-border="false"></div>
+		</footer>	
+	</body>
+</html>

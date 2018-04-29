@@ -1,0 +1,5 @@
+INDEX VERSION 1.127+/home/nadia/java/JavaCollections/.metadata/.plugins/org.eclipse.jdt.core
+1801288199.index
+1586516429.index
+33579752.index
+703257969.index

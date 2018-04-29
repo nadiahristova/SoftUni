@@ -1,0 +1,31 @@
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+public class Prob17_LogsAggregator {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		int inputs = Integer.parseInt(scan.nextLine().trim());
+		TreeMap<String,TreeSet<String>> userIP = new TreeMap<>();
+		HashMap<String,Integer> userDur = new HashMap<>();
+		
+		for (int i = 0; i < inputs; i++) {
+			String[] data = scan.nextLine().split(" ");
+			if (userIP.containsKey(data[1])) {
+				userIP.get(data[1]).add(data[0]);
+				int duration = userDur.get(data[1])+Integer.parseInt(data[2]);
+				userDur.put(data[1], duration);
+			} else {
+				userIP.put(data[1], new TreeSet<String>());
+				userIP.get(data[1]).add(data[0]);
+				userDur.put(data[1], Integer.parseInt(data[2]));
+			}
+		}
+		
+		for(String user:userDur.keySet()) {
+			System.out.println(user + ": " +userDur.get(user)+ " " + userIP.get(user) );
+		}
+	}
+
+}

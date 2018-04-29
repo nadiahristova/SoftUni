@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Tick Tack Toe</title>
+	<meta charset="UTF-8" />
+	<script type="text/javascript" src="TickTackToe.js" async></script>
+	<link href="Tick-Tack-Toe.css" rel="stylesheet" type="text/css" />
+	</head>
+	
+	<body>
+		<table cellspacing="0">
+			<colgroup>
+				<col style="width:120px">
+				<col style="width:120px">
+				<col style="width:120px">
+			</colgroup>
+			<tr>
+				<th><input type="button" id="00" onclick="Clicked(00)"/></th>
+				<th><input type="button" id="01" onclick="Clicked(01)"/></th>
+				<th><input type="button" id="02" onclick="Clicked(02)"/></th>
+			</tr>
+			<tr>
+				<td><input type="button" id="10" onclick="Clicked(10)" /></td>
+				<td><input type="button" id="11" onclick="Clicked(11)"/></td>
+				<td><input type="button" id="12" onclick="Clicked(12)"/></td>
+			</tr>
+			<tr>
+				<td><input type="button" id="20" onclick="Clicked(20)" /></td>
+				<td><input type="button" id="21" onclick="Clicked(21)"/></td>
+				<td><input type="button" id="22" onclick="Clicked(22)"/></td>
+			</tr>
+		</table>
+		
+		<section>
+			<h1>Tick Tack Toe</h1>
+			<p id="info"></p>
+		</section>
+	</body>
+</html>

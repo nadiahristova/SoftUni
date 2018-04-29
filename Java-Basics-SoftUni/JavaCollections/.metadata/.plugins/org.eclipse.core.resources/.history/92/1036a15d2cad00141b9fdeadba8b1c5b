@@ -1,0 +1,29 @@
+
+public class LongestOddEvenSeq {
+	public static void main(String[] args) {
+		String line  = "(2) (2) (2) (2) (2)".trim().replace(" ", "");
+		String[] nums = line.split("[()]+");
+		int counter, maxSequ = 0;
+		boolean odd;
+		for (int i = 1; i < nums.length; i++) {
+			counter = 1;
+			int num = Integer.parseInt(nums[i]);
+			if (num % 2 == 0) {
+				odd = false;
+			} else odd = true;
+			for (int j = i+1; j < nums.length; j++) {
+				int currNum = Integer.parseInt(nums[j]);
+				boolean currOdd = (currNum % 2 != 0); 
+				if (currNum == 0 || odd != currOdd) {
+					counter++;
+					i++;					
+				}
+				odd = currOdd;
+			}
+			if (counter > maxSequ) {
+				maxSequ = counter;
+			}
+		}
+		System.out.println(maxSequ);
+	}
+}

@@ -1,0 +1,19 @@
+
+public class Prob02_SequenceOfEqualStrings {
+	public static void main(String[] args) {
+		String line = "a b b xxx c c c";
+		String[] arrStrings = line.trim().split("//s+");
+		for (int i = 0; i < arrStrings.length-1; i++) {
+			int counter = 0;
+			String sequence = arrStrings[i] + " ";
+			int j = i+1;
+			while (arrStrings[j].equals(arrStrings[i]) || (j == arrStrings.length-1)) {
+				j++;
+				counter++;
+				sequence = arrStrings[j] + " ";
+			}	
+			System.out.println(sequence);
+			i+=counter;
+		}
+	}
+}

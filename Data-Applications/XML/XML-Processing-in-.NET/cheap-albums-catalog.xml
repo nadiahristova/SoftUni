@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<albums culture="en-US">
+  <album>
+    <name>Master Of Puppets</name>
+    <artist>Metallica</artist>
+    <year>1986</year>
+    <producer>Flemming Rasmussen</producer>
+    <price>10.99</price>
+    <songs>
+      <song>
+        <title>Battery</title>
+        <duration>5:12</duration>
+      </song>
+      <song>
+        <title>Master of Puppets</title>
+        <duration>8:36</duration>
+      </song>
+      <song>
+        <title>Welcome Home (Sanitarium)</title>
+        <duration>6:27</duration>
+      </song>
+      <song>
+        <title>Disposable Heroes</title>
+        <duration>8:17</duration>
+      </song>
+      <song>
+        <title>Orion</title>
+        <duration>8:28</duration>
+      </song>
+      <song>
+        <title>Damage, Inc.</title>
+        <duration>5:29</duration>
+      </song>
+    </songs>
+  </album>
+  <album>
+  </album>
+  <album>
+    <name>Something Wicked This Way Comes</name>
+    <artist>Iced Earth</artist>
+    <year>1999</year>
+    <producer>Jim Morris</producer>
+    <price>15.00</price>
+    <songs>
+      <song>
+        <title>Burning Times</title>
+        <duration>3:44</duration>
+      </song>
+      <song>
+        <title>Melancholy (Holy Martyr)</title>
+        <duration>4:47</duration>
+      </song>
+      <song>
+        <title>Watching Over Me</title>
+        <duration>4:28</duration>
+      </song>
+      <song>
+        <title>Consequences</title>
+        <duration>5:36</duration>
+      </song>
+      <song>
+        <title>Blessed Are You</title>
+        <duration>5:05</duration>
+      </song>
+    </songs>
+  </album>
+</albums>

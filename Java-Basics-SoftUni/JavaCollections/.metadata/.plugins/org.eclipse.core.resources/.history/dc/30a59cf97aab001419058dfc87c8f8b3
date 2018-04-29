@@ -1,0 +1,15 @@
+import java.util.Scanner;
+
+public class Prob05_CountAllWords {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String text = "";
+		while (input.hasNextLine()) {
+			text += input.nextLine() + " ";
+			
+		}		
+		String[] words = text.trim().split("\\W+");
+		//String[] words = text.trim().split("[^a-zA-z]+");
+		System.out.println(words.length);
+	}	
+}

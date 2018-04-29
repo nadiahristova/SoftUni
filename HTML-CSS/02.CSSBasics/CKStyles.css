@@ -1,0 +1,139 @@
+body, header, article, nav, ul , li {
+	margin:0;
+	padding:0;
+}
+
+body {
+	background-image:url("img/colorful_dots_on_black.jpg");
+	font-family:calibri;
+}
+
+body > header:first-of-type {
+	font-size:2.7em;
+	font-weight:bold;
+	color:yellow;
+	width:100%;
+	height:70px;
+	text-align:center;
+	background: -webkit-linear-gradient(left, red, red 33.333%, green 33.333%,  green 67.666%, blue 67.666%);
+}
+
+nav {
+	width:15%;
+	float:left;
+	display:block;
+	margin-top:2%;
+	background-color:white;
+	opacity:0.9;
+	border-radius:15px;
+	padding:15px;
+	margin-left: 1%;
+	margin-right: 2%;
+	padding-top:10px;	
+	position:fixed;
+}
+
+nav  header {
+	font-size:1.2em;
+	font-weight:bold;
+	text-decoration:underline;
+	padding-bottom:10px;
+} 
+
+nav ul {	
+	list-style-image: url('img/ok.png');
+	list-style-position:inside;			
+}
+
+nav ul a{
+	text-decoration:none;
+	color:black;
+	display:block;
+	border-radius:5px;
+	width:100%;
+	padding-left:5px;
+}
+
+nav ul li{	
+	line-height:20px;
+}
+
+nav ul a:visited {
+	color:gray;
+}
+
+nav ul li a:hover {
+	cursor:default;	
+}
+
+section {	
+	width:77.5%;
+	float:right;
+	display:block;
+	margin-top:0.3%;
+	margin-right: 2%;
+}
+
+section article{
+	width:auto;
+	background-color:white;
+	opacity:0.9;
+	border-radius:15px;
+	padding:15px;
+	margin-top:20px;
+}
+
+article > header {
+	font-size:1.2em;
+	border-radius:5px;
+	height:30px;
+	vertical-align:center;
+	margin-bottom:10px;
+	text-align:left;
+	padding-top:5px;
+	padding-left:7px;
+	color:white;
+}
+
+section  article  div:first-letter {
+	font-size:3.3em;	
+}
+
+section article div:first-line {
+	font-style:italic;
+}
+#webColors, a[href*='webColors']:hover{
+	background:red;
+}
+
+#webSafeColors, a[href*='webSafeColors']:hover{
+	background:orange;
+	color:black;
+}
+
+#RGB, li a[href*='RGB']:hover{
+	background:yellow;
+	color:black;
+}
+
+#RGBA, li a[href*='RGBA']:hover{
+	background:green;	
+}
+
+#\#HSLHSV, a[href*='HSLHSV']:hover{
+	background:blue;	
+}
+
+#\#lorem, a[href*='lorem']:hover{
+	background:purple;	
+}
+
+body section footer a{
+	color:gray;
+	font-style:italic;
+}
+
+span:lang(la) {
+	font-style: italic;
+	color: darkblue;
+}

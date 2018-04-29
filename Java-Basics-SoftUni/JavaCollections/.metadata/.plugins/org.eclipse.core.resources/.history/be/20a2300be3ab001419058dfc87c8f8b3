@@ -1,0 +1,27 @@
+import java.util.HashMap;
+
+
+public class Prob11_MostFrequentWord {
+	public static void main(String[] args) {
+		String line = "Hello my friend, hello my darling. Come on, come here. Welcome, welcome darling.";
+		String[] words = line.split("\\s+");
+		
+		HashMap<String, Integer> dictionary = new HashMap<>();
+		int maxOccur = 0;
+		for(String word : words){			
+			if (dictionary.containsKey(word)) {
+				int currOccur = dictionary.get(word) + 1;
+				if (currOccur > maxOccur) {
+					maxOccur = currOccur;
+				}
+				dictionary.put(word, currOccur);
+			} else dictionary.put(word, 1);
+		}
+		
+		for (String key : dictionary.keySet()) {
+			if (dictionary.get(key) == maxOccur) {
+				System.out.println(key + " -> " + dictionary.get(key) + " times");
+			}
+		}
+	}
+}

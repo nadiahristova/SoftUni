@@ -1,0 +1,30 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Scanner;
+
+public class Prob05_CountAllWords {
+	public static void main(String[] args) throws IOException {		
+		Scanner input = new Scanner(System.in);
+		String text = "";	
+		String line = input.next();
+		boolean has = true;
+		do {
+			
+			//line = buffRead.readLine();
+			text += line + " ";
+			if (input.hasNext()) {
+				line = input.next();
+			} else has = false;
+			//line = input.next();
+			//line.contains("");
+			//line.substring(beginIndex, endIndex)
+			//line.
+		} while (!line.matches("\n"));
+		String[] words = text.trim().split("\\W+");
+		//String[] words = text.trim().split("[^a-zA-z]+");
+		System.out.println(words.length);
+	}	
+}

@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<title>Some Form</title>
+		<meta charset="UTF-8"/>
+		<link href="01_Style.css" rel="stylesheet"/>
+		<script src="01_WebinarRegistrationForm.js" type="text/javascript"></script>
+	</head>
+	
+	<body>
+		<form>
+			<header>Регистрация за уебинар</header>
+			<div>
+				<label for="name">Име и Фамилия:<span>*</span></label>
+				<input type="text" id="name"/>
+				<label for="address">>Адрес:</label>
+				<input type="text"  id="address"/>
+				<label for="city">Населено място:</label>
+				<input type="text" id="city" />
+				<label for="zip">Пощенски код:</label>
+				<input type="text" id="zip"/>
+				<label>Email:<span>*</span></label>
+				<input type="text" />
+				<label>Телефон:<span>*</span></label>
+				<input type="text" />
+				<label>Дата на семинара:<span>*</span></label>
+				<input type="date" />
+				<input type="checkbox" id="yes" onclick="callFact()"/>
+				<label for="yes">Желая фактура</label>				
+			</div>
+			<div id="invisible">
+				<label>Фирма/Организация:<span>*</span></label>
+				<input type="text" />
+				<label>МОЛ:</label>
+				<input type="text" />
+				<label>ЕИК:</label>
+				<input type="text" />
+				<label>ИН по ДДС:</label>
+				<input type="text" />
+				<label>Адрес:<span>*</span></label>
+				<input type="text" />								
+			</div>
+			<div>
+				<input type="submit" value="Регистрирай се" />
+				<input type="reset" value="Изчисти"/>
+			</div>
+		</form>
+	</body>
+</html>

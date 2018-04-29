@@ -1,0 +1,165 @@
+/* A CSS File */
+body, table {
+	margin:0;
+	padding:0;
+}
+
+div.main {
+	background:#00923E;
+	padding:15px;
+	margin: 10px;
+	width:730pt;	
+}
+
+table {
+	border:1px solid black;
+	border-radius:15px;
+	font-family:Tahoma, Geneva, sans-serif;
+	background:white;	
+	table-layout:fixed;	
+	overflow:hidden;	
+}
+
+table td {
+	border: 1px solid black;
+	padding:6px;	
+	text-align:center;		
+	font-size:1.1em;
+	vertical-align:center;
+}
+
+th {	
+	font-weight:bold;
+	font-size:1.4em;
+	border: 1px solid black;
+	padding:6px;
+}
+
+.alLeft {
+	text-align:left;
+}
+
+.alRight {
+	text-align:right;
+}
+
+table tr:last-child td:nth-child(1){
+	border-bottom-left-radius: 15px;
+}
+
+table tr:last-child td:last-child{
+	border-bottom-right-radius: 15px;
+}
+
+table thead tr:first-child th:first-child{
+	border-top-left-radius: 15px;
+}
+
+table tr:first-child th:last-child{
+	border-top-right-radius: 15px;
+}
+
+tbody  tr:nth-child(2n) {
+	background-color: #C8C8C8;
+}
+
+tbody  tr:nth-child(2n+1) {
+	background-color: #fff;
+}
+
+thead  tr:nth-child(1) {
+	background-color:#F8C711;
+}
+
+span {
+	width:25px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.alLeft span {
+	float:left;
+}
+
+.alRight span {
+	float:right;
+}
+
+span#bzFlag {
+	content:url(img/Brazil-flag.png);			
+}
+
+span#mxFlag {
+	content:url(img/Mexico-Flag.png);	
+}
+
+span#spFlag {
+	content:url(img/Spain-Flag.png);	
+}
+
+span#nethFlag {
+	content:url(img/Netherlands-Flag.png);	
+}
+
+span#itaFlag {
+	content:url(img/Italy-Flag.png);	
+}
+
+span#enFlag {
+	content:url(img/England-Flag.png);	
+}
+
+span#argFlag {
+	content:url(img/Argentina-Flag.png);	
+}
+
+span#herzFlag {
+	content:url(img/Bosnia-and-Herzegovina-Flag.png);	
+}
+
+span#deFlag {
+	content:url(img/Germany-Flag.png);	
+}
+
+span#porFlag {
+	content:url(img/Portugal-Flag.png);	
+}
+
+.button {
+    display: block;	
+    height: 20px;
+    width: 20px;
+    background: green;
+    border: 1.5px solid lightgray;
+	text-decoration:none;
+	color:white;     
+    text-align: center;
+    padding:6.5px;
+    font-size:0.7em;    
+    border-radius: 50%;    
+    box-shadow: 1px 1.5px 1px black;     
+    text-shadow: 0 0.5px 0.5px gray;     
+}
+
+a:target {
+  animation: highlight 1s ease;  
+  transform: translate(20px);     
+}
+
+a.button:hover {
+    background: gray;
+    opacity:0.5;
+}
+
+a#inactiveButt.button{
+	background:red;
+}
+select:disabled {
+	color:#CE1818;
+	background:#e2e2e2;
+}
+
+select {
+	color:green;
+	height:20px;
+}

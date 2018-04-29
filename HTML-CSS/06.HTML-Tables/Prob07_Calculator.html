@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Calculator</title>
+		<script type='text/javascript'></script>
+		<style>		
+			tr {
+				height:55px;
+			}
+			input[type="text"]{
+				color:#011E54;
+				border-color:orange;
+				font-family:Algerian;
+				font-weight:bold;
+				font-size:15pt;
+				text-align:right;
+				text-ident:10px;
+				width:100%;
+				height:35px;
+				box-sizing:border-box;
+				border-radius:5px;
+			}
+			input[type="button"]{				
+				background-color: rgba(190, 190, 190, 0.2);				
+				color:white;
+				font-weight:bold;
+				font-family:Algerian;
+				border-radius:5px;
+				width:100%;
+				height:100%;
+				font-size:15pt;
+			}
+			form {
+				background-image: url(img/3.jpg);
+				background-repeat:no-repeat;				
+				width:230px;
+				border:2px solid orange;
+				border-radius:15px;
+			}
+		</style>		
+	</head>
+	<body>	
+	
+		<FORM name="Calculator" action="">
+			<table cellspacing="10px">
+				<colgroup>
+					<col width="50px"/>
+					<col width="50px"/>
+					<col width="50px"/>
+					<col width="50px"/>
+				</colgroup>
+				<tr>
+					<td colspan="3"><input type="text" name="ReadOut" value="0" readonly></td>
+					<td><input type="button" name="butCE" value="CE" onclick="ClearEntry()"></td>
+				</tr>
+				<tr>
+					<td><input type="button" name="but1" value="1" onclick="NumPressed(1)"></td>
+					<td><input type="button" name="but2" value="2" onclick="NumPressed(2)"></td>
+					<td><input type="button" name="but3" value="3" onclick="NumPressed(3)"></td>
+					<td><input type="button" name="but+" value="+" onclick="Operation('+')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" name="but4" value="4" onclick="NumPressed(4)"></td>
+					<td><input type="button" name="but5" value="5" onclick="NumPressed(5)"></td>
+					<td><input type="button" name="but6" value="6" onclick="NumPressed(6)"></td>
+					<td><input type="button" name="but-" value="-" onclick="Operation('-')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" name="but7" value="7" onclick="NumPressed(7)"></td>
+					<td><input type="button" name="but8" value="8" onclick="NumPressed(8)"></td>
+					<td><input type="button" name="but9" value="9" onclick="NumPressed(9)"></td>
+					<td><input type="button" name="but*" value="*" onclick="Operation('*')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" name="but0" value="0" onclick="NumPressed(0)"></td>
+					<td><input type="button" name="butC" value="C" onclick="Clear()"></td>
+					<td><input type="button" name="but/" value="/" onclick="Operation('/')"></td>
+					<td><input type="button" name="but=" value="=" onclick="Operation('=')"></td>
+				</tr>
+			</table>
+		</FORM>
+        <script>
+            var FCalc = document.Calculator;
+            var Accumulate = 0;
+            var isNew = false;
+            var PendingOp = "";
+            function NumPressed (Num) {
+                if (isNew) {
+                    FCalc.ReadOut.value  = Num;
+                    isNew = false;
+                }
+                else {
+                    if (FCalc.ReadOut.value == "0")
+                        FCalc.ReadOut.value = Num;
+                    else
+                        FCalc.ReadOut.value += Num;
+                }
+            }
+            function Operation (Op) {
+                var Readout = FCalc.ReadOut.value;
+                if (isNew && PendingOp != "=");
+                else
+                {
+                    isNew = true;
+                    if ( '+' == PendingOp )
+                        Accumulate += parseFloat(Readout);
+                    else if ( '-' == PendingOp )
+                        Accumulate -= parseFloat(Readout);
+                    else if ( '/' == PendingOp )
+                        Accumulate /= parseFloat(Readout);
+                    else if ( '*' == PendingOp )
+                        Accumulate *= parseFloat(Readout);
+                    else
+                        Accumulate = parseFloat(Readout);
+                    FCalc.ReadOut.value = Accumulate;
+                    PendingOp = Op;
+                }
+            }        
+            function ClearEntry () {
+				var aNum= parseFloat(FCalc.ReadOut.value);
+				if(aNum <= -10 || aNum >=10) {
+				var stripped = Math.floor(aNum / 1e1); 
+				FCalc.ReadOut.value	= stripped.toString();	
+				} else 	FCalc.ReadOut.value	= "0";			
+                isNew = true;
+            }
+            function Clear () {
+                Accumulate = 0;
+                PendingOp = "";
+                FCalc.ReadOut.value	= "0";
+            }         
+        </script>
+		</body>
+
+</html>
+

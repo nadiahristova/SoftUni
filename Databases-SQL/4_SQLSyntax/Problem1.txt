@@ -1,0 +1,29 @@
+What is SQL?
+SQL stands for Structured Query Language. SQL is used to communicate with a database. It is the standard language for relational database management systems. SQL statements are used to perform tasks such as update data on a database, or retrieve data from a database. 
+
+*****
+
+What is DML? 
+A data manipulation language (DML) is a family of computer languages including commands permitting users to manipulate data in a database. This manipulation involves inserting data into database tables, retrieving existing data, deleting data from existing tables and modifying existing data. 
+
+Most important commands:
+- SELECT - retrieve data from a database
+- INSERT - insert data into a tables 
+- UPDATE - updates existing data within the tables
+- DELETE - Delete all records from a database tables
+- MERGE - UPSERT operation(insert or update)
+- CALL - call a PL/SQL or Java subprogram
+- EXPLAIN PLAN - interpretation of the data access path
+- LOCK TABLE - concurrency Control
+
+*****
+
+What is DDL? 
+DDL is short name of DATA DEFINITION LANGUAGE. which deals with database schemas and descriptions, of how the data should reside in the database.
+
+Most important commands:
+- CREATE - to create object in the database
+- ALTER - alters the structure of the database
+- DROP - delete objects from the database- TRUNCATE - remove all records from a table, including all spaces allocated for the records are removed
+- COMMENT - add comments to the data dictionary
+- RENAME - rename an object

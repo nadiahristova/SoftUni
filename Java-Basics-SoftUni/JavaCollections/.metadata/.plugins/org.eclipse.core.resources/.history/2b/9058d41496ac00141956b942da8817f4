@@ -1,0 +1,36 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+public class Prob14_StuckNumbers {
+	public static void main(String[] args) {
+		int countNum = 3;
+		String line = "5 1 20";
+		boolean haveAnswers = false;
+		String[] nums = line.trim().split("\\s+");
+
+		for (int a = 0; a < nums.length; a++) {
+			for (int b = 0; b < nums.length; b++) {
+				for (int c = 0; c < nums.length; c++) {
+					for (int d = 0; d < nums.length; d++) {
+						if ((nums[a] + nums[b]).equals(nums[c] + nums[d])) {
+							HashSet<String> abcd = new HashSet<>(Arrays.asList(
+									nums[a], nums[b], nums[c], nums[d]));
+							if (abcd.size() == 4) {
+								System.out.println(nums[a] + "|" + nums[b]
+										+ "==" + nums[c] + "|" + nums[d]);
+								haveAnswers = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if (!haveAnswers) {
+			System.out.println("No");
+		}
+	}
+}

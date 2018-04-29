@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Header</title>
+		<style>
+			table {
+				background-color:#234465;
+				font-family:calibri;
+				color:white;
+				width:100%;
+				text-align:center;
+			}
+			span#notifications {
+				color:#fea71e;				
+				vertical-align:center;
+			}
+			span#notifications:hover {
+				text-decoration:underline;
+			}
+			a:link {
+				text-decoration:none;
+				color:white;				
+			}
+			td#ableToHover:hover{
+				background-color:#4CA0DB;
+				border-collapse:separate;
+				border-radius:10px;
+				padding:5px;
+			}
+			span {				
+				color:white;
+			}
+			.notiIcon {
+				float:right;
+			}
+			input[type="text"] {
+				width:90%;
+				box-sizing:border-box;
+				border-radius:5px;
+				float:left;	
+				text-indent: 10px;				
+			}
+			button[type="submit"] {
+				outline:none;
+				float:right;
+				width:22px;
+				height:22px;
+				border-radius:5px;
+				background-image: url(img/glass.png);				
+				vertical-align:top;
+				background-repeat:no-repeat;
+				margin:0;
+				outline:none;				
+			}
+			select{
+				background-color:#234465;
+				border-collapse:separate;
+				overflow: hidden;
+				border-radius:10px;
+				color:white;
+				width:100%;
+			}
+			#drop-down{
+				list-style:none;
+				margin-bottom:10px;
+				float:left; 
+				width:100%;				
+				position:relative;
+				z-index:5;
+			}
+			#drop-down li{
+				float:left;
+				margin-right:10px;
+				position:relative;			
+			}
+			#drop-down a{
+				display:block;				
+				color:#fff;
+				background::#234465;
+				text-decoration:none;
+			}
+			#drop-down ul{
+				background::#234465; 				
+				list-style:none;
+				position:absolute;
+				left:-9999px; 
+			}
+			#drop-down ul a{
+				white-space:nowrap; 
+			}
+			#drop-down li:hover ul{ 
+				left:0; 				
+			}
+			#drop-down li:hover a{ 
+				background:#234465;
+				text-align:left;
+				width:200px;
+			}
+			#drop-down li:hover ul a{ 
+				text-decoration:none;
+			}
+			#drop-down li:hover ul li a:hover{ 
+				background:#4CA0DB;
+			}
+		</style>		
+	</head>
+	
+	<body>
+		<table cellpadding="5px"; cellspacing="10px">
+			<tr>
+				<td rowspan="2"; align="left"><a href="https://softuni.bg"><img src="img/logo.png"></a></td>
+				<td colspan="3"; align="right"><a href="#";><span id="notifications">0</span></a> &#160;<img src="img/notificationsIcon.png"; class="notiIcon"></td>
+				<td colspan="3">
+					<input type="text"; placeholder="Search"/>
+					<button type="submit" ></button>
+				</td>
+			</tr>
+			<tr>
+				<td id="ableToHover"><a href="https://softuni.bg/news"><span>NEWS</span></a></td>
+				<td id="ableToHover">
+				<td>
+				<ul id="drop-down">
+					<li>
+					<a href="#">ABOUT THE UNIVERSITY &#9660;</a>
+					<ul>
+						<li><a href="https://softuni.bg/about">About the university</a></li>
+						<li><a href="https://softuni.bg/curriculum">Curriculum</a></li>
+						<li><a href="https://softuni.bg/trainers">Technical Trainers</a></li>
+						<li><a href="https://softuni.bg/professions">Certificates</a></li>
+						<li><a href="https://softuni.bg/majors">Diplomas</a></li>
+					</ul>			
+					</li>
+				</ul>				
+				</td>
+				<td id="ableToHover">TRAINING COURSES &#9660;</td>
+				<td id="ableToHover"><a href="https://softuni.bg/university/companies/partners"><span>FOR COMPANIES</span></a></td>
+				<td id="ableToHover"><a href="https://softuni.bg/forum"><span>FORUM</span></a></td>
+				<td id="ableToHover"><a href="https://softuni.bg/contacts"><span>CONTACTS</span></a></td>
+			</tr>
+		</table>
+	</body>
+</html>

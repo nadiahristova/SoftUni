@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Flight Order</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="Styles/02-Styles.css">
+	</head>
+	
+	<body>
+		<form>
+			<header>flight order</header>
+			<section>
+				<label for="town">From</label>
+				<select name="town" id="town">
+					<option disabled selected> enter a city </option>
+					<option value="blagoevgrad" slected="selected">Blagoevgrad</option>
+					<option value="sofia">Sofia</option>
+					<option value="mezdra">Mezdra</option>
+					<option value="gornonana">Gornonanadolnishte</option>
+				</select>
+				
+				<label for="departure-date">Departure Date</label>
+				<input type="date" id="departure-date" name="departure-date" value="2014-06-09"\>
+				
+				<label for="return-date">Return Date</label>
+				<input type="date" id="return-date" name="return-date" value="2014-06-13"\>
+				
+				<label for="firstNum">12+</label><label for="secondNum">2-12</label><label for="thirdNum">0-2</label>
+				<input type="number" min="12" id="firstNum" name="firstNum" /><input type="number" min="2" max="12" id="secondNum" name="secondNum" /><input type="number" min="0" max="2" id="thirdNum" name="thirdNum" />
+			</section>
+			
+			<section>
+				<label for="destination">To</label>
+				<select name="destination" id="destination">
+					<option disabled selected> enter a city </option>
+					<option value="blagoevgrad" slected="selected">Blagoevgrad</option>
+					<option value="sofia">Sofia</option>
+					<option value="dospat">Dospat</option>
+					<option value="dolnonana">Dolnonanagornishte</option>
+				</select>
+				<input type="checkbox" id="prefer-checkbox" name="prefers-directs" value="yes">
+				<label for="prefer-checkbox">Prefer directs</label><br />
+				
+				<label>Time Interval</label>
+				<input type="time" id="start-time-interval" name="start-time-interval-departure" value="00:20"\>
+				<input type="time" id="end-time-interval" name="end-time-interval-departure" value="05:00"\>
+				
+				<label>Time Interval</label>
+				<input type="time" id="start-time-interval" name="start-time-interval-arrival" value="16:00"\>
+				<input type="time" id="end-time-interval" name="end-time-interval-arrival" value="22:00"\>
+				
+				<label for="class">Choose class</label>
+				<select name="class" id="class">
+					<option value="economy" selected="selected">Economy</option>
+					<option value="business">Business</option>
+					<option value="TWS">Third World Style</option>					
+				</select>
+				
+				<input type="submit" value="Search" />
+			</section>
+		</form>
+	</body>
+</html>

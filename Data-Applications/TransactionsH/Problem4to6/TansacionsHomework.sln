@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM.Data", "ATM.Data\ATM.Data.csproj", "{FB790A4A-6C47-41A8-821F-6BB7C8F39AC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM.Models", "ATM.Models\ATM.Models.csproj", "{685881F9-451C-4CD7-8812-E27A5432790E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM.ConsoleClient", "ATM.ConsoleClient\ATM.ConsoleClient.csproj", "{3408E499-2CE3-43A7-A73E-07592EB9867A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB790A4A-6C47-41A8-821F-6BB7C8F39AC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB790A4A-6C47-41A8-821F-6BB7C8F39AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB790A4A-6C47-41A8-821F-6BB7C8F39AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB790A4A-6C47-41A8-821F-6BB7C8F39AC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685881F9-451C-4CD7-8812-E27A5432790E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685881F9-451C-4CD7-8812-E27A5432790E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685881F9-451C-4CD7-8812-E27A5432790E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685881F9-451C-4CD7-8812-E27A5432790E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3408E499-2CE3-43A7-A73E-07592EB9867A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3408E499-2CE3-43A7-A73E-07592EB9867A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3408E499-2CE3-43A7-A73E-07592EB9867A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3408E499-2CE3-43A7-A73E-07592EB9867A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

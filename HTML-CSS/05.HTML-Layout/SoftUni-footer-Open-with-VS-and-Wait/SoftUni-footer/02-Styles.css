@@ -1,0 +1,85 @@
+﻿footer, ul, li, a, span, div, input, button, body, image {
+	margin:0;
+	padding:0;
+	box-sizing:border-box;
+}
+
+footer {
+	width:100%;
+	background-color:#234465;
+	padding:2%;	
+	font-family:"trebuchet MS", leelawadee, calibri;
+	overflow:auto;
+	display:flex;
+	float:left;
+	justify-content: space-between;
+	flex-wrap:wrap;	
+}
+
+
+footer > div {
+	width:250px;	
+	margin:10px;
+}
+
+input[type="button"] {
+	float:right;
+	font-size:0.9rem;
+	display:block;	
+	border:2px solid #FF9D1F;
+	background: #234465;
+	color:white;
+	padding:0 auto;
+	width:160px;
+	height:40px;
+	transition: all 0.3s cubic-bezier(0,0,1,1) 0s;
+	outline:none;
+}
+
+input[type="button"]:hover {
+	background: #FF9D1F;
+	cursor:pointer;	
+}
+
+input[type="button"]:last-of-type{
+	clear:right;
+	margin-top:10px;
+}
+
+ul li {
+	list-style:none;
+	margin-top:5px;	
+}
+
+a {
+	text-decoration:none;
+	color:white;
+}
+
+div > header {
+	font-size:1rem;
+	color:#FF9D1F;
+	text-transform:uppercase;
+	font-weight:bold;
+	margin-bottom:15px;
+}
+
+div > span {
+	color:white;	
+}
+
+ footer>div:first-of-type {
+	width:180px;
+ }
+ 
+.icons {
+	display:inline-block;
+	margin:20px 5px auto auto;
+}
+
+
+footer>div:last-of-type {
+	background-color:white;
+    overflow:auto;
+    width:300px;
+ }

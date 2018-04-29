@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kent's Media Profile</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="styles/02-Styles.css">		
+	</head>
+	
+	<body>
+		<main>
+			<header>Profile</header>		
+			<section>
+				<figure>
+					<figcaption><header>User: Kent<header></figcaption>
+					<a href="http://www.manbehindthedoll.com/"><img src="img/Kent.jpg" alt="Kent's Pic" width="150px"></a>
+				</figure>
+				<section>
+					<header>Profile completed 60%</header>
+					<meter value="0.6">60%</meter>
+				</section>
+			</section>
+			<section>
+				<header>Uploaded Audio Files</header>
+				<ul>
+					<li><audio controls preload loop autoplay id="Nyan-Cat"><source src="media/nya.mp3"/>Your browser does not support the &lt;auto&gt; tag</audio></li>
+					<li><audio controls preload loop><source src="media/Apocalypse.mp3"/>Your browser does not support the &lt;auto&gt; tag</audio></li>
+					<li><audio controls preload loop><source src="media/ArmyOfShadows_A.mp3"/>Your browser does not support the &lt;auto&gt; tag</audio></li>
+					<li><audio controls preload loop><source src="media/ArmyOfShadows_B.mp3"/>Your browser does not support the &lt;auto&gt; tag</audio></li>					
+				</ul>
+			</section>
+			<section>
+				<header>Upload Video Files</header>
+				<iframe width="350" height="250" src="https://www.youtube.com/embed/3TQbDz6-4eM" allowfullscreen frameborder="0"></iframe>				
+			</section>
+		</main>
+		
+		<script>
+			var vol = document.getElementById("Nyan-Cat");
+			vol.volume = 0.3;
+		</script>
+	</body>
+</html>

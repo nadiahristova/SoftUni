@@ -1,0 +1,29 @@
+package exam5;
+
+import java.util.Arrays;
+
+public class _01_MirroNums {
+	public static void main(String[] args) {
+		int n = 5;
+		String line = "1234 4321 9876 1122 6789";
+		String[] nums = line.split("\\s+");
+		for (int i = 0; i < nums.length; i++) {
+			String currNum = nums[i];
+			for (int j = i+1; j < nums.length; j++) {
+				String reversedNum = new StringBuilder(currNum).reverse().toString();
+				if (nums[j].equals(reversedNum)) {
+					System.out.println(currNum + " <!> " + reversedNum);
+				}
+			}
+		}
+		
+	}
+
+//	private static String reverse(String string) {
+//		//char[] ch = new char[string.length()];
+//		String str = new StringBuilder(string).reverse().toString();
+//		//Arrays.asList(string.toCharArray()).toCharArray();
+//		return str;
+//	}
+
+}

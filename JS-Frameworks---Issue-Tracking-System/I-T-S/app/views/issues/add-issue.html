@@ -1,0 +1,67 @@
+<div class="row">
+    <div id="home-basic6">
+        <div class="well bs-component">
+            <h5 id="nav-tabs">Add issue to project</h5>
+            <hr/>
+            <form class="form-horizontal" name="addIssueForm">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="issueTitle">Title</label>
+                        <div class="infoP">
+                            <input type="text" placeholder="Title" class="form-control" id="issueTitle" required="required" ng-model="issue.Title"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <div class="infoP">
+                            <input type="text" ng-model="issue.Description" class="form-control" id="description"
+                                   required="required" placeholder="Description">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Assignee</label><br/>
+                        <input-dropdown
+                                        id="id1"
+                                        filter-list-method="filterInput(userInput)"
+                                        selected-item="selectedDropdownItem"
+                                        default-dropdown-items="availableOptions">
+                        </input-dropdown>
+                    </div>
+                    <div class="form-group">
+                        <label for="prioritie">Priority</label>
+                        <select id="prioritie"
+                                ng-options="priority.Name for priority in priorities track by priority.Id"
+                                ng-model="currPriority"></select>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Due Date</label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" id="dueDate" ng-model="issue.DueDate" placeholder="Due Date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author </label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" value="{{issueAuthor}}" id="author" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectName">Project </label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" value="{{projectName}}" id="projectName" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="labels">Labels</label>
+                        <div class="infoP" id="labels">
+                            <input type="text" class="form-control" ng-model="rawLabels" placeholder="Labels (separate by comma)" />
+                        </div>
+                    </div>
+                    <br/>
+                    <button class="btn btn-primary" ng-click="createIssue(issue)">Add Issue</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+.dash-table{
+    height:490px;
+    border: 1px solid #181818;
+    border-radius: 4px;
+}
+
+table{
+    border: 1px solid #181818;
+}
+
+th{
+    text-align: center;
+}
+
+td{
+    text-align: center;
+    vertical-align: text-bottom;
+}
+
+.sort-link:hover{
+    cursor: pointer;
+}
+
+.not-dec{
+    text-decoration: none;
+    color: white;
+}
+
+table a:not(.btn), .table a:not(.btn){
+     text-decoration: none;
+ }

@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Find-Words-in-File", "Find-Words-in-File\Find-Words-in-File.csproj", "{116D5F80-94B7-4DE7-9061-A6DE91CCDFD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products-in-Price-Range", "Products-in-Price-Range\Products-in-Price-Range.csproj", "{A2E39C5E-E732-42C2-89F0-AAF6B4B7F845}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Implement-a-Binary-Heap", "Implement-a-Binary-Heap\Implement-a-Binary-Heap.csproj", "{9E011A0A-B35A-4B73-AD9F-46D98228DB49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "String-Editor", "String-Editor\String-Editor.csproj", "{9F66B464-D305-439D-8848-E867DA281E42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{116D5F80-94B7-4DE7-9061-A6DE91CCDFD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{116D5F80-94B7-4DE7-9061-A6DE91CCDFD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{116D5F80-94B7-4DE7-9061-A6DE91CCDFD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{116D5F80-94B7-4DE7-9061-A6DE91CCDFD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2E39C5E-E732-42C2-89F0-AAF6B4B7F845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E39C5E-E732-42C2-89F0-AAF6B4B7F845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2E39C5E-E732-42C2-89F0-AAF6B4B7F845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E39C5E-E732-42C2-89F0-AAF6B4B7F845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E011A0A-B35A-4B73-AD9F-46D98228DB49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E011A0A-B35A-4B73-AD9F-46D98228DB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E011A0A-B35A-4B73-AD9F-46D98228DB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E011A0A-B35A-4B73-AD9F-46D98228DB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F66B464-D305-439D-8848-E867DA281E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F66B464-D305-439D-8848-E867DA281E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F66B464-D305-439D-8848-E867DA281E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F66B464-D305-439D-8848-E867DA281E42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

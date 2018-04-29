@@ -1,0 +1,38 @@
+package Exam3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class _03_Biggest3PrimeNumbers {
+	public static void main(String[] args) {
+		String input = " (  -3  ) (2) (  1)".replace(" ", "");
+		String[] numsStr = input.split("[\\(\\)]+");
+		ArrayList<Integer> primeNums = new ArrayList<>();
+		
+		for (int i = 1; i < numsStr.length; i++) {
+			int currNum = Integer.parseInt(numsStr[i]);
+			if (currNum > 1 && isPrime(currNum)) {
+				primeNums.add(currNum);
+			}
+		}
+		int size = primeNums.size();
+		if ( size < 3) {
+			System.out.println("No");
+		} else {
+			Collections.sort(primeNums);
+			int sum = primeNums.get(size-1)+primeNums.get(size-2)+primeNums.get(size-3);
+			System.out.println(sum);
+		}
+		
+	}
+
+	private static boolean isPrime(int num) {
+		int upTo = (int) Math.pow(num, 0.5)+1;		
+		for (int i = 2; i <= upTo; i++) {
+			if (num % i == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+}

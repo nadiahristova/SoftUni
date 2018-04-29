@@ -1,0 +1,224 @@
+	header, body, h1, h2, h3, h5, button, input, form, ul, li , a, aside, main, span, p{
+		padding:0;
+		margin:0;
+	}
+	
+	body {
+		font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		}
+	
+	body > header{
+		font-weight:normal;		
+		margin:10px auto 20px 40px;	
+		padding-left:10px;
+		font-size:1.5em;
+	}
+	
+	h2{
+		font-weight:normal;		
+		padding-top:15px;
+		font-size:1.4em;		
+	}
+	
+	ul li {
+		list-style:none;				
+	}
+	
+	header  nav  ul li {
+		list-style:none;		
+		display:inline;	
+		font-size:0.5em;
+		padding-right:50px;
+	}
+	
+	a {
+		text-decoration:none;
+		color:gray;		
+	}
+	
+	header span > a, time {
+		text-transform:uppercase;
+		color:gray;
+	}
+	
+	
+	input[type="text"]{
+		text-indent:7px;
+		display:inline;
+		float:right;
+		width:150px;
+		height:20px;
+		border-right:none;			
+	}
+	
+	button {		
+		height:20px;
+		width:20px;
+		float:right;
+		display:inline;		
+		border: solid 0.1em lightgray;			
+		margin-right:40px;
+		background-image: url("../img/glass.png");
+		background-repeat:no-repeat;	
+	}
+	
+	p {
+		margin-top:20px;
+		margin-bottom:20px;
+		font-size:0.9em;
+	}
+	
+	span {
+		font-size:15px;
+		color:#AFAFAF;
+		font-size:0.7em;		
+	}
+	
+	header nav {
+		width:100%;
+		margin:-10px;
+		margin-top:25px;
+	}
+	
+	form {
+		display:inline;		
+	}
+	
+	hr {
+		color:lightgray;
+		size:1px;
+		width:95%;
+	}
+	
+	select {
+		
+		width:100px;
+		height:25px;
+		margin-bottom:20px;
+		
+	}
+	
+	aside:nth-of-type(2) {
+		margin-top:22px;
+		float:right;
+		display:block;
+		width:20%;
+		margin-right:2%;
+		text-transform:uppercase;	
+		color:gray;			
+	}
+	
+	aside:nth-of-type(2) > p {
+		margin:0;
+	}
+	
+	aside nav {
+		margin-top:55px;
+		width:20%;
+		float:left;	
+	}
+	
+	aside > nav > ul li {
+		list-style:none;
+		display:block;	
+		padding-left:45px;
+		line-height:1.5em;
+		padding-bottom:5px;
+	}
+	
+	aside  nav ul li a {
+		color:#3E6CAB;
+	}
+	
+	main {
+		margin-left:3%;
+		width:52%;
+		display:block;
+		float:left;
+	}
+	
+	footer a{
+		font-size:0.9em;
+		color:#3E6CAB;
+	}
+	
+	main > footer {
+		margin-top:50px;
+	}
+	
+	body > footer {
+		width:100%;
+		background-color:black;	
+		padding-bottom:10px;		
+		overflow:auto;	
+		color:white;		
+	}
+	
+	body > footer a{
+		color:white;
+		font-size:0.8em;
+	}
+	
+	body > footer > section {
+		display:block;
+		float:left;
+	}
+	
+	body > footer section {
+		display:block;	
+		width:18%;
+		padding-left:30px;
+		padding-top:15px;
+		float:left;
+		line-height:1.3em;
+	}
+	
+	body  > footer > div{
+		width:100%;
+		background-color:white;
+		color:grey;
+		padding-bottom:10px;
+		font-size:0.9em;
+		padding-left:30px;
+	}
+	
+	body > footer > section:nth-of-type(2) {
+		width:10%;
+	}
+	
+	h5{
+		font-weight:normal;
+		text-transform:uppercase;
+		padding-bottom:5px;
+		padding-bottom:5px;
+		margin:0;
+	}
+	
+	dfn:before {
+		content:url("../img/twitter.png");		
+	}	
+	
+	section > span  {	
+		font-size:0.8em;
+		color:white;
+		line-height:0.5em;
+	}
+	
+	section > p > span  {
+		font-size:1.2em;
+		color:white;
+	}
+	
+	body > footer > section p {		
+		font-size:0.7em;
+		color:grey;
+		line-height:1.5em;
+		padding:0;
+		margin:0;
+	}
+	
+	
+	body > footer > section ul  li {		
+		display:block;
+		padding-left:5px;
+	}

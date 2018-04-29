@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<students xmlns="urn:students" name="student description">
+  <student>
+    <name>Iliq Penkov</name>
+    <gender>male</gender>
+    <birth-date>1976-05-15</birth-date>
+    <phone-number use="optional">0889XXXXXXXX</phone-number>
+    <email>Iliq007@abv.bg</email>
+    <univercity>Nov Bulgarski Universitet</univercity>
+    <specialty>....</specialty>
+    <faculty-number use="optional">4545662</faculty-number>
+    <exams>
+      <exam>
+        <exam-name>Economy</exam-name>
+        <date-taken>2015-01-30</date-taken>
+        <grade>6</grade>
+      </exam>
+      <exam>
+        <exam-name>????</exam-name>
+        <date-taken>2015-04-15</date-taken>
+        <grade>6</grade>
+      </exam>
+    </exams>
+  </student>  
+  <student>
+    <name>Silvana Georgieva</name>
+    <gender>female</gender>
+    <birth-date>1995-05-15</birth-date>
+    <phone-number use="optional">0889XXXXXXXX</phone-number>
+    <email>Svetleto@yahoo.com</email>
+    <univercity>Nov Bulgarski Universitet</univercity>
+    <specialty>....</specialty>
+    <faculty-number use="optional">4545663</faculty-number>
+    <exams>
+      <exam>
+        <exam-name>Economy</exam-name>
+        <date-taken>2015-01-30</date-taken>
+        <grade>6</grade>
+      </exam>
+      <exam>
+        <exam-name>????</exam-name>
+        <date-taken>2015-04-15</date-taken>
+        <grade>6</grade>
+      </exam>
+    </exams>
+  </student>
+</students>

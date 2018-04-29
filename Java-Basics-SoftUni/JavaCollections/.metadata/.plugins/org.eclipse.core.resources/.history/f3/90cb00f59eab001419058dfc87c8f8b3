@@ -1,0 +1,27 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Scanner;
+
+public class dfhdhdh {
+	public static void main(String[] args) throws IOException {		
+		Scanner input = new Scanner(System.in);
+		String line = null, text = null;
+		String[] str;
+		do {
+			line = input.nextLine();
+			str = line.split("\\Z");
+			text += line + " ";
+			//String lastChar = "" + line.charAt(line.length()-1);
+			//boolean boo = line.matches(".+$");
+			//boolean boo2 = false;
+		} while (str.length == 0);
+		//String line = input.nextLine();
+		//String text = input.nextLine();
+		String[] words = text.trim().split("\\W+");
+		//String[] words = text.trim().split("[^a-zA-z]+");
+		System.out.println(words.length);
+	}	
+}

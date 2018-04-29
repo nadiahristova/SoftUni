@@ -1,0 +1,20 @@
+import java.util.Collections;
+import java.util.HashSet;
+
+
+public class gddgfgd {
+	public static void main(String[] args) {
+		String list1 = "h e l l o";
+		String list2 = "l o w";
+		String[] strArrList1 = list1.trim().split("\\W+");
+		System.out.println(strArrList1[1]);
+		String[] strArrList2 = list2.trim().split(" ");
+		HashSet<String> joinedList = new HashSet<>();
+		Collections.addAll(joinedList,list1);
+		Collections.addAll(joinedList,list2);
+		
+		for (String letter:joinedList) {
+			System.out.println(letter + " ");
+		}
+	}	
+}

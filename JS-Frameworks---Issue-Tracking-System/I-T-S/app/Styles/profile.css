@@ -1,0 +1,91 @@
+fieldset {
+    padding: 5px;
+    margin: 10px;
+}
+
+fieldset label {
+   color: white;
+}
+
+fieldset .btn{
+    float: right;
+}
+
+.pass{
+    margin-left:60px;
+}
+
+#home-basic1{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 470px;
+}
+
+#home-basic2{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 450px;
+}
+
+#home-basic2 .form-control{
+    width:85%;
+    margin-left:30px;
+}
+
+#inp1{
+    display:block;
+    margin-left:26px;
+    width:85%;
+}
+
+#home-basic3{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 500px;
+}
+
+#inp2 {
+    display:block;
+    margin-left:10%;
+    width:85%;
+}
+
+#home-basic4{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 600px;
+}
+
+#home-basic5{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 660px;
+}
+
+#home-basic6{
+    margin: auto;
+    max-width: 500px;
+    min-width: 400px;
+    height: 625px;
+}
+
+.infoP{
+    width:80%;
+}
+
+select{
+    margin-left: 12px;
+}
+
+#id1{
+    margin-left: 55px;
+}
+
+#prioritie1{
+    margin-left:55px;
+}

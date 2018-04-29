@@ -1,0 +1,57 @@
+*{
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+body > header {
+	padding-top:15px;
+	width:100%;
+	font-family:arial;
+	font-size:3em;
+	font-weight:bold;
+	text-align:center;
+	margin-bottom:10px;
+}
+
+body > hr {
+	width:98%;
+	height:3px;
+	margin:0 auto;
+	background-color:grey;
+}
+
+body > div {
+	margin:15px 10px;
+	width:23%;
+	display:inline-block;
+	font-style:itallic;
+	font-family: "Lucida Handwriting", ItallicT, Arial;
+}
+
+td {
+	margin:1px;
+	text-align:center;
+	width:7%;
+}
+
+th {
+	padding:5px 0;
+}
+
+div > header {
+	font-weight:bold;	
+	width:100%;
+	font-size:1.4em;
+	text-align:center;
+	font-family: "Lucida Calligraphy", ItallicT, Arial;
+}
+
+.red {
+	color:red;
+}
+
+.out {
+	opacity:0.3;
+}
+

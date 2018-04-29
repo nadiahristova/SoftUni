@@ -1,0 +1,80 @@
+﻿@model OnlineQuestions.App.Models.ViewModels.AllTestsViewModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron text-center">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h2>Welcome, @User.Identity.Name</h2>
+    }
+    else
+    {
+        <h2>Welcome to Questions Online.</h2>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <h3>Available Tests:</h3>
+            <br/>
+
+            <table class="table">
+                <tr>
+                    <th>
+                        Quiz Name
+                    </th>
+                    <th>
+                        Questions count
+                    </th>
+                    <th>
+                        Your score
+                    </th>
+                    <th></th>
+                </tr>
+
+    @foreach (var item in Model.Tests)
+    {
+        <tr>
+            <td>
+                @item.TestTitle
+            </td>
+            <td>
+                @if (item.IsTakenByCurrentUser)
+                {
+                    <text>@item.CorrectAnswers / @item.QuestionCount</text>
+                }
+                else
+                {
+                    @item.QuestionCount
+                }
+            </td>
+            <td>
+                @if(item.IsTakenByCurrentUser)
+                {
+                    @((item.CorrectAnswers * 100 / item.QuestionCount)  + " %")
+                }
+                else
+                {
+                    @Html.ActionLink("Take the test", "GetTestQuestions", "Test", new { testId = item.TestId }, 
+                   new { @class = "btn btn-primary"})
+                }
+            </td>
+         </tr>
+      }
+
+            </table>
+        }
+        else
+        {
+            <br />
+            <br />
+            <p>
+                <span class="glyphicon glyphicon-info-sign"></span> Only logged in users can take the tests and keep their score. In order to do so please register.
+            </p>
+        }
+    </div>
+</div>

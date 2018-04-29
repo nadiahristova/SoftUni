@@ -1,0 +1,39 @@
+* {
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+body > section {
+	margin:20px auto;
+	width:500px;
+}
+
+body > section >* {
+	display:block;
+}
+
+input[type="text"] {
+	color:orange;
+	background-color:#234465;
+	width:100%;
+	padding:10px 20px;
+	font-family:calibri;
+	font-weight:bold;
+	border:none;
+	font-size:1.1em;
+	letter-spacing:0.05em;
+}
+
+input[type="text"]:last-of-type {
+	font-size:1.3em;
+}
+
+input[type="button"] {
+	margin:10px auto;
+	padding:5px 10px;
+	font-family:"times new roman";
+	border:2px solid black;
+	font-size:1.1em;
+	background-color:white;
+}

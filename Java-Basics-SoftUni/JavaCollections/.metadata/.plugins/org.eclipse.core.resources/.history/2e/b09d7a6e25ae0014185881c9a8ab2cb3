@@ -1,0 +1,35 @@
+package Exam6;
+
+import java.util.Scanner;
+
+public class _03_WierdStrings {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String line = input.nextLine().replaceAll("[/|()\\s+\\\\]+", "");
+		String[] words = line.split("[^a-zA-Z]+");
+		int[] wight = new int[words.length];
+		for (int i = 0; i < wight.length; i++) {
+			char[] ch = words[i].toLowerCase().toCharArray();
+			int wWord = 0;
+			for (int j = 0; j < ch.length; j++) {
+				wWord += ch[j] - 96;		
+			}
+			wight[i] = wWord;
+		}
+		
+		int maxSum = 0;
+		int index = -1;
+		for (int i = 0; i < wight.length-1; i++) {
+			int sum = wight[i] + wight[i+1];
+			if (sum > maxSum) {
+				maxSum = sum;
+				index = i;
+			}
+		}
+		if (index>-1) {
+			System.out.println(words[index]);
+			System.out.println(words[index+1]);
+		}
+	}
+
+}

@@ -1,0 +1,82 @@
+<h3>Dashboard</h3>
+<br />
+<br />
+
+<div class="row">
+    <div class="col-sm-6">
+        <h5>Affiliated Projects <span ng-if="isCurrUserAdmin"> /  <a href="#/Projects">View All Projects</a> <span class="badge"><a href="#/addProject" style="color: white">add new project</a></span></span></h5>
+        <hr />
+        <table class="table table-striped table-hover table-responsive dash-table">
+            <thead>
+            <tr>
+                <th>ProjectName</th>
+                <th>Lead</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="project in affilProjects | filter : paginate">
+                <td>
+                    <a href="#/projects/{{project.Id}}" class=".not-dec">{{project.Name}}</a>
+                    <span ng-if="isCurrUserAdmin ||  project.Lead.Id === userID">
+                        <span class="badge">
+                            <a href="#/projects/{{project.Id}}/edit" class=".not-dec">EDIT</a>
+                        </span>
+                    </span>
+                </td>
+                <td>{{project.Lead.Username}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <uib-pagination class="pagination" total-items="totalCountProjects" items-per-page='numPerPage' ng-model="currentPageProjects"
+                        ng-change="pageChangedProjects(numPerPage, currentPageProjects)" max-size="maxSize" boundary-link-numbers="true" ></uib-pagination>
+    </div>
+
+    <div class="col-sm-6">
+        <h5>Affiliated Issues </h5>
+        <hr />
+        <table class="table table-striped table-hover table-responsive dash-table">
+            <thead>
+            <tr>
+                <th>
+                    <a class="sort-link .not-dec" ng-click="orderedByTitleDesc = !orderedByTitleDesc; pageChangedIssues(numPerPage, 1, 'Title', orderedByTitleDesc)">
+                        Title
+                    </a>
+                </th>
+                <th>
+                    <a class="sort-link .not-dec" ng-click="orderedByDescriptionDesc = !orderedByDescriptionDesc; pageChangedIssues(numPerPage, 1, 'Description', orderedByDescriptionDesc)">
+                        Description
+                    </a>
+                </th>
+                <th>
+                    <a class="sort-link .not-dec" ng-click="orderedByProjectDesc = !orderedByProjectDesc; pageChangedIssues(numPerPage, 1, 'Project.Name', orderedByProjectDesc)">
+                        Project
+                    </a>
+                </th>
+                <th>
+                    <a class="sort-link .not-dec" ng-click="orderedByDueDateDesc = !orderedByDueDateDesc; pageChangedIssues( numPerPage, 1, 'DueDate', orderedByDueDateDesc)">
+                        Due Date
+                    </a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="issue in ownIssues | filter : paginate">
+                <td valign="middle">
+                    <a href="#/issues/{{issue.Id}}" class=".not-dec">{{issue.Title}}</a>
+                    <span ng-if="isCurrUserAdmin ||  issue.Author.Id === userID">
+                        <span class="badge">
+                            <a href="#/issues/{{issue.Id}}/edit" class=".not-dec">EDIT</a>
+                        </span>
+                    </span>
+                </td>
+                <td>{{issue.Description}}</td>
+                <td><a href="#/projects/{{issue.Project.Id}}" class=".not-dec">{{issue.Project.Name}}</a></td>
+                <td>{{issue.DueDate}}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <uib-pagination class="pagination"  total-items="totalCountIssues" items-per-page='numPerPage' ng-model="currentPageIssues"
+                        ng-change="pageChangedIssues(numPerPage, currentPageIssues)" max-size="maxSize" boundary-link-numbers="true" ></uib-pagination>
+    </div>
+</div>

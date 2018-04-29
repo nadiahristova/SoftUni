@@ -1,0 +1,38 @@
+*{
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+form {
+	margin:0 auto;
+	width:20%;
+}
+
+input {
+	width:100%;
+	margin:3px;
+}
+
+input[type='radio']{
+	width:5%;
+}
+
+label {
+	width:90%;
+}
+
+form > * {
+	display:inline-block;
+}
+
+input[type='submit']{
+	width:70px;
+	border-radius:5px;
+}
+
+div{
+	margin:0 auto;
+	width:20%;
+}
+

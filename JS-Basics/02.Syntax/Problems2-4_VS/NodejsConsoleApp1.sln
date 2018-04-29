@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EA492CBD-AADF-4DBF-A932-898DC7B5DF44}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "_2_CalculateKnots", "_2_Calculate knots\_2_CalculateKnots.njsproj", "{69ACFB58-04DD-4F44-8CB8-19B203D12B89}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "_3_CylinderVolume", "_3_CylinderVolume\_3_CylinderVolume.njsproj", "{844C42B5-3851-4D90-868E-2B2E7DBFFBC1}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "_4_TheLifetimeSupplyCalculator", "_4_TheLifetimeSupplyCalculator\_4_TheLifetimeSupplyCalculator.njsproj", "{F745F118-4194-461D-835C-9D130BD2BAFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69ACFB58-04DD-4F44-8CB8-19B203D12B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69ACFB58-04DD-4F44-8CB8-19B203D12B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69ACFB58-04DD-4F44-8CB8-19B203D12B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69ACFB58-04DD-4F44-8CB8-19B203D12B89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{844C42B5-3851-4D90-868E-2B2E7DBFFBC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{844C42B5-3851-4D90-868E-2B2E7DBFFBC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{844C42B5-3851-4D90-868E-2B2E7DBFFBC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{844C42B5-3851-4D90-868E-2B2E7DBFFBC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F745F118-4194-461D-835C-9D130BD2BAFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F745F118-4194-461D-835C-9D130BD2BAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F745F118-4194-461D-835C-9D130BD2BAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F745F118-4194-461D-835C-9D130BD2BAFB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,8 @@
+
+public class Prob16_SimpleExpression {
+	public static void main(String[] args) {
+		String[] numbers = "   5 -3.305     + 12 - 55- 1  - 2+6".trim().split("\\D+");
+		boolean boo =true;
+		System.out.println(boo);
+	}
+}

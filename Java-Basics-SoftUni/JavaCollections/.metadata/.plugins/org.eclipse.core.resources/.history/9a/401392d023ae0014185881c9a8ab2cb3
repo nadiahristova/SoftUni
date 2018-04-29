@@ -1,0 +1,22 @@
+package Exam6;
+
+import java.util.Scanner;
+
+public class _03_WierdStrings {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		int a = 'a';
+		String line = "(a)bc||de|f: (Hello)3 '' |(soap|Box)rAc|e=(somnambulSkiGiganti)"
+				.replaceAll("[/|()\\s+\\\\]+", "");
+		String[] words = line.split("[^a-zA-Z]+");
+		int[] wight = new int[words.length];
+		for (int i = 0; i < wight.length; i++) {
+			char[] ch = words[i].toLowerCase().toCharArray();
+			int wWord = 0;
+			for (int j = 0; j < ch.length; j++) {
+				//wWord += ()
+			}
+		}
+	}
+
+}

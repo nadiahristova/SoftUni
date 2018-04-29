@@ -1,0 +1,45 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+
+h1, h2, h3, h4 {
+	text-align:center;
+}
+
+section {
+	background-color: #FFC0CB;
+	border-radius: 10px;
+	margin: 10px;
+	padding: 10px;
+	width: 960px;
+
+}
+
+	section>article{
+		margin: 10px;
+		vertical-align: top;
+		display: inline-block;
+	}
+
+		section>article>figure>img {
+			width: 150px;
+			height: 150px;
+		}
+
+		section>article>footer>meter {
+			width: 150px;
+		}
+		
+		section>article>audio {
+			margin: 10px 0;
+			display: block;
+		}
+		
+		section>article>embed{
+			height: 90px;
+		}
+		
+		section>article>video {
+		}

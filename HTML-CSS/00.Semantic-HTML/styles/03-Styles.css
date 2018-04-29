@@ -1,0 +1,49 @@
+body, main, ul, li, nav, iframe, header, section {
+	padding:0;
+	margin:0;
+	box-sizing: border-box;
+}
+
+body > main > section {		
+	width:62%;
+	background-color:black;
+	padding:20px;
+	margin:20px;
+	font-family:tahoma;
+	border-radius:15px;
+	overflow:auto;
+	position:fixed;
+}
+
+body > main > section > header {
+	color:#F2C106;
+	font-weight:bold;
+	text-align:center;
+	width:100%;
+	font-size:3em;
+	padding-bottom:20px;
+}
+
+iframe {	
+	border:2px solid #F2C106;	
+	width:300px;
+	height:210px;
+	display:in-block;
+	float:left;	
+}
+
+ul li {
+	list-style:none;
+	font-style:italic;
+	font-size:2.1em;
+	padding-left:45px;
+	display:block;
+}
+
+ul li a{
+	text-decoration:none;
+	color:white;
+}
+nav {
+	float:left;
+}

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root-directory path="C:\Example">
+  <dir name="docs">
+    <file name="tutorial.pdf" />
+    <file name="TODO.txt" />
+    <file name="Presentation.pptx" />
+  </dir>
+  <dir name="photos">
+    <dir name="birthday-4-march">
+      <file name="friends.jpg" />
+      <file name="the_cake.jpg" />
+      <file name="baloons.jpg" />
+    </dir>
+    <dir name="travel">
+      <file name="IMG24152.jpg" />
+    </dir>
+  </dir>
+</root-directory>

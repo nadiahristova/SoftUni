@@ -1,0 +1,30 @@
+import java.util.*;
+
+
+public class gddgfgd {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String list1 = "w e l c o m e t o s o f t u n i";
+		String list2 = "j a v a p r o g r a m m i n g";
+		String[] strArrList1 = list1.trim().split("\\s+");		
+		String[] strArrList2 = list2.trim().split(" ");
+		
+		ArrayList<String> joinedList = new ArrayList<>();
+		ArrayList<String> l1 = new ArrayList<>();
+		ArrayList<String> l2 = new ArrayList<>();
+		ArrayList<String> middleList = new ArrayList<>();
+		
+		l1.addAll(Arrays.asList(strArrList1));
+		l2.addAll(Arrays.asList(strArrList2));
+		middleList.addAll(Arrays.asList(strArrList2));		
+		joinedList = (ArrayList<String>) l1.clone();
+		
+		l2.retainAll(l1);
+		middleList.removeAll(l2);
+		joinedList.addAll(middleList);
+		
+		for (String letter:joinedList) {
+			System.out.print(letter + " ");
+		}
+	}	
+}

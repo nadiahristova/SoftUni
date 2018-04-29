@@ -1,0 +1,139 @@
+﻿<<>>  Problem 1.	Add(T) Complexity – Worst Case:
+ public void Add(T item)
+    {
+        var newArr = new T[this.arr.Length + 1];	//(C steps)
+        Array.Copy(this.arr, newArr, this.arr.Length);	//(C steps)*(this.arr.Length times)
+        newArr[newArr.Length - 1] = item;	//(C steps)
+        this.arr = newArr;	//(C steps)
+    }
+
+ f(n) = C + C*n + C + C 
+ f(n) = n + 3
+ O(f(n)) = O(n+3) => 
+ The upper bound for time complexity of the algorithm is: 
+	O(n), where n = this.arr.Length
+ 
+						**********
+											
+<<>>  Problem 2.	Remove(index) Complexity – Worst Case:
+public T Remove(int index)
+    {
+        T result = this.arr[index];		//(C steps)
+        var newArr = new T[this.arr.Length - 1];		//(C steps)
+        Array.Copy(this.arr, newArr, index);	//(C steps)*(index times)
+        Array.Copy(this.arr, index + 1, newArr, index, this.arr.Length - index - 1);	//(C steps)*((this.arr.Length - index - 1) times)
+        this.arr = newArr;			//(C steps)
+        return result;			//(C steps)
+    }
+	
+ f(n) = C + C + C*index + C*(this.arr.Length - index - 1)+ C + C = 4*C + C*index - C*index + C*this.arr.Length - C
+ f(n) = n + 3
+ O(f(n)) = O(n+3) => 
+ The upper bound for time complexity of the algorithm is: 
+	O(n), where n = this.arr.Length
+	 
+						**********
+											
+<<>>  Problem 3.	Remove(index) Complexity – Best Case:
+public T Remove(int index)
+	{
+		T result = this.arr[index];		//(C steps)
+		var newArr = new T[this.arr.Length - 1];		//(C steps)
+		Array.Copy(this.arr, newArr, index);	//(C steps)*(index times)
+		Array.Copy(this.arr, index + 1, newArr, index, this.arr.Length - index - 1);	//(C steps)*((this.arr.Length - index - 1) times)
+		this.arr = newArr;			//(C steps)
+		return result;			//(C steps)
+	}
+	
+	f(n) = 3*C + C*this.arr.Length
+	In the best case this.arr.Length = 1 (this.arr.Length must be > 0 or else we'll get an exception)=>
+	f(n) = 4
+	O(f(n)) = O(4) =>
+The lower bound for time complexity of the algorithm is: O(1)
+	 
+						**********
+											
+<<>>  Problem 4.	Remove(index) Complexity – Average Case:
+	f(n) = 3*C + C*this.arr.Length
+	In the average case this.arr.Length = this.arr.Length/2 =>
+	f(n) = n/2 + 3
+	O(f(n)) = O(n/2 + 3) =>
+The average bound for time complexity of the algorithm is: 
+	O(n), where n = this.arr.Length
+	 
+						**********
+											
+<<>>  Problem 5.	RemoveFirst(T) Complexity:
+public T RemoveFirst()
+    {
+        return this.Remove(0);	//(C steps)*(1 time for O(f(n)) of Remove(int index) method)
+    }
+
+	=> worst and average case: O(1*n) = O(n),  where n = this.arr.Length
+	   best case: O(1)
+	   	 
+						**********
+
+<<>>  Problem 6.	RemoveLast(T) Complexity:
+public T RemoveLast()
+    {
+        return this.Remove(this.Length - 1);	//(C steps)*(1 time for O(f(n)) of Remove(int index) method)
+    }
+	
+	=> worst and average case: O(1*n) = O(n),  where n = this.arr.Length
+	   best case: O(1)
+	  	   
+						**********
+											
+<<>>  Problem 7.	Length Complexity:
+    public int Length
+    {
+        get
+        {
+            return this.arr.Length;			//(C steps)
+        }
+    }
+
+	Time complexity of the algorithm is: O(1)
+		  	   	 
+						**********
+											
+<<>>  Problem 8.	This[index] Complexity:
+	public T this[int index]
+    {
+        get
+        {
+            return this.arr[index];
+        }
+    }
+
+	Time complexity of the algorithm is: O(1)
+			  	   	 
+						**********
+									
+<<>>  Problem 9.	First Complexity
+	public T First
+    {
+        get
+        {
+            return this.arr[0];
+        }
+    }
+
+	Time complexity of the algorithm is: O(1)
+				  	   	 
+						**********
+			
+<<>>  Problem 10.	Last Complexity
+						
+	    public T Last
+    {
+        get
+        {
+            return this.arr[this.arr.Length - 1];
+        }
+    }
+	
+	Arrays are fixed-length; the Length property returns an internal field in the array. =>
+	Time complexity of the algorithm is: O(1)
+	

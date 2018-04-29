@@ -1,0 +1,11 @@
+
+public class LongestOddEvenSeq {
+	public static void main(String[] args) {
+		String line  = "(3) (22) (-18) (55) (44) (3) (21)".trim().replace(" ", "");
+		String[] nums = line.split("[()]+");
+		int counter = 0;
+		for (int i = 0; i < nums.length; i++) {
+			
+		}
+	}
+}

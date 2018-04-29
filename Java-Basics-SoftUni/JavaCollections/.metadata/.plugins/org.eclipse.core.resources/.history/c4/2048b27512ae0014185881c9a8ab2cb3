@@ -1,0 +1,20 @@
+package Exam6;
+
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+
+public class _01_DateTime {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		DateTimeFormatter formatt = DateTimeFormatter.ofPattern("'T'HH:mm:ss'Z'");
+		LocalTime firs = LocalTime.parse(input.nextLine(),formatt);
+		LocalTime second = LocalTime.parse(input.nextLine(),formatt);
+		Duration between = Duration.between(firs, second);
+		long secs = between.toMillis();
+		System.out.printf(between.toString());
+	}
+
+}

@@ -1,0 +1,44 @@
+package Exam4;
+
+import java.util.TreeMap;
+
+public class _02_Bombs {
+	public static void main(String[] args) {
+		String line = "prepare|yo|dong";
+		char[] letter = line.toCharArray();
+		char[] afterBombs = new char[letter.length];
+		TreeMap<Integer, Integer> bombs = new TreeMap<>();
+
+		for (int i = 0; i < letter.length; i++) {
+			int counter;
+			if (letter[i] == '|') {
+				counter = 0;
+				int sum = 0;
+				for (int j = i + 1; j < letter.length; j++) {
+					if (letter[j] == '|') {
+						break;
+					} else {
+						counter++;
+						sum += letter[j];
+					}
+				}
+				sum %= 10;
+				bombs.put(i - sum, counter + 2 + 2 * sum);
+			}
+
+		}
+
+		for (int pos : bombs.keySet()) {
+			int endPos = bombs.get(pos);
+			if (pos < 0) {
+				pos = 0;
+			}
+			for (int j = pos; j <= endPos; j++) {
+				letter[j] = '.';
+			}
+		}
+
+		System.out.println(letter.toString());
+	}
+}
+

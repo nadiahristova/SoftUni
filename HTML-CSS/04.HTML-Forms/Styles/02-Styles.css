@@ -1,0 +1,108 @@
+form, header, section, label, input {
+	margin:0;
+	padding:0;
+	box-sizing:border-box;
+}
+
+form {
+	background-color:#FFC0CB;
+	overflow:hidden;
+	font-style:italic;
+	font-family:tahoma;
+	padding:15px;
+	float:left;
+}
+
+header {
+	width:100%;	
+	text-align:center;
+	text-transform:uppercase;
+	font-weight:bold;
+	font-size:2rem;
+}
+
+section {
+	float:left;
+	width:220px;
+	display:inline-box;
+	margin-right:5px;	
+}
+
+label {
+	font-size:0.8rem;
+	float:left;
+	width:100%;
+	margin:5px 0;	
+}
+section:nth-of-type(2) > input[type="checkbox"] + label{
+	width:auto;
+	margin:4px auto 6px 5px;
+}
+
+select{
+	height:25px;	
+	font-size:1.1rem;
+	text-indent:3px;
+	width:100%;
+}
+ #town {
+	margin-bottom:27px;
+ }
+
+input {
+	height:30px;
+	font-family:consolas;
+	font-size:1.2rem;
+	text-indent:3px;
+	color:rgba (0, 0, 0, 0.3);
+}
+
+input[type="checkbox"] {
+	width:12px;
+	height:12px;
+	margin-top:7px;
+	float:left;
+}
+
+input[type="date"] {
+	width:100%;
+}
+
+#return-date ~ label {
+	width:70px;	
+	margin-right:5px;
+	float:left;
+}
+
+input[type="number"] {
+	width:70px;
+	margin-right:5px;
+	float:left;
+}
+
+section:first-of-type > input[type="number"]:last-of-type, section:first-of-type > label:last-of-type {
+	margin-right:0 !important;
+	float:right;
+}
+
+input[type="time"] {
+	width:81pt;
+	display:inline-block;
+	float:left;
+}
+
+#start-time-interval {
+	margin-right:4px;
+}
+
+label:last-of-type + select {
+	height:30px;
+	margin-bottom:5px;
+}
+
+input[type="submit"] {
+	width:100%;
+	letter-spacing:-2px;
+	font-size:1.2rem;
+	font-weight:600;
+}

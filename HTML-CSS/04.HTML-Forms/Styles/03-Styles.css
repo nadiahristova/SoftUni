@@ -1,0 +1,45 @@
+form, input, header, span , search{
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+header {
+	font-variant:small-caps;
+	text-transform:capitalize;
+	color:#464646;
+	font-size:2.6rem;
+	font-weight:bold;
+	font-family:constantia, sans-serif;
+	margin-bottom:10px;	
+}
+
+span {
+	color:#22769C;	
+}
+
+header::before {
+	content:url('../img/word-press-logo.png');
+	position:relative;
+	top:12px;
+	padding-right:2px;
+}
+
+header ~ * {
+	font-size:0.9rem;
+}
+
+input[type="file"] {
+	font-size:0.8rem;		
+}
+
+input[type="search"] {
+	width:125px;
+	margin-top:-5px;
+}
+
+input[type="search"] + span::after {
+	content:url('../img/word-press.png');
+	position:relative;
+	top:6px;
+}

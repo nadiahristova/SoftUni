@@ -1,0 +1,14 @@
+package Exam6;
+
+import java.util.Scanner;
+
+public class _03_WierdStrings {
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		String line = "(a)bc||de|f: (Hello)3 '' |(soap|Box)rAc|e=(somnambulSkiGiganti)"
+				.replaceAll("[/|()\\s+\\\\]+", "");
+		String[] words = line.split("[^a-zA-Z]");
+		
+	}
+
+}

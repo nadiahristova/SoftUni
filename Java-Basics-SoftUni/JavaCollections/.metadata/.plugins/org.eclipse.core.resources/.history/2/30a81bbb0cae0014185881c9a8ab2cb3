@@ -1,0 +1,18 @@
+package exam5;
+
+import java.util.LinkedHashMap;
+import java.util.Scanner;
+import java.util.TreeMap;
+
+public class _04_Orders {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		int n = Integer.parseInt(scan.nextLine());
+		TreeMap<String,LinkedHashMap<String,Integer>> out = new TreeMap<>();
+		
+		for (int i = 0; i < n; i++) {
+			String[] arr = scan.nextLine().split("[|\\s*-\\s*]+");
+			String Comp = arr[0];
+		}
+	}
+}

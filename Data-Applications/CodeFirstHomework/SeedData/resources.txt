@@ -1,0 +1,16 @@
+1 http://www.foo.com/bar.html A very interesting documentary concerning this topic
+1 http://www.foo.com/bar.html A very inspiring lecture about this topic
+2 http://www.foo.com/bar.html A very inspiring Presentation about this topic
+3 http://www.foo.com/bar.html A very detailed lecture about this topic
+3 http://www.foo.com/bar.html Solved problems
+4 http://www.foo.com/bar.html Pictures
+4 http://www.foo.com/bar.html Diagrams
+4 http://www.foo.com/bar.html Invitation
+1 http://www.foo.com/bar.html A very interesting documentary concerning this topic
+1 http://www.foo.com/bar.html A very inspiring lecture about this topic
+2 http://www.foo.com/bar.html A very inspiring Presentation about this topic
+3 http://www.foo.com/bar.html A very detailed lecture about this topic
+3 http://www.foo.com/bar.html Solved problems
+4 http://www.foo.com/bar.html Pictures
+4 http://www.foo.com/bar.html Diagrams
+4 http://www.foo.com/bar.html Invitation

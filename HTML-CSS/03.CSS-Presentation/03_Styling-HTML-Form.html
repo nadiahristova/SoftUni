@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A form</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="Styles/03-Styles.css">
+	</head>
+	
+	<body>
+		<center>
+			<form action="#" method="post">
+				<section>
+					<header>Step 1: Your details</header>
+					<div>
+						<label>Name</label>
+						<input id="name" name="name" type="text" placeholder="First and last name" />
+					</div>
+					<div>
+						<label>Email</label>					
+						<input id="email" name="email" type="email" placeholder="example@domain.com"/>
+					</div>
+					<div>
+						<label>Phone</label>					
+						<input id="phone" name="phone" type="tel" placeholder="eg. +447500000000" />
+					</div>
+				</section>
+				
+				<section>
+					<header>Step 2: Delivery address</header>
+					<div>
+						<label>Address</label>
+						<textarea id="address" name="address"></textarea>
+					</div>
+					<div>
+						<label>Post code</label>					
+						<input id="postcode" name="postcode" type="text"/>
+					</div>
+					<div>
+						<label>Country</label>					
+						<input id="country" name="country" type="text"/>
+					</div>
+				</section>
+				
+				<section>
+					<header>Step 3: Card details</header>
+					<div class="checker">
+						<span>Card type</span><br />
+						<div>
+						<input id="visa" name="card" type="radio" value="VISA"/> <label for="visa">VISA</label>
+						<input id="amex" name="card" type="radio" value="AmEx"/> <label for="amex">AmEx</label>
+						<input id="mastercard" name="card" type="radio" value="Mastercard"/> <label for="mastercard">Mastercard</label>
+						</div>
+					</div>
+					<div>
+						<label>Card number</label>					
+						<input id="cardNum" name="cardNum" type="text"/>
+					</div>
+					<div>
+						<label>Security code</label>					
+						<input id="secCode" name="secCode" type="text"/>
+					</div>
+					<div>
+						<label>Name on card</label>					
+						<input id="cardName" name="cardName" type="text" placeholder="exact name as on the card" />
+					</div>
+				</section>
+				
+				<input value="BUY IT!" type="button">
+			</form>
+		</center>
+	</body>
+</html>

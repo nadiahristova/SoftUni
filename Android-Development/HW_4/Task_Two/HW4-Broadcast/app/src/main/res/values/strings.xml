@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">HW4 - Broadcast</string>
+    <string name="action_settings">Settings</string>
+    <string name="destroy_service_caption">destroy service</string>
+    <string name="destroyed_service_caption">Service destoyed</string>
+    <string name="battery_change_lbl">Battery lvl change for the past hour:</string>
+    <string name="check_battery">check battery lvl</string>
+</resources>

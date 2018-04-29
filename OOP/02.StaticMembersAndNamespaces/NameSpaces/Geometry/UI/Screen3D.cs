@@ -1,0 +1,6 @@
+﻿namespace NameSpaces.Geometry.UI
+{
+    class Screen3D
+    {
+    }
+}

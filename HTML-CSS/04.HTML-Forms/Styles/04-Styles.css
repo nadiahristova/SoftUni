@@ -1,0 +1,152 @@
+form, input, header, h1, h3, h5, section, select, option, label, span, fieldset, textarea {
+	padding:0;
+	margin:0;
+	box-sizing:border-box;
+}
+
+form {
+	background-color:#3B5997;
+	overflow:auto;
+	float:left;
+	color:white;
+	font-family:tahoma;	
+}
+
+header {
+	font-size:1rem;
+	display:inline-block;
+	width:100%;
+	text-align:center;	
+}
+
+header > h1 {	
+	font-size:6rem;	
+	margin-bottom:10px;
+}
+
+header > h1 > span {
+	font-size:0.8rem;
+	padding-left:5px;
+}
+
+header > h3 {	
+	font-size:2rem;
+	margin-bottom:7px;
+}
+
+fieldset {
+	border-radius:10px;
+	padding:10px;
+}
+
+legend {
+	text-align:center;
+	font-size:0.8rem;
+}
+
+section {
+	float:left;	
+	padding:15px;	
+}
+
+section:first-of-type {
+	width:275px;	
+}
+
+section:last-of-type {
+	width:400px;
+}
+
+input[type="submit"], input[type="reset"] {
+	width:100%;
+	height:45px;
+	color:#3B5997;
+	border-radius:10px;
+	border:none;
+	margin-top:15px;
+}
+
+section:first-of-type  > fieldset:first-of-type {
+	padding-bottom:36px;
+}
+
+fieldset:first-of-type > input:not([type="datetime"]) {
+	width:48%;	
+	border-radius:3px;
+	height:19px;
+	border:none;
+	margin-bottom:3px;
+}
+
+fieldset:first-of-type > input[type="datetime"] {
+	width:150px;	
+	border-radius:3px;
+	height:19px;
+	border:none;
+}
+
+section:first-of-type > fieldset > label {
+	font-size:0.7rem;
+}
+
+section:first-of-type > fieldset > div {
+	display:inline-block;
+	overflow:auto;
+}
+
+label.inline {
+	display:inline-block;
+	overflow:auto;
+	margin-top:5px;	
+	font-size:0.8rem;
+}
+
+input[type=radio"radio"].inline-radio {
+	margin-top:2px;
+}
+
+select {
+	border-radius:3px;
+	color: rgba(0, 0, 0, 0.4);	
+}
+
+select option:disabled {
+	color: rgba(0, 0, 0, 0.4);
+}
+
+select option:not(disabled) {
+	color: black;
+}
+
+#country, #village, #district, #street {
+	width:32.2%;
+}
+
+#nr, #floor, #ap-nr {
+	width:21%;
+}
+
+#ap-nr + label {
+	font-size:0.8rem;
+}
+
+input[type="color"] {
+	height:19px;
+	width:32.2%;
+}
+
+#wm-nr, #anties, #door-color {
+	width:32.2%;
+}
+
+#anties + label {
+	font-size:0.8rem;
+}
+
+textarea {
+	border-radius:3px;
+	color: rgba(0, 0, 0, 0.4);
+	font-size:0.8rem;
+	width:100%;
+	height:50px;
+}

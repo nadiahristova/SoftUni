@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFS-Escape-from-Labyrinth", "BFS-Escape-from-Labyrinth\BFS-Escape-from-Labyrinth.csproj", "{27F265F3-ABF7-46FD-A656-AD5CD27CDC2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFS-Escape-from-Labyrinth.Tests", "BFS-Escape-from-Labyrinth.Tests\BFS-Escape-from-Labyrinth.Tests.csproj", "{1875E377-837F-405B-828C-468C6A33B761}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3.RideTheHorse", "P3.RideTheHorse\P3.RideTheHorse.csproj", "{2581CF86-EBE9-433B-8FB0-36E058490434}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LongestPathInTree", "LongestPathInTree\LongestPathInTree.csproj", "{398249F3-5805-4183-9F1D-6CD398ADD9C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sorting", "Sorting\Sorting.csproj", "{B6B70DA3-5BD4-4091-9158-785F518644AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27F265F3-ABF7-46FD-A656-AD5CD27CDC2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F265F3-ABF7-46FD-A656-AD5CD27CDC2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F265F3-ABF7-46FD-A656-AD5CD27CDC2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F265F3-ABF7-46FD-A656-AD5CD27CDC2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1875E377-837F-405B-828C-468C6A33B761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1875E377-837F-405B-828C-468C6A33B761}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1875E377-837F-405B-828C-468C6A33B761}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1875E377-837F-405B-828C-468C6A33B761}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2581CF86-EBE9-433B-8FB0-36E058490434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2581CF86-EBE9-433B-8FB0-36E058490434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2581CF86-EBE9-433B-8FB0-36E058490434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2581CF86-EBE9-433B-8FB0-36E058490434}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398249F3-5805-4183-9F1D-6CD398ADD9C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398249F3-5805-4183-9F1D-6CD398ADD9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398249F3-5805-4183-9F1D-6CD398ADD9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398249F3-5805-4183-9F1D-6CD398ADD9C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6B70DA3-5BD4-4091-9158-785F518644AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6B70DA3-5BD4-4091-9158-785F518644AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6B70DA3-5BD4-4091-9158-785F518644AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6B70DA3-5BD4-4091-9158-785F518644AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

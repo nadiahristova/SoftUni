@@ -1,0 +1,21 @@
+* Document databases pair each key with a complex data structure known as a document. Documents can contain many different key-value pairs, or key-array pairs, or even nested documents.
+* Graph stores are used to store information about networks, such as social connections. Graph stores include Neo4J and HyperGraphDB.
+* Key-value stores are the simplest NoSQL databases. Every single item in the database is stored as an attribute name (or "key"), together with its value. Examples of key-value stores are Riak and Voldemort. Some key-value stores, such as Redis, allow each value to have a type, such as "integer", which adds functionality.
+* Wide-column stores such as Cassandra and HBase are optimized for queries over large datasets, and store columns of data together, instead of rows.
+
+* Column: Accumulo, Cassandra, Druid, HBase, Vertica
+* Document: Lotus Notes, Clusterpoint, Apache CouchDB, Couchbase, HyperDex, MarkLogic, MongoDB, OrientDB, Qizx
+* Key-value: CouchDB, Dynamo, FoundationDB, HyperDex, MemcacheDB, Redis, Riak, FairCom c-treeACE, Aerospike, OrientDB, MUMPS
+* Graph: Allegro, Neo4J, InfiniteGraph, OrientDB, Virtuoso, Stardog
+* Multi-model: OrientDB, FoundationDB, ArangoDB, Alchemy Database, CortexDB
+
+
+The Benefits of NoSQL
+When compared to relational databases, NoSQL databases are more scalable and provide superior performance, and their data model addresses several issues that the relational model is not designed to address:
+* Large volumes of structured, semi-structured, and unstructured data
+* Agile sprints, quick iteration, and frequent code pushes
+* Object-oriented programming that is easy to use and flexible
+* Efficient, scale-out architecture instead of expensive, monolithic architecture
+
+
+

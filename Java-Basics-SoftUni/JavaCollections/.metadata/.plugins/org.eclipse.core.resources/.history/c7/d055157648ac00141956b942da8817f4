@@ -1,0 +1,28 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Scanner;
+ 
+/**
+*
+* @author vimal
+*/
+public class Prob13_WebCrawler {
+ 
+    /**
+    * @param args the command line arguments
+    */
+    public static void main(String[] args)  {
+        try {        	
+            URL my_url = new URL("http://www.vimalkumarpatel.blogspot.com/");
+            Scanner webReader = new Scanner(new InputStreamReader(my_url.openStream()));
+            //BufferedReader br = new BufferedReader(new InputStreamReader(my_url.openStream()));
+            String strTemp = "";
+            while(null != (strTemp = webReader.nextLine())){
+            System.out.println(strTemp);
+        }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}

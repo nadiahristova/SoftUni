@@ -1,0 +1,14 @@
+import java.math.BigDecimal;
+import java.util.Scanner;
+
+public class Prob16_SimpleExpression {
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		String expression = "  3   9  + 8  8 -9-  6 ".trim().replace(" ", "");
+		String[] numbers = expression.split("[^0-9.]+");
+		String[] signs = expression.split("[0-9.]+");
+		BigDecimal num = new BigDecimal(numbers[0]);
+	}
+
+}

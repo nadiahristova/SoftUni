@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Calculator</title>
+		<meta charset="UTF-8">
+		<link href="Styles/05-Styles.css" rel="stylesheet">
+	</head>
+	
+	<body>
+		<form action="#" metod="get">
+			<header>
+				<span>Calculator</span>
+				<button id="minimize"></button>
+				<button id="restore"></button>
+				<button id="close"></button>
+			<header>
+			
+			<nav>
+				<ul>
+					<li><a href="#">View</a></li>
+					<li><a href="#">Edit</a></li>
+					<li><a href="#">Help</a></li>
+				</ul>
+			</nav>		
+		
+			<div id="upper">
+				<input name="display" id="display" type="text" value="0">
+				<div class="wrapper">
+					<div class="with-pos-bits">
+						<input name="display-second-half-8th-byte" id="display-second-half-8th-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="63" >
+						<input name="display-second-half-4th-byte" id="display-second-half-4th-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="31" >				
+					</div>
+					<div>
+						<input name="display-first-half-8th-byte" id="display-first-half-8th-byte" type="text" value="0000" >	
+						<br /> 
+						<input name="display-first-half-4th-byte" id="display-first-half-4th-byte" type="text" value="0000" >
+						<br />					
+					</div>
+					<div>
+						<input name="display-second-half-7th-byte" id="display-second-half-7th-byte" type="text" value="0000" >
+						<br />					
+						<input name="display-second-half-3th-byte" id="display-second-half-3th-byte" type="text" value="0000" >			
+					</div>
+					<div>
+						<input name="display-first-half-7th-byte" id="display-first-half-7th-byte" type="text" value="0000" >			
+						<br />
+						<input name="display-first-half-3th-byte" id="display-first-half-3th-byte" type="text" value="0000" >			
+						<br />
+					</div>
+					<div class="with-pos-bits">
+						<input name="display-second-half-6th-byte" id="display-second-half-6th-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="47" >
+						<input name="display-second-half-2nd-byte" id="display-second-half-2nd-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="15" >				
+					</div>
+					<div>
+						<input name="display-first-half-6th-byte" id="display-first-half-6th-byte" type="text" value="0000" >			
+						<br />
+						<input name="display-first-half-2nd-byte" id="display-first-half-2nd-byte" type="text" value="0000" >			
+						<br />
+					</div>
+					<div>
+						<input name="display-second-half-5th-byte" id="display-second-half-5th-byte" type="text" value="0000" >			
+						<br />
+						<input name="display-second-half-1st-byte" id="display-second-half-1st-byte" type="text" value="0000" >			
+						<br />
+					</div>
+					<div class="with-pos-bits">
+						<input name="display-first-half-5th-byte" id="display-first-half-5th-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="32" >
+						<input name="display-first-half-1st-byte" id="display-first-half-1st-byte" type="text" value="0000" >
+						<input name="display-pos-last-bit" id="display-pos-last-bit" type="text" value="0" >				
+					</div>
+				</div>
+			</div>
+			
+			<div id="lower">
+				<div>
+					<div class="wrapper">
+						<ul>
+							<li>
+								<input name="system" type="radio" id="hex" ><label for="hex">Hex</label>
+							</li>
+							<li>
+								<input name="system" type="radio" id="dec" checked="checked"><label for="dec">Dec</label>
+							</li>
+							<li>
+								<input name="system" type="radio" id="oct" ><label for="oct">Oct</label>
+							</li>
+							<li>
+								<input name="system" type="radio" id="bin" ><label for="bin">Bin</label>
+							</li>
+						</ul>
+					</div>
+					<br />
+					<div class="wrapper">
+						<ul>
+							<li>
+								<input name="style" type="radio" id="qword" /><label for="qword">Qword</label>
+							</li>
+							<li>
+								<input name="style" type="radio" id="dword" checked="checked"/><label for="dword">Dword</label>
+							</li>
+							<li>
+								<input name="style" type="radio" id="word" /><label for="word">Word</label>
+							</li>
+							<li>
+								<input name="style" type="radio" id="byte" /><label for="byte">Byte</label>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<table cellspacing="5" border="1">
+					<colgroup>
+						<col width="36px"/><col width="36px"/><col width="36px"/><col width="36px"/><col width="36px"/><col width="36px"/><col width="36px"/><col width="36px"/>
+					</colgroup>
+					
+					<tr>
+						<td><button id="none"></button></td> <td><button id="mod">Mod</button></td> <td><button id="a" class="letter">A</button></td> <td><button id="mc">MC</button></td><td><button id="mr">MR</button></td><td><button id="ms">MS</button></td><td><button id="m+">M+</button></td><td><button id="m-">M-</button></td>
+					</tr>
+					<tr>
+						<td><button id="(">(</button></td> <td><button id=")">)</button></td> <td><button id="b" class="letter">B</button></td> <td><button id="right">&larr;</button></td><td><button id="ce">CE</button></td><td><button id="clear">c</button></td><td><button id="pl/min">&#8723;</button></td><td><button id="sqrt">&radic;</button></td>
+					</tr>
+					<tr>
+						<td><button id="rol">RoL</button></td> <td><button id="RoR">RoR</button></td> <td><button id="C" class="letter">C</button></td> <td><button id="7">7</button></td><td><button id="8">8</button></td><td><button id="9">9</button></td><td><button id="/">/</button></td><td><button id="%">%</button></td>
+					</tr>
+					<tr>
+						<td><button id="or">Or</button></td> <td><button id="xor">Xor</button></td> <td><button id="d" class="letter">D</button></td> <td><button id="4">4</button></td><td><button id="5">5</button></td><td><button id="6">6</button></td><td><button id="*">*</button></td><td><button id="div">1/x</button></td>
+					</tr>
+					<tr>
+						<td><button id="lsh">Lsh</button></td> <td><button id="rsh">Rsh</button></td> <td><button id="e" class="letter">E</button></td> <td><button id="1">1</button></td><td><button id="2">2</button></td><td><button id="3">3</button></td><td><button id="-">-</button></td><td rowspan="2"><button id="equal">=</button></td>
+					</tr>
+					<tr>
+						<td><button id="not">Not</button></td> <td><button id="and">And</button></td> <td><button id="f" class="letter">F</button></td> <td colspan="2"><button id="0">0</button></td><td><button id="dot">.</button></td><td><button id="plus">+</button></td>
+					</tr>
+				</table>
+			</div>
+			
+		</form>
+	</body>
+</html>

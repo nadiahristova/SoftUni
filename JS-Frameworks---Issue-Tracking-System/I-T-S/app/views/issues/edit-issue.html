@@ -1,0 +1,83 @@
+<div class="row">
+    <div id="home-basic5">
+        <div class="well bs-component">
+            <h5 id="nav-tabs">Edit issue</h5>
+            <hr/>
+            <form class="form-horizontal" name="addIssueForm">
+                <fieldset>
+                    <!--<legend>Welcome to Issue Tracker</legend>-->
+                    <div class="form-group">
+                        <label for="issueTitle">Title</label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" id="issueTitle" required="required" ng-model="issue.Title"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <div class="infoP">
+                            <input type="text" ng-model="issue.Description" class="form-control" id="description"
+                                   required="required" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Assignee <span>(current id:{{selectedDropdownItem.userId}})</span></label>
+                        <div ng-show="isCurrUserAdmin || userID === issue.Author.Username">
+                            <input-dropdown
+                                            id="prioritie1"
+                                            filter-list-method="filterInput(userInput)"
+                                            selected-item="selectedDropdownItem"
+                                            default-dropdown-items="availableOptions">
+                            </input-dropdown>
+                        </div>
+                        <div ng-show="!(isCurrUserAdmin || userID === issue.Author.Username)" class="col-lg-10">
+                            <input class="form-control" type="text" class="form-control" ng-model="issue.Assignee.Username" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prioritie">Prioritie</label>
+                        <select id="prioritie"
+                                ng-options="priority.Name for priority in priorities track by priority.Id"
+                                ng-model="currPriority"></select>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Due Date</label>
+                        <div class="infoP">
+                            <input class="form-control" id="dueDate" ng-model="issue.DueDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="author">Author </label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" ng-model="issue.Author.Username" id="author" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectName">Project </label>
+                        <div class="infoP">
+                            <input type="text" class="form-control" ng-model="issue.Project.Name" id="projectName" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status"
+                                ng-options="status.Name for status in statuses track by status.Id"
+                                ng-model="currStatus"></select>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="labels">Labels</label>
+                        <div class="infoP" id="labels">
+                            <input type="text" class="form-control" ng-model="rawLabels"/>
+                        </div>
+                    </div>
+                    <br/>
+                    <button class="btn btn-primary" ng-click="editIssue()">Edit Issue</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--http://ngmodules.org/modules/angular-input-dropdown-->

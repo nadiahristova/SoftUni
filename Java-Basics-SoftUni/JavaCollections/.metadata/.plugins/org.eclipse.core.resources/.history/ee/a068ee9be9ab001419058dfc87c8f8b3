@@ -1,0 +1,30 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Prob12_CardsFrequencies {
+	public static void main(String[] args) {
+		String line = "8♥ 2♧ 4♦ 10♦ J♥ A♨ K♦ 10♥ K♨ K♦";
+		String[] cards = line.trim().split("\\W+");
+		//ArrayList<String> faces = new ArrayList<>();
+		HashMap<String,Integer> facesAndOccur = new HashMap<>();
+		
+		for (int i = 0; i < cards.length-1; i++) {
+			if (!cards[i].equals("X")) {
+				String face = cards[i].substring(0,cards[i].length()-2);
+				int numOccur = 1;				
+				for (int j = i+1; j < cards.length; j++) {
+					if (cards[j].equals(cards[i])) {
+						cards[j] = "X";
+						numOccur++;
+					}
+				}	
+				facesAndOccur.put(face, numOccur);
+			}			
+		}
+		
+		for (String face : facesAndOccur.keySet()) {
+			System.out.println(String.format("$1%d -> $2%.f2%", face, (double) facesAndOccur.get(face)/cards.length));
+		}
+		
+	}
+}

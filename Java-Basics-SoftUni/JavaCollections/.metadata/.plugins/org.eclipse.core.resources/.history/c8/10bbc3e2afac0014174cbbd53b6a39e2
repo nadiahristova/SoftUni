@@ -1,0 +1,9 @@
+
+public class Prob16_SimpleExpression {
+	public static void main(String[] args) {
+		String line = "   5 -33     + 12 - 55- 1  - 2+6";
+		String[] numbers = line.trim().split("[\\s*\\-\\s*]");
+		boolean boo =true;
+		System.out.println(boo);
+	}
+}
