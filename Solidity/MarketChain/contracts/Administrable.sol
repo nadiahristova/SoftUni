@@ -49,15 +49,15 @@ contract Administrable is Ownable {
         public onlyValidAddress(admin) onlyOwner onlyNotOwner(admin)
     returns (bool) {
         uint numOfAssignments = _adminAssignmentsCountMap[admin]; 
-        require(numOfAssignments < 5);
+        require(numOfAssignments < 5, '1');
 
         bytes32 assignedAdminLocationKey = _returnLocationAdminKey(countryISOCode, admin, province);
-        require(_countryHasAdminMap[assignedAdminLocationKey] == 0);
+        require(_countryHasAdminMap[assignedAdminLocationKey] == 0, '3');
 
         bytes32 assignedLocationKey = _returnLocationKey(countryISOCode, province);
         uint takenSlots = _adminsPerProvince[assignedLocationKey].takenSlots;
         
-        require(takenSlots < 55);
+        require(takenSlots < 55, '2');
 
         /** 
         CountryRegion[5] memory managedRegions = _adminsAssignments[admin];
@@ -78,15 +78,22 @@ contract Administrable is Ownable {
         require(index != managedRegions.length);
         */
 
+        uint collectionLength = _adminsPerProvince[assignedLocationKey].admins.length;
+
+        if(takenSlots < collectionLength) {
+             _adminsPerProvince[assignedLocationKey].admins[takenSlots] = admin;
+        } else {
+            _adminsPerProvince[assignedLocationKey].admins.push(admin);
+        }
+
         takenSlots++;
         numOfAssignments++;
 
         _adminAssignmentsCountMap[admin] = numOfAssignments;
 
         _adminsPerProvince[assignedLocationKey].takenSlots = takenSlots;
-        _adminsPerProvince[assignedLocationKey].admins.push(admin);
 
-        _countryHasAdminMap[assignedAdminLocationKey] = takenSlots;
+        _countryHasAdminMap[assignedAdminLocationKey] = takenSlots;// basically the new index + 1
 
         emit LogAdminAssigned(admin, countryISOCode, province);
 
@@ -111,8 +118,8 @@ contract Administrable is Ownable {
     returns (bool) {
         require(isAdmin(accAddress));
 
-        bytes32 assignedAdminLocationKey = _returnLocationAdminKey(countryISOCode, accAddress, province);
-        uint index = _countryHasAdminMap[assignedAdminLocationKey];
+        bytes32 assignedAdminLocationKey_Deleted = _returnLocationAdminKey(countryISOCode, accAddress, province);
+        uint index = _countryHasAdminMap[assignedAdminLocationKey_Deleted];
         require(index != 0);
 
         bytes32 assignedLocationKey = _returnLocationKey(countryISOCode, province);
@@ -138,8 +145,12 @@ contract Administrable is Ownable {
             _countryHasAdminMap[_returnLocationAdminKey(countryISOCode, lastValidRecod, province)] == index;
         }
 
-        _countryHasAdminMap[assignedAdminLocationKey] == 0;
+        // we are marking the old admin as deleted
+        delete _countryHasAdminMap[assignedAdminLocationKey_Deleted];
+        // we decreasing num of admin assignments
         _adminAssignmentsCountMap[accAddress] -= 1;
+
+        emit LogAdminRetired(accAddress, countryISOCode, province);
 
         return true;
     }
@@ -157,7 +168,11 @@ contract Administrable is Ownable {
     function returnAdminsPerProvince(bytes2 isoCode, bytes30 province) public view returns (address[] memory) {
         return _adminsPerProvince[_returnLocationKey(isoCode, province)].admins;
     }
-
+/** 
+    function takenSlots(bytes2 isoCode, bytes30 province) public view returns (uint) {
+        return _adminsPerProvince[_returnLocationKey(isoCode, province)].takenSlots;
+    }
+*/
     function _returnLocationAdminKey(bytes2 isoCode, address adr, bytes30 province) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(isoCode, adr, province));
     }

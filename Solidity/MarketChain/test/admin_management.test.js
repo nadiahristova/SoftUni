@@ -105,7 +105,7 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
         await catchRevert(administrable.removeAdminFromProvince(admin_candidate, default_IsoCode, default_province, { from: owner }));
     })
 
-    it("should NOT allow the removal of admin not assigned to this region", async () => {
+    it("should NOT allow admin not assigned to a province to be removed form there", async () => {
         const randomIsoCode = web3.utils.randomHex(2);
         const randomProvince = web3.utils.randomHex(30);
 
@@ -115,18 +115,29 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
         await catchRevert(administrable.removeAdminFromProvince(admin, default_IsoCode, randomProvince, { from: owner }));
     })
 
-    it("should be able to delete admin", async () => {
-
-        const randomIsoCode = web3.utils.randomHex(2);
-        const randomProvince = web3.utils.randomHex(30);
+    it("should be able to remove admin", async () => {
+        const expectedEventResult = {
+            account : admin,
+            isoCode : default_IsoCode,
+            province : default_province
+        };
 
         await administrable.assignAdminToProvince(admin, default_IsoCode, default_province, { from: owner })
 
-        await administrable.removeAdminFromProvince(admin, default_IsoCode, default_province, { from: owner })
+        let result = await administrable.removeAdminFromProvince(admin, default_IsoCode, default_province, { from: owner })
 
-        let result = await administrable.isAdmin(admin);
+        const logAdminRemoval = result.logs[0].args;
+        const loggedAccount = logAdminRemoval.account;
+        const loggedIsoCode = logAdminRemoval.isoCode; 
+        const loggedProvince = logAdminRemoval.province;
+        
+        assert.equal(loggedAccount, expectedEventResult.account, 'LogAdminRetired event account property not emitted or correct, check removeAdminFromProvince method');
+        assert.equal(are_trimmed_HEX_equal(loggedIsoCode, expectedEventResult.isoCode), true, 'LogAdminRetired event isoCode property not emitted or correct, check removeAdminFromProvince method');
+        assert.equal(are_trimmed_HEX_equal(loggedProvince, expectedEventResult.province), true, 'LogAdminRetired event province property not emitted or correct, check removeAdminFromProvince method');
 
-        assert.equal(result, false, 'account should not still be admin');
+        result = await administrable.isAdmin(admin);
+
+        assert.equal(result, false);
     })
 
     it("should be able to delete admin", async () => {
@@ -139,7 +150,7 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
 
         await administrable.removeAdminFromProvince(admin, default_IsoCode, default_province, { from: owner })
 
-        let result = await administrable.isAdmin(admin);
+        const result = await administrable.isAdmin(admin);
 
         assert.equal(result, true, 'account should be admin');
     })
@@ -170,5 +181,30 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
         assert.equal(admin, result[0], 'first account record does not match');
         assert.equal(client, result[1], 'second account record does not match');
         assert.equal(emptyAddress, result[2], 'third account record should be empty');
+    })
+ 
+    it("should be able to keep correct track of admin records", async () => {
+        await administrable.assignAdminToProvince(admin, default_IsoCode, default_province, { from: owner })
+        await administrable.assignAdminToProvince(admin_candidate, default_IsoCode, default_province, { from: owner })
+        await administrable.assignAdminToProvince(producer, default_IsoCode, default_province, { from: owner })
+        await administrable.assignAdminToProvince(client, default_IsoCode, default_province, { from: owner })
+
+        await administrable.removeAdminFromProvince(producer, default_IsoCode, default_province, { from: owner })
+
+        await administrable.assignAdminToProvince(producer, default_IsoCode, default_province, { from: owner })
+
+        await administrable.removeAdminFromProvince(admin_candidate, default_IsoCode, default_province, { from: owner })
+
+        await administrable.assignAdminToProvince(admin_candidate, default_IsoCode, default_province, { from: owner })
+
+        await administrable.removeAdminFromProvince(admin, default_IsoCode, default_province, { from: owner })
+
+        const result = await administrable.returnAdminsPerProvince.call(default_IsoCode, default_province);
+
+        assert.equal(result.length, 4, 'number of records does not match');
+        assert.equal(admin_candidate, result[0], 'first account record does not match');
+        assert.equal(producer, result[1], 'second account record does not match');
+        assert.equal(client, result[2], 'third account record should be empty');
+        assert.equal(emptyAddress, result[3], 'fourth account record should be empty');
     })
 })

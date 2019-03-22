@@ -4,6 +4,14 @@ import "./Administrable.sol";
 
 contract MarketChain is Administrable {
 
+    enum MemberType { Producer, Client }
+
+    struct Member {
+        address account;
+        MemberType memberType;
+        
+    }
+
     struct Location { //3 x 32 bytes
         bytes16 postalCode;
         int128 altitude; //meters
