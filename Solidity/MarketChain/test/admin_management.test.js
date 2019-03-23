@@ -1,4 +1,4 @@
-var Administrable = artifacts.require("./Administrable.sol");
+var Administrable = artifacts.require("./MarketChain.sol");
 
 const catchRevert = require('../utils/exceptions').catchRevert;
 
@@ -177,10 +177,9 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
 
         const result = await administrable.returnAdminsPerProvince.call(default_IsoCode, default_province);
 
-        assert.equal(result.length, 3, 'number of records does not match');
+        assert.equal(result.length, 2, 'number of records does not match');
         assert.equal(admin, result[0], 'first account record does not match');
         assert.equal(client, result[1], 'second account record does not match');
-        assert.equal(emptyAddress, result[2], 'third account record should be empty');
     })
  
     it("should be able to keep correct track of admin records", async () => {
@@ -201,10 +200,9 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
 
         const result = await administrable.returnAdminsPerProvince.call(default_IsoCode, default_province);
 
-        assert.equal(result.length, 4, 'number of records does not match');
+        assert.equal(result.length, 3, 'number of records does not match');
         assert.equal(admin_candidate, result[0], 'first account record does not match');
         assert.equal(producer, result[1], 'second account record does not match');
         assert.equal(client, result[2], 'third account record should be empty');
-        assert.equal(emptyAddress, result[3], 'fourth account record should be empty');
     })
 })

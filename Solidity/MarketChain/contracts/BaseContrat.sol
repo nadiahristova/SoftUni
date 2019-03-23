@@ -6,7 +6,9 @@ contract BaseContract {
         _;
     }
 
+/** 
     function _length(address[] storage arr) internal view returns(uint) {
         return arr.length;
     }
+*/
 }
