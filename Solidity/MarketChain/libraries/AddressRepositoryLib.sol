@@ -31,7 +31,7 @@ library AddressRepositoryLib {
     ///@param relatedInfo hashed value of information relevant to the kept values
     ///@return True on success
     function add(Repository storage self, address value, bytes32 relatedInfo) 
-        public 
+        internal 
     returns (bool) {
         uint assignCountPerValue = self._valueAssignmentsCount[value]; 
         require(assignCountPerValue < MAX_NUM_OF_VALUE_ASSIGNMENTS); 
@@ -64,10 +64,7 @@ library AddressRepositoryLib {
         uint length = self._values[relatedInfo].length;
         assert(repoValueIndex <= length);
         
-        if (length == 1) {
-            delete self._values[relatedInfo];
-        }
-        else {
+        if (length > 1) {
             // actualLength is the index of the last valid(assigned) record
             address lastValidRecod = self._values[relatedInfo][--length];
 
@@ -78,6 +75,9 @@ library AddressRepositoryLib {
             self._values[relatedInfo][repoValueIndex - 1] = lastValidRecod;
             // we are saving the new index for the moved value
             self._valueIndexMap[_returnCombinedKey(lastValidRecod, relatedInfo)] == repoValueIndex;
+        } else {
+            assert(length == 1);
+            delete self._values[relatedInfo];
         }
 
         // we are marking the old value as removed from the repository

@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Ownable.sol";
 import "../libraries/AddressRepositoryLib.sol";
 
+// TODO: onlyWhenInitialized
+
 contract Administrable is Ownable {
     using AddressRepositoryLib for AddressRepositoryLib.Repository;
 
@@ -18,18 +20,18 @@ contract Administrable is Ownable {
     event LogAdminRetired(address indexed account, bytes2 indexed isoCode, bytes30 indexed province);
 
     ///@dev Assignes admin to a given region of a country
-    ///@param admin Account address of admin candidate 
+    ///@param accAddress Account address of admin candidate 
     ///@param isoCode Two letter hex ISO Code for a given country.
     ///@param province Name of a province in hex. 
     ///@return Success when admin can be assigned to a given region.
     ///@notice Only owner can use this function. Max number of admins per region is restricted to 55. Max number of managed
     /// regions by admin is restricted to 5. ISO Code length is 2 letters upper case. Province name max length is 30 lower case text.
-    function assignAdminToProvince(address admin, bytes2 countryISOCode, bytes30 province) 
-        public onlyValidAddress(admin) onlyOwner onlyNotOwner(admin)
+    function assignAdminToProvince(address accAddress, bytes2 countryISOCode, bytes30 province) 
+        public onlyValidAddress(accAddress) onlyOwner onlyNotOwner(accAddress)
     returns (bool) {
-        _adminRepository.add(admin, _returnLocationKey(countryISOCode, province));
+        _adminRepository.add(accAddress, _returnLocationKey(countryISOCode, province));
 
-        emit LogAdminAssigned(admin, countryISOCode, province);
+        emit LogAdminAssigned(accAddress, countryISOCode, province);
 
         return true;
     }

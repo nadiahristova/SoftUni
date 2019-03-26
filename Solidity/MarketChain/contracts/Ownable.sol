@@ -1,6 +1,6 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-import "./BaseContrat.sol";
+import "./BaseContract.sol";
 
 contract Ownable is BaseContract {
     address public owner;
@@ -8,6 +8,7 @@ contract Ownable is BaseContract {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     
     constructor () public {
+        //require(tx.origin == msg.sender);
         owner = msg.sender;
     }
 

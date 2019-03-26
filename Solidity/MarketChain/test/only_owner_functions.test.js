@@ -1,8 +1,8 @@
-var MarketChain = artifacts.require("./MarketChain.sol");
+var MarketController = artifacts.require("./MarketController.sol");
 
 const catchRevert = require('../utils/exceptions').catchRevert;
 
-contract('MarketChain', function ([owner, nonOwner]) {
+contract('MarketController', function ([owner, nonOwner]) {
 
     //shared parameters
     let market; 
@@ -16,7 +16,7 @@ contract('MarketChain', function ([owner, nonOwner]) {
     });
 
     beforeEach(async () => {
-        market = await MarketChain.new();
+        market = await MarketController.new();
     });
 
 

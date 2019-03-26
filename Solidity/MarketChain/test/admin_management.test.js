@@ -1,4 +1,4 @@
-var Administrable = artifacts.require("./MarketChain.sol");
+var Administrable = artifacts.require("./MarketController.sol");
 
 const catchRevert = require('../utils/exceptions').catchRevert;
 
