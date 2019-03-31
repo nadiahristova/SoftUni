@@ -1,7 +1,5 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-import "../interfaces/MarketControllerInterface.sol";
-
 library MemberBaseLib {
     struct Members {
         mapping (address => Member) members;

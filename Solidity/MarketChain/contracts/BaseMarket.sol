@@ -1,6 +1,8 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-import "./Administrable.sol";
+pragma experimental ABIEncoderV2;
+
+import "./AdministrableByRegion.sol";
 import "./VotingMemberBase.sol";
 import "./InvoiceProductPurchaseValidator.sol";
 
@@ -30,7 +32,7 @@ import "../interfaces/ProducerBaseInterface.sol";
 // Note: voting should be pausable
 
 // onlyWhenInitialized, onlyValidAddress
-contract BaseMarket is MarketInterface, Administrable, InvoiceProductPurchaseValidator {
+contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion, InvoiceProductPurchaseValidator {
     using SafeMath for uint256;
 
     ///@dev keep track of participants in the market chain and their vote weight
@@ -239,45 +241,40 @@ contract BaseMarket is MarketInterface, Administrable, InvoiceProductPurchaseVal
 
 
     function buyProduct (
-            address seller, 
-            ProducerBaseInterface producerBase,
-            uint256 productId,
-            uint256 storeFrontId,
-            uint256 amount,
-            uint256 pricePerUnit,
-            uint256 validUntil,
+            InvoiceDetails memory invoice,
             uint256 nonce, 
             bytes memory signature) 
         public 
         payable
-        onlyNaturalNumber(amount)
-        onlyNaturalNumber(pricePerUnit)
         onlyNaturalNumber(nonce)
-        onlyValidAddress(seller)
-        onlyValidAddress(address(producerBase))
-        onlyPartnerProducerBase(address(producerBase))
-        onlyMarketMember(seller)
+        onlyValidAddress(invoice.producerBase)
+        onlyPartnerProducerBase(invoice.producerBase)
+        onlyMarketMember(invoice.seller)
     returns(bool) {
-        require(validUntil >= now);
 
-        require(hasStoreFront(_returnStoreLocatorKey(seller, address(producerBase)), storeFrontId));
+        require(_hasValidState(invoice));
+
+        require(hasStoreFront(_returnStoreLocatorKey(invoice.seller, invoice.producerBase), invoice.storeFrontId));
 
         address payable buyer = msg.sender;
+
+        require(invoice.buyer == buyer);
         
-        bool isValidInvoice = _validateProductPurchase(seller, buyer, 
-            address(producerBase), productId, storeFrontId, amount, pricePerUnit, validUntil, nonce, signature);
+        bool isValidInvoice = _validateProductPurchase(invoice, nonce, signature);
         
         require(isValidInvoice);
 
         uint256 pricePaid = msg.value;
-        uint256 productPrice = amount.mul(pricePerUnit);
+        uint256 productPrice = invoice.amount.mul(invoice.pricePerUnit);
 
         require(pricePaid >= productPrice);
 
-        bool successfulRegistration = producerBase.registerPurchaseWithInvoice(seller, buyer, productId, storeFrontId, 
-            amount, pricePerUnit, validUntil, nonce, signature);
+        bool successfulRegistration = ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature);
 
         require(successfulRegistration);
+
+        address seller = invoice.seller;
+        uint256 productId = invoice.productId;
 
         _accumulatedProfit[seller] = _accumulatedProfit[seller].add(productPrice);
 
@@ -290,7 +287,7 @@ contract BaseMarket is MarketInterface, Administrable, InvoiceProductPurchaseVal
         upMemberVoteWeight(buyer, 1);
         upMemberVoteWeight(seller, 2);
 
-        emit PurchaseRegistered(buyer, seller, address(producerBase), productId);
+        emit PurchaseRegistered(buyer, seller, invoice.producerBase, productId);
 
         return true;
     }

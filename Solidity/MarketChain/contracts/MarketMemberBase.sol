@@ -1,7 +1,8 @@
 pragma solidity >=0.5.6 <0.6.0;
 
 import "./VotingMemberBase.sol";
-import "./VotingMemberBase.sol";
+
+import "../interfaces/MarketInterface.sol";
 
 import "../libraries/MarketPartnerLib.sol";
 
@@ -43,28 +44,28 @@ contract MarketMemberBase is VotingMemberBase {
         return _partnerMarkets._hasMarketMembership(market, accAddress);
     }
 
-    function addMarketPartner (MarketControllerInterface market) 
+    function addMarketPartner (MarketInterface market) 
         public 
         onlyOwner
     returns(bool) {
         return _partnerMarkets._addMarketPartner(address(market));
     }
 
-    function removeMarketPartner (MarketControllerInterface market) 
+    function removeMarketPartner (MarketInterface market) 
         public 
         onlyOwner
     returns(bool) {
         return _partnerMarkets._removeMarketPartner(address(market));
     }
 
-    function confirmMarketMembership (MarketControllerInterface market) 
+    function confirmMarketMembership (MarketInterface market) 
         public 
         onlyMember
     returns(bool) {
         return _partnerMarkets._addMarketMembership(address(market), msg.sender);
     }
 
-    function revokeMarketMembership (MarketControllerInterface market) 
+    function revokeMarketMembership (MarketInterface market) 
         public 
         onlyMember
     returns(bool) {

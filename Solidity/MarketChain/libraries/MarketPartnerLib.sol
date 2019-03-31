@@ -120,7 +120,7 @@ library MarketPartnerLib {
         return false;
     }
     
-    function _isContract(address accAddress) private returns (bool){
+    function _isContract(address accAddress) private view returns (bool){
       uint32 size;
 
       assembly {

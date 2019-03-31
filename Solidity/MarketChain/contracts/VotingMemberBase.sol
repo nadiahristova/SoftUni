@@ -1,6 +1,7 @@
 pragma solidity >=0.5.6 <0.6.0;
 
 import "./Ownable.sol";
+import "./BaseContract.sol";
 import "./Initializable.sol";
 
 import "../libraries/MarketPartnerLib.sol";
@@ -10,7 +11,7 @@ import "../interfaces/MemberBaseInterface.sol";
 
 // TODO Check if LIb can detect variables in base contract
 
-contract VotingMemberBase is Ownable, Initializable, MemberBaseInterface {
+contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInterface {
     
     using VotingMemberBaseLib for VotingMemberBaseLib.Members;
 

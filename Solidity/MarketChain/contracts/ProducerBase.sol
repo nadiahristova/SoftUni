@@ -5,92 +5,37 @@ pragma experimental ABIEncoderV2;
 import "./MarketMemberBase.sol";
 import "./InvoiceProductPurchaseValidator.sol";
 
+import "../libraries/InventoryLib.sol";
+
 import "../interfaces/MarketInterface.sol";
 import "../interfaces/ProducerBaseInterface.sol";
 
 contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
+    using InventoryLib for InventoryLib.StoreFronts;
+    using InventoryLib for InventoryLib.ProductStock;
+
+    InventoryLib.StoreFronts _storeFronts;
+    InventoryLib.ProductStock _inventory;
+
     uint constant MAX_STOREFRONTS_PER_STORE = 25;
     uint constant INVENTORY_CAP_PER_STOREFRONT = 255;//check option for readonly
+
     uint constant TIME_BETWEEN_UPDATES = 2 days;// move to init or make one more layer on top of product base
 
-    uint _productIds;
-    uint _storeFrontIds;
-
-    enum MeasurementUnit { 
-        Count, // number of items
-        Moles,
-        Grams, 
-        Milimeters,
-        Milliliters, 
-        SquareMilimeters,
-        CubicMilimeters 
-    }
-
-    mapping(uint => bool) recognisedProducts; 
-
-    struct ProductInfo {// these two in another contract
-        bool isSupported;
-        bytes32 name;
-        bytes32 category;
-        bytes32 description;
-        // buyers
-    }
-
-    mapping(bytes32 => uint) productDescriptionSignatureToProductId; // this one too
-    //mapping(uint => ProductInfo) recognisedProducts; // these two in another contract
-
-    struct Store {
-        StoreFront[] storeFronts;
-        // map StoreFrontId to index in storeFronts + 1, 0 - indicates that such StoreFront does not exist
-        mapping (uint => uint) storeFrontsMap;
-    }
-
-    struct StoreFront {
-        uint id;
-        bool isDisabled;
-        uint248 createdAt;
-        bytes32 name;
-        // turn into dynamic 2 dimentional array
-        Product[] products;
-        mapping (uint => uint) productsMap;
-    }
-
-    mapping (uint => Inventory) _storeFrontInventory;
-
-    struct Inventory {
-        Product[] products;
-        mapping (uint => uint) productsMap;
-    }
-
-    struct Product {
-        //bytes32 name; 
-        //bytes32 about; // hashed name, category and description => maybe move in some 
-        // kind of library or move it to market contract
-        //MeasurementUnit measurementUnit;
-        uint id;
-        uint productDescriptionId;
-        uint editedAt;
-        uint amount;
-        uint248 pricePerUnit;
-        bool hasNegotiablePrice;
-        //ProductStandartInterface productStandart;
-    }
-        
-    mapping(address => Store) stores;
 
     modifier onlyExistingStoreFront (uint storeFrontId) {
-         require(stores[msg.sender].storeFrontsMap[storeFrontId] != 0);
+         require(_storeFronts._isStoreFrontExisting(msg.sender, storeFrontId));
          _;
     }
 
     modifier onlyOnNotDisabledStoreFront(uint storeFronId) {
-        require(!stores[msg.sender].storeFronts[storeFronId].isDisabled);
+        require(!_storeFronts._isStoreFrontDiabled(msg.sender, storeFronId));
         _;
     }
 
     modifier onlyExistingProduct (uint storeFrontId, uint productId) {
-         require(stores[msg.sender].storeFronts[storeFrontId].productsMap[productId] != 0);
+         require(_inventory._isProductExisting(productId));
          _;
     }
 
@@ -106,20 +51,23 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     event LogProductRemovedFromStoreFront(address indexed ownerAddress, uint indexed storeFrontId, 
         uint productLocalId);  
     event LogProductAddedToStoreFront(address indexed ownerAddress, uint indexed storeFrontId, 
-        uint productLocalId); //, uint indexed productDescriptionId
-    event LogProductPricePerUnitUpdated(
-        address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
-        uint newPrice);
-    event LogProductProducedAmountUpdated(
-        address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
-        uint newAmount);
-    event LogProductPriceNegotiabilityUpdated(
-        address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
-        bool priceIsNegotiable);
+        uint indexed productId); 
+    event LogProductPricePerUnitUpdated(uint indexed productId, uint oldPrice, uint newPrice);
+    event LogProductProducedAmountUpdated(uint indexed productId, uint oldAmount, uint newAmount);
+    event LogProductPriceNegotiabilityUpdated(uint indexed productId, bool priceIsNegotiable);
+    event LogStoreFrontShared(address storeOwner, uint256 storeFrontId, address market);
 
-    event LogPurchase(address client, address producer, address market, uint256 productId);
+    event LogPurchaseRegistered(address client, address producer, address market, uint256 productId);
 
-
+    ///@dev Used for a request or confirmation of membership revocation 
+    ///@return Membership revocation status
+    function revokeMembership(address accAddress) 
+        public 
+        onlyOwner
+        onlyValidAddress(accAddress)
+    returns (bool) {
+        return _revokeMembership(accAddress);
+    } 
 
     /** Store Front Logic */
     function addStoreFront(bytes32 name) onlyMember external {
@@ -127,53 +75,22 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         
         address storeOwner = msg.sender;
 
-        require(stores[storeOwner].storeFronts.length < MAX_STOREFRONTS_PER_STORE);
-
-        uint newStoreFrontId = _storeFrontIds + 1;
-
-        StoreFront memory newStoreFront;
-
-        newStoreFront.id = newStoreFrontId;
-        newStoreFront.createdAt = uint248(now);
-        newStoreFront.name = name;
-
-        // uint storeFrontMapIndex = stores[storeOwner].storeFronts.push(newStoreFront) + 1;
-        // stores[storeOwner].storeFrontsMap[newStoreFrontId] = storeFrontMapIndex;
-
-        _storeFrontIds = newStoreFrontId;
+        uint256 newStoreFrontId = _storeFronts._addStoreFront(storeOwner, name, MAX_STOREFRONTS_PER_STORE);
 
         upMemberVoteWeight(storeOwner, 2);
 
         emit LogStoreFrontAdded(storeOwner, newStoreFrontId);
     }
 
-    //notify markets that store front is added, removed
-    // notify markets that item is added, removed
+    //notify markets that store front is added, removed !!!!
     function removeStoreFront(uint storeFrontId) 
         external 
         onlyMember 
         onlyExistingStoreFront(storeFrontId)
     {
         address storeOwner = msg.sender;
-        uint storeFrontCount = stores[storeOwner].storeFronts.length;
 
-        uint storeFrontIndex_removed = stores[storeOwner].storeFrontsMap[storeFrontId] - 1;
-
-        assert(storeFrontIndex_removed < storeFrontCount);
-
-        // swap places of storefronts
-        if(storeFrontCount > 1) {
-            StoreFront storage endStoreFront = stores[storeOwner].storeFronts[storeFrontCount - 1];
-
-            uint endStoreFrontId = endStoreFront.id;
-
-            stores[storeOwner].storeFrontsMap[endStoreFrontId] = storeFrontIndex_removed + 1;
-            stores[storeOwner].storeFronts[storeFrontIndex_removed] = endStoreFront;
-        }
-
-        // remove last element from the stack
-        stores[storeOwner].storeFronts.pop();
-        delete stores[storeOwner].storeFrontsMap[storeFrontId];
+        _storeFronts._removeStoreFront(storeOwner, storeFrontId);
 
         downMemberVoteWeight(storeOwner, 5);
 
@@ -188,7 +105,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     {
         address storeOwner = msg.sender;
 
-        stores[storeOwner].storeFronts[storeFrontId].isDisabled = true;
+        _storeFronts._disableStoreFront(storeOwner, storeFrontId);
 
         emit LogStoreFrontDisabled(storeOwner, storeFrontId);
     }
@@ -200,9 +117,9 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     {
         address storeOwner = msg.sender;
         
-        require(stores[storeOwner].storeFronts[storeFrontId].isDisabled);
+        require(_storeFronts._isStoreFrontDiabled(storeOwner, storeFrontId));
 
-        delete stores[storeOwner].storeFronts[storeFrontId].isDisabled;
+        _storeFronts._enableStoreFront(storeOwner, storeFrontId);
 
         emit LogStoreFrontEnabled(storeOwner, storeFrontId);
     }
@@ -219,43 +136,30 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         require(market.notifyForStoreFrontDeletion(storeOwner, storeFrontId));
 
         upMemberVoteWeight(msg.sender, 5);
+
+        emit LogStoreFrontShared(storeOwner, storeFrontId, address(market));
     }
 
     /** Product Logic */
     // add member => add first store front
     function addProductToStoreFront(
             uint storeFrontId,
-            uint productDescriptionId, 
+            uint specificationId, 
             uint pricePerUnit, 
-            uint amountProduced, 
+            uint amount, 
             bool hasNegotiablePrice) 
         external
-        onlyValidItemEntry(pricePerUnit, amountProduced)
+        onlyValidItemEntry(pricePerUnit, amount)
         onlyMember
         onlyExistingStoreFront(storeFrontId)
         onlyOnNotDisabledStoreFront(storeFrontId)
         returns(uint) {
             //require(recognisedProducts[productDescriptionId]);
 
-            address storeOwner = msg.sender;
+            address storeOwner = msg.sender; 
             
-            uint newProductIndex = stores[storeOwner].storeFronts[storeFrontId].products.length;
-
-            assert(newProductIndex < INVENTORY_CAP_PER_STOREFRONT);
-
-            uint newProductId = _productIds;
-
-            stores[storeOwner].storeFronts[storeFrontId].products.push(
-                Product({
-                    id: ++newProductId,
-                    productDescriptionId: productDescriptionId, 
-                    amount: amountProduced, 
-                    editedAt: now,
-                    pricePerUnit: uint248(pricePerUnit), 
-                    hasNegotiablePrice: hasNegotiablePrice}));
-
-            stores[storeOwner].storeFronts[storeFrontId].productsMap[newProductId] = newProductIndex + 1;
-            _productIds = newProductId;
+            uint256 newProductId = _inventory._addProductToStoreFront(storeOwner, storeFrontId, specificationId, 
+                pricePerUnit, amount, hasNegotiablePrice, INVENTORY_CAP_PER_STOREFRONT);
 
             upMemberVoteWeight(storeOwner, 1);
 
@@ -263,15 +167,6 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
             return newProductId;
     }
-
-    // function getProductInfo(address accAddress, uint256 storeFrontId, uint256 productId)
-    //     public 
-    //     onlyExistingStoreFront(accAddress, storeFrontId)
-    //     onlyOnNotDisabledStoreFront(accAddress, storeFrontId)
-    //     onlyExistingProduct(accAddress, storeFrontId, productId)
-    // returns (Product memory){
-
-    // }
 
     function removeProductFromStoreFront(
             uint storeFrontId,
@@ -283,24 +178,8 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyExistingProduct(storeFrontId, productId)
     {
         address storeOwner = msg.sender;
-        uint productCount = stores[storeOwner].storeFronts[storeFrontId].products.length;
-
-        uint productIndex_deleted = stores[storeOwner].storeFronts[storeFrontId].productsMap[productId] - 1;
-
-        assert(productIndex_deleted < productCount);
-
-        if(productCount > 1) {
-            Product memory endProduct = stores[storeOwner].storeFronts[storeFrontId].products[productCount - 1];
-
-            uint endProductId = endProduct.id;
-
-            stores[storeOwner].storeFronts[storeFrontId].productsMap[endProductId] = productIndex_deleted + 1;
-
-            stores[storeOwner].storeFronts[storeFrontId].products[productIndex_deleted] = endProduct;
-        }
-
-        stores[storeOwner].storeFronts[storeFrontId].products.pop();
-        delete stores[storeOwner].storeFronts[storeFrontId].productsMap[productId];
+        
+        _inventory._removeProductFromStoreFront(storeOwner, storeFrontId, productId);
 
         downMemberVoteWeight(storeOwner, 1);
 
@@ -320,32 +199,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyOnNotDisabledStoreFront(storeFrontId)
         onlyExistingProduct(storeFrontId, productId)
     {
-        address storeOwner = msg.sender;
-
-        uint productIndex = stores[storeOwner].storeFronts[storeFrontId].productsMap[productId] - 1;
-        require(stores[storeOwner].storeFronts[storeFrontId].products[productIndex].editedAt + TIME_BETWEEN_UPDATES < now);
-
-        Product memory product = stores[storeOwner].storeFronts[storeFrontId].products[productIndex];
-
-        if(product.amount != amountProduced) {
-            stores[storeOwner].storeFronts[storeFrontId].products[productIndex].amount = amountProduced;
-
-            emit LogProductProducedAmountUpdated(storeOwner, storeFrontId, productId, amountProduced);
-        }
-      
-        if(product.pricePerUnit != pricePerUnit) {
-            stores[storeOwner].storeFronts[storeFrontId].products[productIndex].pricePerUnit = uint248(pricePerUnit);
-
-            emit LogProductPricePerUnitUpdated(storeOwner, storeFrontId, productId, pricePerUnit);
-        }
-
-        if(product.hasNegotiablePrice != hasNegotiablePrice) {
-            stores[storeOwner].storeFronts[storeFrontId].products[productIndex].hasNegotiablePrice = hasNegotiablePrice;
-
-            emit LogProductPriceNegotiabilityUpdated(storeOwner, storeFrontId, productId, hasNegotiablePrice);
-        }
-
-        stores[storeOwner].storeFronts[storeFrontId].products[productIndex].editedAt = now;
+        _inventory._updateProduct(productId, pricePerUnit, amountProduced, hasNegotiablePrice, TIME_BETWEEN_UPDATES);
     }
 
     function registerPurchaseWithInvoice (
@@ -360,55 +214,28 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         require(_hasValidState(invoice));
 
         require(isMember(invoice.seller));
-
-        //require(stores[producer].storeFrontsMap[storeFrontId] != 0);
-        require(!stores[invoice.seller].storeFronts[invoice.storeFrontId].isDisabled);
-        require(stores[invoice.seller].storeFronts[invoice.storeFrontId].productsMap[invoice.productId] != 0);
+        
+        require(_storeFronts._isStoreFrontExisting(invoice.seller, invoice.storeFrontId) 
+            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId));
+        require(_inventory._isProductExisting(invoice.productId));
 
         address market = msg.sender;
-        
-        uint productIndex = stores[invoice.seller].storeFronts[invoice.storeFrontId].productsMap[invoice.productId] - 1;
-        
-        invoice.producerBase = market;
 
         bool isValidInvoice = _validateProductPurchase(invoice, nonce, signature);
         
         require(isValidInvoice);
 
-          // TODO: test
-        Product storage product = stores[invoice.seller].storeFronts[invoice.storeFrontId].products[productIndex];
-
-        uint availableAmount = product.amount;
-
-        require(availableAmount >= invoice.amount);
-
-        availableAmount -= invoice.amount;
-
-        product.amount = availableAmount;
+        _inventory._decreaseAmount(invoice.productId, invoice.amount);
 
         upMemberVoteWeight(invoice.seller, 5);
 
-        emit LogPurchase(invoice.buyer, invoice.seller, market, invoice.productId);
+        emit LogPurchaseRegistered(invoice.buyer, invoice.seller, market, invoice.productId);
 
         return true;
     }
 
-    ///@dev Used for a request or confirmation of membership revocation 
-    ///@return Membership revocation status
-    function revokeMembership(address accAddress) 
-        public 
-        onlyOwner
-        onlyValidAddress(accAddress)
-    returns (bool) {
-        return _revokeMembership(accAddress);
-    } 
-
-    function _getProduct (address accAddress, uint256 storeFrontId, uint productId) private view returns(Product memory) {
-        uint productIndex = stores[accAddress].storeFronts[storeFrontId].productsMap[productId] - 1;
-
-        require(productIndex >= 0);
-
-        return stores[accAddress].storeFronts[storeFrontId].products[productIndex];
+    function _getProduct (uint productId) private view returns(InventoryLib.Product memory) {
+        return _inventory._products[productId];
     }
 }
         

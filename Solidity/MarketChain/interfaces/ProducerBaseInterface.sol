@@ -1,12 +1,13 @@
+pragma solidity >=0.5.6 <0.6.0;
+
+pragma experimental ABIEncoderV2;
+
+import "../contracts/InvoiceProductPurchaseValidator.sol";
+
 contract ProducerBaseInterface {
+
     function registerPurchaseWithInvoice (
-            address seller, 
-            address buyer,
-            uint256 productId,
-            uint256 storeFrontId,
-            uint256 amount,
-            uint256 pricePerUnit,
-            uint256 validUntil,
+            InvoiceProductPurchaseValidator.InvoiceDetails memory invoice,
             uint256 nonce, 
             bytes memory signature) public returns (bool);
 }
