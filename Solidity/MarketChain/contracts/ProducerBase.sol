@@ -1,4 +1,4 @@
-pragma solidity >=0.5.2 <0.6.0;
+pragma solidity >=0.5.6 <0.6.0;
 
 pragma experimental ABIEncoderV2;
 
@@ -56,6 +56,13 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         mapping (uint => uint) productsMap;
     }
 
+    mapping (uint => Inventory) _storeFrontInventory;
+
+    struct Inventory {
+        Product[] products;
+        mapping (uint => uint) productsMap;
+    }
+
     struct Product {
         //bytes32 name; 
         //bytes32 about; // hashed name, category and description => maybe move in some 
@@ -102,10 +109,10 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         uint productLocalId); //, uint indexed productDescriptionId
     event LogProductPricePerUnitUpdated(
         address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
-        uint oldPrice, uint newPrice);
+        uint newPrice);
     event LogProductProducedAmountUpdated(
         address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
-        uint oldAmount, uint newAmount);
+        uint newAmount);
     event LogProductPriceNegotiabilityUpdated(
         address indexed ownerAddress, uint indexed storeFrontId, uint indexed productLocalId, 
         bool priceIsNegotiable);
@@ -130,8 +137,8 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         newStoreFront.createdAt = uint248(now);
         newStoreFront.name = name;
 
-        uint storeFrontMapIndex = stores[storeOwner].storeFronts.push(newStoreFront) + 1;
-        stores[storeOwner].storeFrontsMap[newStoreFrontId] = storeFrontMapIndex;
+        // uint storeFrontMapIndex = stores[storeOwner].storeFronts.push(newStoreFront) + 1;
+        // stores[storeOwner].storeFrontsMap[newStoreFrontId] = storeFrontMapIndex;
 
         _storeFrontIds = newStoreFrontId;
 
@@ -323,13 +330,13 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         if(product.amount != amountProduced) {
             stores[storeOwner].storeFronts[storeFrontId].products[productIndex].amount = amountProduced;
 
-            emit LogProductPricePerUnitUpdated(storeOwner, storeFrontId, productId, product.amount, amountProduced);
+            emit LogProductProducedAmountUpdated(storeOwner, storeFrontId, productId, amountProduced);
         }
       
         if(product.pricePerUnit != pricePerUnit) {
             stores[storeOwner].storeFronts[storeFrontId].products[productIndex].pricePerUnit = uint248(pricePerUnit);
 
-            emit LogProductProducedAmountUpdated(storeOwner, storeFrontId, productId, product.pricePerUnit, pricePerUnit);
+            emit LogProductPricePerUnitUpdated(storeOwner, storeFrontId, productId, pricePerUnit);
         }
 
         if(product.hasNegotiablePrice != hasNegotiablePrice) {
@@ -342,52 +349,46 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     }
 
     function registerPurchaseWithInvoice (
-            address producer, 
-            address buyer,
-            uint256 productId,
-            uint256 storeFrontId,
-            uint256 amount,
-            uint256 pricePerUnit,
-            uint256 validUntil,
+            InvoiceDetails memory invoice,
             uint256 nonce, 
             bytes memory signature) 
         public 
-        onlyNaturalNumber(amount)
-        onlyNaturalNumber(pricePerUnit)
         onlyNaturalNumber(nonce)
-        onlyValidAddress(producer)
-        onlyValidAddress(buyer)
-        onlyOnValidMarketMembership(producer, msg.sender)
+        onlyOnValidMarketMembership(invoice.seller, msg.sender)
     returns (bool) {
-        require(isMember(producer));
+
+        require(_hasValidState(invoice));
+
+        require(isMember(invoice.seller));
 
         //require(stores[producer].storeFrontsMap[storeFrontId] != 0);
-        require(!stores[producer].storeFronts[storeFrontId].isDisabled);
-        require(stores[producer].storeFronts[storeFrontId].productsMap[productId] != 0);
+        require(!stores[invoice.seller].storeFronts[invoice.storeFrontId].isDisabled);
+        require(stores[invoice.seller].storeFronts[invoice.storeFrontId].productsMap[invoice.productId] != 0);
 
         address market = msg.sender;
         
-        uint productIndex = stores[producer].storeFronts[storeFrontId].productsMap[productId] - 1;
+        uint productIndex = stores[invoice.seller].storeFronts[invoice.storeFrontId].productsMap[invoice.productId] - 1;
+        
+        invoice.producerBase = market;
 
-        bool isValidInvoice = _validateProductPurchase(producer, buyer, 
-            market, productId, storeFrontId, amount, pricePerUnit, validUntil, nonce, signature);
+        bool isValidInvoice = _validateProductPurchase(invoice, nonce, signature);
         
         require(isValidInvoice);
 
           // TODO: test
-        Product storage product = stores[producer].storeFronts[storeFrontId].products[productIndex];
+        Product storage product = stores[invoice.seller].storeFronts[invoice.storeFrontId].products[productIndex];
 
         uint availableAmount = product.amount;
 
-        require(availableAmount >= amount);
+        require(availableAmount >= invoice.amount);
 
-        availableAmount -= amount;
+        availableAmount -= invoice.amount;
 
         product.amount = availableAmount;
 
-        upMemberVoteWeight(producer, 5);
+        upMemberVoteWeight(invoice.seller, 5);
 
-        emit LogPurchase(buyer, producer, market, productId);
+        emit LogPurchase(invoice.buyer, invoice.seller, market, invoice.productId);
 
         return true;
     }
@@ -402,7 +403,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _revokeMembership(accAddress);
     } 
 
-    function _getProduct (address accAddress, uint256 storeFrontId, uint productId) private returns(Product memory) {
+    function _getProduct (address accAddress, uint256 storeFrontId, uint productId) private view returns(Product memory) {
         uint productIndex = stores[accAddress].storeFronts[storeFrontId].productsMap[productId] - 1;
 
         require(productIndex >= 0);
