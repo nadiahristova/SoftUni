@@ -6,9 +6,8 @@ contract BaseContract {
         _;
     }
 
-/** 
-    function _length(address[] storage arr) internal view returns(uint) {
-        return arr.length;
+    modifier onlyNaturalNumber(uint256 num) {
+        require(num >= 0);
+        _;
     }
-*/
 }

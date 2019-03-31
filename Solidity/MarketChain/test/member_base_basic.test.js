@@ -1,8 +1,6 @@
-var ClientBase = artifacts.require("./ClientBase.sol");
-var ProducerBase = artifacts.require("./ProducerBase.sol");
-var MarketController = artifacts.require("./MarketController.sol");
-
-const catchRevert = require('../utils/exceptions').catchRevert;
+var ClientBase = artifacts.require("ClientBase");
+var ProducerBase = artifacts.require("ProducerBase");
+var MarketController = artifacts.require("MarketController");
 
 contract('ClientBase', function ([owner, bob, elly, eve]) {
 

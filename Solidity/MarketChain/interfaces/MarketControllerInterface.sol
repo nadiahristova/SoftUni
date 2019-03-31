@@ -1,6 +1,8 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-interface MarketControllerInterface {
+import "./ProducerBaseInterface.sol";
+
+interface MarketControllerInterface { // abstract contract
     
     function registerMarketMember(address member) external;
 
@@ -9,6 +11,8 @@ interface MarketControllerInterface {
     function voteForMarketMemberBlock(address producer) external returns (bool);
 
     function revokeMembership(address member) external;
+
+    function sendJoinRequest(address accAddress, ProducerBaseInterface memberBase) external;
 
     //function kill() external returns (bool);
     // initialize function skipped

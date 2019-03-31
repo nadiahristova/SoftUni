@@ -1,4 +1,5 @@
 pragma solidity >=0.5.6 <0.6.0;
+
 pragma experimental ABIEncoderV2;
 
 library AddressRepositoryLib {
@@ -33,7 +34,8 @@ library AddressRepositoryLib {
     function add(Repository storage self, address value, bytes32 relatedInfo) 
         internal 
     returns (bool) {
-        uint assignCountPerValue = self._valueAssignmentsCount[value]; 
+        uint assignCountPerValue = self._valueAssignmentsCount[value];
+         
         require(assignCountPerValue < MAX_NUM_OF_VALUE_ASSIGNMENTS); 
 
         bytes32 combinedKey = _returnCombinedKey(value, relatedInfo);

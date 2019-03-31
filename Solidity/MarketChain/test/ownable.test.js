@@ -1,7 +1,6 @@
-var Ownable = artifacts.require("./Ownable.sol");
+var Ownable = artifacts.require("Ownable");
 
-const catchRevert = require('../utils/exceptions').catchRevert;
-//const BN = web3.utils.BN;
+const { shouldFail } = require('openzeppelin-test-helpers');
 
 contract('Ownable', function ([owner, nonOwner]) {
 
@@ -34,10 +33,10 @@ contract('Ownable', function ([owner, nonOwner]) {
     })
 
     it("should not allow to transfer ownership", async () => {
-        await catchRevert(ownable.transferOwnership(nonOwner, { from: nonOwner }), "only owner can transfer ownership");
+        await shouldFail.reverting(ownable.transferOwnership(nonOwner, { from: nonOwner }), "only owner can transfer ownership");
     })
 
     it("should not allow to transfer ownership", async () => {
-        await catchRevert(ownable.transferOwnership(emptyAddress, { from: owner }), "should specify existing address");
+        await shouldFail.reverting(ownable.transferOwnership(emptyAddress, { from: owner }), "should specify existing address");
     })
 })

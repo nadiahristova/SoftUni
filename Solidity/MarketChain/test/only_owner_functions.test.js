@@ -1,6 +1,4 @@
-var MarketController = artifacts.require("./MarketController.sol");
-
-const catchRevert = require('../utils/exceptions').catchRevert;
+var MarketController = artifacts.require("MarketController");
 
 contract('MarketController', function ([owner, nonOwner]) {
 
@@ -30,7 +28,7 @@ contract('MarketController', function ([owner, nonOwner]) {
 
     it("should NOT allow to set max number of admins per country", async () => {
 
-        await catchRevert(market.assignAdminToProvince(nonOwner, isoCode, province, { from: nonOwner }), "only owner should be able to use this function");
+        await shouldFail.reverting(market.assignAdminToProvince(nonOwner, isoCode, province, { from: nonOwner }), "only owner should be able to use this function");
     })
 
     it("should allow the owner to remove admin from province", async () => {
@@ -44,6 +42,6 @@ contract('MarketController', function ([owner, nonOwner]) {
     it("should NOT allow non owner to remove admin from province", async () => {
 
         await market.assignAdminToProvince(nonOwner, isoCode, province, { from: owner });
-        await catchRevert(market.removeAdminFromProvince(nonOwner, isoCode, province, { from: nonOwner }), "only owner should be able to use this function");
+        await shouldFail.reverting(market.removeAdminFromProvince(nonOwner, isoCode, province, { from: nonOwner }), "only owner should be able to use this function");
     })
 })

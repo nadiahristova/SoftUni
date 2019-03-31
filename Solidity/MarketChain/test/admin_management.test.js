@@ -1,6 +1,6 @@
-var Administrable = artifacts.require("./MarketController.sol");
+var Administrable = artifacts.require("MarketController");
 
-const catchRevert = require('../utils/exceptions').catchRevert;
+const { shouldFail } = require('openzeppelin-test-helpers');
 
 contract('Administrable', function ([owner, admin_candidate, admin, producer, client]) {
 
@@ -49,11 +49,11 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
     it("should NOT allow admin to be assigned twice to a region", async () => {
         await administrable.assignAdminToProvince(admin_candidate, default_IsoCode, default_province, { from: owner });
 
-        await catchRevert(administrable.assignAdminToProvince(admin_candidate, default_IsoCode, default_province, { from: owner }), 'an admin cannot be assigned to a region more than once');
+        await shouldFail.reverting(administrable.assignAdminToProvince(admin_candidate, default_IsoCode, default_province, { from: owner }), 'an admin cannot be assigned to a region more than once');
     })
 
     it("should NOT allow owner to be assigned as an admin", async () => {
-        await catchRevert(administrable.assignAdminToProvince(owner, default_IsoCode, default_province, { from: owner }));
+        await shouldFail.reverting(administrable.assignAdminToProvince(owner, default_IsoCode, default_province, { from: owner }));
     })
 
     it("should confirm account being admin", async () => {
@@ -85,7 +85,7 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
         randomIsoCode = web3.utils.randomHex(2);
         randomProvince = web3.utils.randomHex(30);
 
-        await catchRevert(administrable.assignAdminToProvince(admin, randomIsoCode, randomProvince, { from: owner }), 'max number of regions managed by single admin should be 5');
+        await shouldFail.reverting(administrable.assignAdminToProvince(admin, randomIsoCode, randomProvince, { from: owner }), 'max number of regions managed by single admin should be 5');
     })
 
     it("should NOT allow more than 55 admins per region", async () => {
@@ -98,11 +98,11 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
 
         randomAccAddress = web3.utils.randomHex(20);
 
-        await catchRevert(administrable.assignAdminToProvince(randomAccAddress, default_IsoCode, default_province, { from: owner }), 'max number of admins should be 55');
+        await shouldFail.reverting(administrable.assignAdminToProvince(randomAccAddress, default_IsoCode, default_province, { from: owner }), 'max number of admins should be 55');
     })
 
     it("should NOT allow the removal of non admin", async () => {
-        await catchRevert(administrable.removeAdminFromProvince(admin_candidate, default_IsoCode, default_province, { from: owner }));
+        await shouldFail.reverting(administrable.removeAdminFromProvince(admin_candidate, default_IsoCode, default_province, { from: owner }));
     })
 
     it("should NOT allow admin not assigned to a province to be removed form there", async () => {
@@ -111,8 +111,8 @@ contract('Administrable', function ([owner, admin_candidate, admin, producer, cl
 
         await administrable.assignAdminToProvince(admin, default_IsoCode, default_province, { from: owner })
 
-        await catchRevert(administrable.removeAdminFromProvince(admin, randomIsoCode, default_province, { from: owner }));
-        await catchRevert(administrable.removeAdminFromProvince(admin, default_IsoCode, randomProvince, { from: owner }));
+        await shouldFail.reverting(administrable.removeAdminFromProvince(admin, randomIsoCode, default_province, { from: owner }));
+        await shouldFail.reverting(administrable.removeAdminFromProvince(admin, default_IsoCode, randomProvince, { from: owner }));
     })
 
     it("should be able to remove admin", async () => {

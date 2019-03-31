@@ -1,6 +1,6 @@
-var ClientBase = artifacts.require("./ClientBase.sol");
-var ProducerBase = artifacts.require("./ProducerBase.sol");
-var MarketController = artifacts.require("./MarketController.sol");
+var ClientBase = artifacts.require("ClientBase");
+var ProducerBase = artifacts.require("ProducerBase");
+var MarketController = artifacts.require("MarketController");
 
 contract('MemberBase', function ([owner]) {
 

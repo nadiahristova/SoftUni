@@ -2,11 +2,15 @@ pragma solidity >=0.5.6 <0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "./Ownable.sol";
+import "./VotingMemberBase.sol";
+
 import "../libraries/AddressRepositoryLib.sol";
+import "../libraries/SafeMath.sol";
 
 // TODO: onlyWhenInitialized
 
-contract Administrable is Ownable {
+contract Administrable is VotingMemberBase {
+    using SafeMath for uint;
     using AddressRepositoryLib for AddressRepositoryLib.Repository;
 
     AddressRepositoryLib.Repository private _adminRepository;
@@ -69,5 +73,15 @@ contract Administrable is Ownable {
     /// i. e. the information we want to associate the admin with
     function _returnLocationKey(bytes2 isoCode, bytes30 province) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(isoCode, province));
+    }
+
+    
+
+    function supportProducer(address producer) external returns (bool) {
+        return true;
+    }
+
+    function voteForMarketMemberBlock(address producer) external returns (bool) {
+        return true;
     }
 }
