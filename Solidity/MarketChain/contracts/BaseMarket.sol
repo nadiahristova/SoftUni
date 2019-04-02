@@ -8,7 +8,7 @@ import "./InvoiceProductPurchaseValidator.sol";
 
 import "../libraries/SafeMath.sol";
 
-import "../interfaces/MarketInterface.sol";
+import "../interfaces/BaseMarketInterface.sol";
 import "../interfaces/MemberBaseInterface.sol";
 import "../interfaces/ClientBaseInterface.sol";
 import "../interfaces/ProducerBaseInterface.sol";
@@ -32,7 +32,7 @@ import "../interfaces/ProducerBaseInterface.sol";
 // Note: voting should be pausable
 
 // onlyWhenInitialized, onlyValidAddress
-contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion, InvoiceProductPurchaseValidator {
+contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByRegion, InvoiceProductPurchaseValidator {
     using SafeMath for uint256;
 
     ///@dev keep track of participants in the market chain and their vote weight
@@ -111,8 +111,16 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
     
     
     ///@dev Initializes constants needed for some ground rules and limitations
-    function initialize (uint[2] memory defaultCampaignTimePeriods, uint profit_fee, uint decisiveVoteWeightProportion, uint decisiveVoteCountProportion, 
-    bytes32[] memory campaignNames, uint[] memory campaignTimePeriods) onlyOwner public returns(bool) {
+    function initialize (
+            uint[2] memory defaultCampaignTimePeriods, 
+            uint profit_fee, uint decisiveVoteWeightProportion, 
+            uint decisiveVoteCountProportion, 
+            uint initialOwnerVoteWeight, 
+            bytes32[] memory campaignNames, 
+            uint[] memory campaignTimePeriods) 
+        public
+        onlyOwner {
+
         require(!_isInitialized);
 
         require(profit_fee > 0 && profit_fee <= 99);
@@ -129,7 +137,7 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
             _availableCampaigns[i].activeTimespan = campaignTimePeriods[i];
         }
         
-        super.initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion);
+        super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
     }
 
     ///@dev Affiliate client base to the market environment
@@ -159,13 +167,13 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
     // todo change so empty address can also register store
     function openStore (ProducerBaseInterface memberBase, bytes32 name) 
         onlyMember
-        public { 
+        external { 
 
         require(name != 0x0); // use name as a marker
         address storeOwner = msg.sender;
         address producerBase = address(memberBase);
 
-        require(!hasStore(storeOwner, producerBase));
+        require(!_hasStore(storeOwner, producerBase));
 
 
         bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
@@ -175,20 +183,6 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
         emit LogNewStoreOpened(storeOwner, producerBase);
     }
 
-    function hasStore (address storeOwner, address producerBase) 
-        view
-        private  
-    returns(bool) {
-        return _openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0;
-    }
-
-    function hasStoreFront (bytes32 storeLocatorKey, uint256 storeFrontId) 
-        view
-        private  
-    returns(bool) {
-        return _openedStoreFrtontsByMember[storeLocatorKey].name != 0x0 && _isStoreFrontToStoreFrontIdMap[storeLocatorKey][storeFrontId] != 0;
-    }
-
     function addStoreFront (ProducerBaseInterface memberBase, uint storeFrontId) 
         external 
         onlyPartnerProducerBase(address(memberBase)) // TODO maybe remove
@@ -196,7 +190,7 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
     returns (bool) {
         address storeOwner = msg.sender;
 
-        require(!hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
+        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
 
         return _addStoreFront(storeOwner, storeFrontId, address(memberBase));
     }  
@@ -209,19 +203,19 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
 
         address memberBase = msg.sender;
 
-        require(!hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
+        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
         
         return _addStoreFront(storeOwner, storeFrontId, memberBase);
     }  
 
-    function removeStoreFront (ProducerBaseInterface memberBase, uint storeFrontId) 
+    function removeStoreFront (ProducerBaseInterface memberBase, uint256 storeFrontId) 
         external
         onlyPartnerProducerBase(address(memberBase))
         onlyMember
     returns (bool) {
         address storeOwner = msg.sender;
 
-        require(hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
+        require(_hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
 
         return _removeStoreFront(storeOwner, storeFrontId, address(memberBase));
     }  
@@ -234,7 +228,7 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
 
         address memberBase = msg.sender;
 
-        require(!hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
+        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
 
         return _removeStoreFront(storeOwner, storeFrontId, memberBase);
     } 
@@ -254,7 +248,7 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
 
         require(_hasValidState(invoice));
 
-        require(hasStoreFront(_returnStoreLocatorKey(invoice.seller, invoice.producerBase), invoice.storeFrontId));
+        require(_hasStoreFront(_returnStoreLocatorKey(invoice.seller, invoice.producerBase), invoice.storeFrontId));
 
         address payable buyer = msg.sender;
 
@@ -284,8 +278,8 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
             buyer.transfer(excessPaymet);
         }
 
-        upMemberVoteWeight(buyer, 1);
-        upMemberVoteWeight(seller, 2);
+        _upMemberVoteWeight(buyer, 1);
+        _upMemberVoteWeight(seller, 2);
 
         emit PurchaseRegistered(buyer, seller, invoice.producerBase, productId);
 
@@ -356,5 +350,20 @@ contract BaseMarket is MarketInterface, VotingMemberBase, AdministrableByRegion,
         private  
     returns(bytes32) {
         return keccak256(abi.encodePacked(storeOwner, memberBase));
+    }
+
+
+    function _hasStore (address storeOwner, address producerBase) 
+        view
+        private  
+    returns(bool) {
+        return _openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0;
+    }
+
+    function _hasStoreFront (bytes32 storeLocatorKey, uint256 storeFrontId) 
+        view
+        private  
+    returns(bool) {
+        return _openedStoreFrtontsByMember[storeLocatorKey].name != 0x0 && _isStoreFrontToStoreFrontIdMap[storeLocatorKey][storeFrontId] != 0;
     }
 }

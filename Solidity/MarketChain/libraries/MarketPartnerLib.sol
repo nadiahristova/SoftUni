@@ -9,8 +9,8 @@ library MarketPartnerLib {
     
     event LogMarketPartnerAdded(address indexed partnerAddress);
     event LogMarketPartnerRemoved(address indexed exMemberAddress);
-    event LogStoreOpeningConfirmed(address indexed accAddress, address indexed marketAddress);
-    event LogStoreClosureConfirmation(address indexed accAddress, address indexed marketAddress);
+    event LogMarketMembershipConfirmed(address indexed accAddress, address indexed marketAddress);
+    event LogMarketMembershipRevoked(address indexed accAddress, address indexed marketAddress);
     
     modifier onlyContractAddress(address adr) {
         require(_isContract(adr));
@@ -63,6 +63,7 @@ library MarketPartnerLib {
         view
         internal 
     returns (bool) {
+
         return self._memberToMarketMap[market][accAddress];
     }
 
@@ -70,43 +71,42 @@ library MarketPartnerLib {
         internal
         onlyContractAddress(market) 
     returns (bool) {
+        
         if(self._memberToMarketMap[market][accAddress]) return false;
 
         self._memberToMarketMap[market][accAddress] = true;
 
-        emit LogStoreOpeningConfirmed(accAddress, address(market));
+        emit LogMarketMembershipConfirmed(accAddress, address(market));
 
         return true;
     }
 
-    function _removeMarketMembership (PartnerMarkets storage self, address market, address accAddress) 
+    function _revokeMarketMembership (PartnerMarkets storage self, address market, address accAddress) 
         internal 
-        onlyContractAddress(market)
     returns (bool) {
+
         if(!self._memberToMarketMap[market][accAddress]) return false;
 
         delete self._memberToMarketMap[market][accAddress];
         
-        emit LogStoreClosureConfirmation(accAddress, market);
+        emit LogMarketMembershipRevoked(accAddress, market);
 
         return true;
     }
 
-    // function _removeAllMarketMemberships(PartnerMarkets storage self, address accAddress) 
-    //     internal {
+    function _removeAllMarketMemberships(PartnerMarkets storage self, address accAddress) 
+        internal {
 
-    //     address[25] memory markets = self._marketPartners;
+        address[25] memory markets = self._marketPartners;
 
-    //     for(uint i; markets[i] != address(0) && (i <  markets.length); i++){
-    //         delete self._memberToMarketMap[markets[i]][accAddress];
-        
-    //         emit LogStoreClosureConfirmation(accAddress,  markets[i]);
-    //     }
-    // }
+        for(uint i; markets[i] != address(0) && (i <  markets.length); i++){
+            _revokeMarketMembership(self, markets[i], accAddress);
+        }
+    }
 
     function _isMarketRegisteredPartner (PartnerMarkets storage self, address market) 
         view
-        private 
+        internal 
     returns(bool) {
         address[25] memory markets = self._marketPartners;
 

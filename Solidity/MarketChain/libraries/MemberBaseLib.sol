@@ -37,7 +37,7 @@ library MemberBaseLib {
     function _registerMember(Members storage self, address candidateMember) 
         internal 
     returns(bool) {
-        if (!_isMember(self, candidateMember)) return false;
+        if (_isMember(self, candidateMember)) return false;
 
         self.members[candidateMember].status = MembershipActivityStatus.IsActiveMember;
         self.members[candidateMember].joinedAt = now;

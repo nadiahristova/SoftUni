@@ -26,17 +26,17 @@ library VotingMemberBaseLib {
 
     ///@dev Add new member to a member base
     function _registerMember(Members storage self, address candidateMember, uint voteWeight) internal returns(bool) {
-        if(self._members._registerMember(candidateMember)) {
-            self._votes._updateOverallMemberCount(true);
+         
+        if(!self._members._registerMember(candidateMember)) return false;
+           
+        self._votes._updateOverallMemberCount(true);
 
-            if(voteWeight > 0) { 
-                self._votes._updateOverallVotesWeight(voteWeight, true);
-            }
-
-            return true;
+        if(voteWeight > 0) { 
+            self._votes._updateOverallVotesWeight(voteWeight, true);
+            self._votes._updateMemberVoteWeight(candidateMember, voteWeight, true);
         }
 
-        return false;
+        return true;
     }
 
     ///@dev Used for a request or confirmation of membership revocation 

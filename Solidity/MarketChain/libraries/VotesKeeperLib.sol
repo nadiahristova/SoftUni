@@ -7,10 +7,9 @@ library VotesKeeperLib {
 
     struct VoteCampain {
         uint248 campaignId;
-        bool isOngoing;
+        bool inProgress;
         uint256 gatheredVotesWeight;
         uint256 validUntil;
-        // TODO: Fix this add supp count
         mapping(address => bool) supportersTracker;
         address[] supporters;
     }
@@ -33,9 +32,10 @@ library VotesKeeperLib {
         VotesKeeper storage self,
         address accAddress,
         uint votingCampaignId) {
-            require(votingCampaignId != 0);
-            require(self.campains[accAddress].campaignId == votingCampaignId);
-            _;
+
+        require(votingCampaignId != 0, "Campaign not set");
+        require(self.campains[accAddress].campaignId == votingCampaignId); // not requested campaign
+        _;
     }
 
     function _hasActiveCampaigns (VotesKeeper storage self, address accAddress) 
@@ -75,6 +75,8 @@ library VotesKeeperLib {
         }
     }
 
+    /// Checks whether the voting had finished and the campaign had been supported
+    /// It had finished when id != 0 and inProgress == false
     function _isCampaignSupported (
             VotesKeeper storage self,
             address accAddress,
@@ -83,7 +85,7 @@ library VotesKeeperLib {
         internal 
         onlyOngoingCampaign(self, accAddress, votingCampaignId)
     returns(bool) {
-        return self.campains[accAddress].isOngoing;
+        return !self.campains[accAddress].inProgress;
     }
 
     function _setVotingCampaign (
@@ -98,9 +100,11 @@ library VotesKeeperLib {
             return false;
         }    
 
-        self.campains[accAddress].campaignId = uint248(votingCampaignId);
-        self.campains[accAddress].isOngoing = true;
-        self.campains[accAddress].validUntil = validUntil;
+        VoteCampain storage campaign = self.campains[accAddress];
+
+        campaign.campaignId = uint248(votingCampaignId);
+        campaign.inProgress = true;
+        campaign.validUntil = validUntil;
 
         self.activeCampaignsCount[accAddress]++;
 
@@ -117,12 +121,12 @@ library VotesKeeperLib {
         onlyOngoingCampaign(self, accAddress, votingCampaignId)
     returns (bool) {
 
-        if (self.campains[accAddress].isOngoing) {
+        if (self.campains[accAddress].inProgress) {
             _resetCampaign(self, accAddress);
 
             emit LogVotingCampaignRevoked(msg.sender, accAddress, votingCampaignId);
         } else {
-
+            // other fields had been cleared when the goal of the campaing had been reached
             delete self.campains[accAddress].campaignId;
         }
 
@@ -143,47 +147,46 @@ library VotesKeeperLib {
             uint votesWeightProportion,
             uint votesMemberProportion)
         internal 
-    returns (bool) {
-        require(supporter != accAddress);
-
+    returns (bool) { 
         require((votesWeightProportion > 0 && votesWeightProportion < 1000)
                 || (votesMemberProportion > 0 && votesMemberProportion < 1000));
 
         uint importance = self.voteWeightMap[supporter];
 
-        if(importance > 0 ||
-            _isCampaignSupported(self, accAddress, votingCampaignId) || 
-            !self.campains[accAddress].supportersTracker[supporter]) {
+        VoteCampain storage campaign = self.campains[accAddress];
+
+        if(//importance == 0 ||
+            campaign.supportersTracker[supporter] ||
+            _isCampaignSupported(self, accAddress, votingCampaignId)) {
                 return false;
         }
-        
-        uint currentVotesWeight = self.campains[accAddress].gatheredVotesWeight.add(importance);
-        uint currentNomOfSupporters = self.campains[accAddress].supporters.length;
+
+        uint currentVotesWeight = campaign.gatheredVotesWeight.add(importance);
+        uint currentNomOfSupporters = campaign.supporters.length;
 
         require(currentNomOfSupporters <= maxNumOfVoters);
         
         emit LogVotingCampaignSupported(supporter, accAddress);
         
         if((votesWeightProportion != 0 && currentVotesWeight >= self.overallVotesWeight.div(votesWeightProportion)) 
-            || (votesMemberProportion != 0 && self.campains[accAddress].supporters.length >= self.overallVotesWeight.div(votesMemberProportion))) {
-
+            || (votesMemberProportion != 0 && campaign.supporters.length >= self.overallMemberCount.div(votesMemberProportion))) {
+            // goal had been reached free up storage
             _resetCampaign(self, accAddress);
 
-            self.campains[accAddress].campaignId = votingCampaignId;
+            campaign.campaignId = votingCampaignId;
             
             emit PropositionAccepted(accAddress, votingCampaignId);
         } 
         else{
-            self.campains[accAddress].gatheredVotesWeight = uint248(currentVotesWeight);
-            self.campains[accAddress].supportersTracker[supporter] = true;
+            campaign.gatheredVotesWeight = uint248(currentVotesWeight);
+            campaign.supportersTracker[supporter] = true;
             
-            self.campains[accAddress].supporters.push(supporter);
+            campaign.supporters.push(supporter);
         }
 
         return true;
     }
     
-    // Fix this
     function _resetCampaign(VotesKeeper storage self, address accAddress) private {
         delete self.campains[accAddress];
 

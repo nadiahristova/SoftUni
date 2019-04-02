@@ -7,7 +7,7 @@ import "./InvoiceProductPurchaseValidator.sol";
 
 import "../libraries/InventoryLib.sol";
 
-import "../interfaces/MarketInterface.sol";
+import "../interfaces/BaseMarketInterface.sol";
 import "../interfaces/ProducerBaseInterface.sol";
 
 contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
@@ -59,10 +59,26 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
     event LogPurchaseRegistered(address client, address producer, address market, uint256 productId);
 
+    function initialize (
+            uint[2] memory defaultCampaignTimePeriods, 
+            uint decisiveVoteWeightProportion, 
+            uint decisiveVoteCountProportion,
+            uint initialOwnerVoteWeight, 
+            bytes32[] memory campaignNames, 
+            uint[] memory campaignTimePeriods) 
+        public
+        onlyOwner {
+
+        require(!_isInitialized);
+        
+        super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
+            initialOwnerVoteWeight, campaignNames, campaignTimePeriods);
+    }
+
     ///@dev Used for a request or confirmation of membership revocation 
     ///@return Membership revocation status
     function revokeMembership(address accAddress) 
-        public 
+        external 
         onlyOwner
         onlyValidAddress(accAddress)
     returns (bool) {
@@ -77,7 +93,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
         uint256 newStoreFrontId = _storeFronts._addStoreFront(storeOwner, name, MAX_STOREFRONTS_PER_STORE);
 
-        upMemberVoteWeight(storeOwner, 2);
+        _upMemberVoteWeight(storeOwner, 2);
 
         emit LogStoreFrontAdded(storeOwner, newStoreFrontId);
     }
@@ -92,7 +108,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
         _storeFronts._removeStoreFront(storeOwner, storeFrontId);
 
-        downMemberVoteWeight(storeOwner, 5);
+        _downMemberVoteWeight(storeOwner, 5);
 
         emit LogStoreFrontRemoved(storeOwner, storeFrontId);
     }
@@ -124,7 +140,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         emit LogStoreFrontEnabled(storeOwner, storeFrontId);
     }
 
-    function pushStoreFrontToMarket(MarketInterface market, uint storeFrontId) 
+    function pushStoreFrontToMarket(BaseMarketInterface market, uint storeFrontId) 
             external
             onlyMember  
             onlyExistingStoreFront(storeFrontId)
@@ -133,9 +149,9 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     {
         address storeOwner = msg.sender;
 
-        require(market.notifyForStoreFrontDeletion(storeOwner, storeFrontId));
+        require(market.memberBaseAddStoreFront(storeOwner, storeFrontId));
 
-        upMemberVoteWeight(msg.sender, 5);
+        _upMemberVoteWeight(msg.sender, 5);
 
         emit LogStoreFrontShared(storeOwner, storeFrontId, address(market));
     }
@@ -161,13 +177,13 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
             uint256 newProductId = _inventory._addProductToStoreFront(storeOwner, storeFrontId, specificationId, 
                 pricePerUnit, amount, hasNegotiablePrice, INVENTORY_CAP_PER_STOREFRONT);
 
-            upMemberVoteWeight(storeOwner, 1);
+            _upMemberVoteWeight(storeOwner, 1);
 
             emit LogProductAddedToStoreFront(storeOwner, storeFrontId, newProductId);
 
             return newProductId;
     }
-
+//notifyForStoreFrontDeletion !!!
     function removeProductFromStoreFront(
             uint storeFrontId,
             uint productId) 
@@ -181,7 +197,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         
         _inventory._removeProductFromStoreFront(storeOwner, storeFrontId, productId);
 
-        downMemberVoteWeight(storeOwner, 1);
+        _downMemberVoteWeight(storeOwner, 1);
 
         emit LogProductRemovedFromStoreFront(storeOwner, storeFrontId, productId);
     }
@@ -227,7 +243,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
         _inventory._decreaseAmount(invoice.productId, invoice.amount);
 
-        upMemberVoteWeight(invoice.seller, 5);
+        _upMemberVoteWeight(invoice.seller, 5);
 
         emit LogPurchaseRegistered(invoice.buyer, invoice.seller, market, invoice.productId);
 

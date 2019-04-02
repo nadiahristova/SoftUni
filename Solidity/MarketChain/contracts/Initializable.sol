@@ -3,17 +3,20 @@ pragma solidity >=0.5.6 <0.6.0;
 
 import "./Ownable.sol";
 
-contract Initializable is Ownable {
+contract Initializable {
+
     bool internal _isInitialized;
 
+    event Initialized();
+
     modifier onlyWhenInitialized() {
-        require(_isInitialized);
+        require(_isInitialized, 'not init');
         _;
     }
 
-    function initialize () onlyOwner public returns(bool) {
-        require(!_isInitialized);
-
+    function _initialize () internal {
         _isInitialized = true;
+
+        emit Initialized();
     }
 }
