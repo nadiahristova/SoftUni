@@ -1,5 +1,7 @@
 pragma solidity >=0.5.6 <0.6.0;
 
+pragma experimental ABIEncoderV2;
+
 library InventoryLib {
 
     struct Store {
@@ -10,7 +12,6 @@ library InventoryLib {
 
     struct StoreFront {
         uint256 id;
-        bytes32 name;
         bool isDisabled;
         uint248 createdAt;
     }
@@ -42,13 +43,13 @@ library InventoryLib {
     
     // TODO add standart!
 
-    event LogStoreFrontAdded(address indexed ownerAddress, uint indexed storeFrontId); 
+    event LogStoreFrontCreated(address indexed ownerAddress, uint indexed storeFrontId); 
     event LogStoreFrontRemoved(address indexed ownerAddress, uint indexed storeFrontId); 
     event LogStoreFrontDisabled(address indexed ownerAddress, uint indexed storeFrontId);
     event LogStoreFrontEnabled(address indexed ownerAddress, uint indexed storeFrontId);
 
     event LogProductRemovedFromStoreFront(address indexed ownerAddress, uint indexed storeFrontId, 
-        uint productLocalId);  
+        uint productId);  
     event LogProductAddedToStoreFront(address indexed ownerAddress, uint indexed storeFrontId, 
         uint indexed productId); 
 
@@ -58,60 +59,68 @@ library InventoryLib {
 
 
     /** Store Front Logic */
-    function _addStoreFront(StoreFronts storage self, address storeOwner, bytes32 name, uint maxStoreFrontPerStore) 
+    function _addStoreFront(StoreFronts storage self, address storeOwner, uint maxStoreFrontPerStore) 
         internal 
-    returns (uint256) {
+    returns (bool) {
 
         require(self.stores[storeOwner].storeFronts.length < maxStoreFrontPerStore);
 
         uint newStoreFrontId = self._storeFrontIds + 1;
 
-        StoreFront memory newStoreFront = StoreFront({ id: newStoreFrontId, name: name, isDisabled: false, createdAt: uint248(now) });
+        StoreFront memory newStoreFront = StoreFront({ id: newStoreFrontId, isDisabled: false, createdAt: uint248(now) });
 
         uint256 storeFrontMapIndex = self.stores[storeOwner].storeFronts.push(newStoreFront);
         self.stores[storeOwner].storeFrontsMap[newStoreFrontId] = storeFrontMapIndex;
 
         self._storeFrontIds = newStoreFrontId;
 
-        emit LogStoreFrontAdded(storeOwner, newStoreFrontId);
+        emit LogStoreFrontCreated(storeOwner, newStoreFrontId);
 
-        return newStoreFrontId;
+        return true;
     }
     
 
     function _removeStoreFront(StoreFronts storage self, address storeOwner, uint storeFrontId) internal {
 
-        uint storeFrontCount = self.stores[storeOwner].storeFronts.length;
+        Store storage store = self.stores[storeOwner];
 
-        uint storeFrontIndex_removed = self.stores[storeOwner].storeFrontsMap[storeFrontId] - 1;
+        uint storeFrontCount = store.storeFronts.length;
+
+        uint storeFrontIndex_removed = store.storeFrontsMap[storeFrontId] - 1;
 
         assert(storeFrontIndex_removed < storeFrontCount);
 
         // swap places of storefronts
         if(storeFrontCount > 1) {
-            StoreFront memory endStoreFront = self.stores[storeOwner].storeFronts[storeFrontCount - 1];
+            StoreFront memory endStoreFront = store.storeFronts[storeFrontCount - 1];
 
-            self.stores[storeOwner].storeFrontsMap[endStoreFront.id] = storeFrontIndex_removed + 1;
-            self.stores[storeOwner].storeFronts[storeFrontIndex_removed] = endStoreFront;
+            store.storeFrontsMap[endStoreFront.id] = storeFrontIndex_removed + 1;
+            store.storeFronts[storeFrontIndex_removed] = endStoreFront;
         }
 
         // remove last element from the stack
-        self.stores[storeOwner].storeFronts.pop();
-        delete self.stores[storeOwner].storeFrontsMap[storeFrontId];
+        store.storeFronts.pop();
+        delete store.storeFrontsMap[storeFrontId];
 
         emit LogStoreFrontRemoved(storeOwner, storeFrontId);
     }
 
     function _disableStoreFront(StoreFronts storage self, address storeOwner, uint storeFrontId) internal {
-
-        self.stores[storeOwner].storeFronts[storeFrontId].isDisabled = true;
+        Store storage sf = self.stores[storeOwner];
+        
+        uint sfIndex = sf.storeFrontsMap[storeFrontId] - 1;
+        
+        sf.storeFronts[sfIndex].isDisabled = true;
 
         emit LogStoreFrontDisabled(storeOwner, storeFrontId);
     }
 
     function _enableStoreFront(StoreFronts storage self, address storeOwner, uint storeFrontId) internal {
-
-        delete self.stores[storeOwner].storeFronts[storeFrontId].isDisabled;
+        Store storage sf = self.stores[storeOwner];
+        
+        uint sfIndex = sf.storeFrontsMap[storeFrontId] - 1;
+        
+        delete sf.storeFronts[sfIndex].isDisabled;
 
         emit LogStoreFrontEnabled(storeOwner, storeFrontId);
     }
@@ -120,14 +129,19 @@ library InventoryLib {
         view
         internal 
     returns (bool) {
-        return self.stores[storeOwner].storeFronts[storeFrontId].id != 0;
+
+        return self.stores[storeOwner].storeFrontsMap[storeFrontId] != 0; // index from the mapping should not be 0
     }
 
     function _isStoreFrontDiabled (StoreFronts storage self, address storeOwner, uint storeFrontId) 
         view
         internal 
     returns (bool) {
-        return self.stores[storeOwner].storeFronts[storeFrontId].isDisabled;
+        Store storage sf = self.stores[storeOwner];
+        
+        uint sfIndex = sf.storeFrontsMap[storeFrontId] - 1;
+
+        return sf.storeFronts[sfIndex].isDisabled;
     }
 
     /** Product Logic */
@@ -206,7 +220,7 @@ library InventoryLib {
 
         Product memory product = self._products[productId];
 
-        require(product.editedAt + timeBetweenUpdates < now);
+        require(product.editedAt + timeBetweenUpdates < now, 'Wait time');
 
         if(product.amount != amountProduced) {
             self._products[productId].amount = amountProduced;

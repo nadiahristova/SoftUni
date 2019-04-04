@@ -4,27 +4,29 @@ import "./VotingMemberBase.sol";
 
 import "../interfaces/BaseMarketInterface.sol";
 
-import "../libraries/MarketPartnerLib.sol";
+import "../libraries/PartnerRelationsKeeperLib.sol";
 
+
+// todo change name
 contract MarketMemberBase is VotingMemberBase {
     
-    using MarketPartnerLib for MarketPartnerLib.PartnerMarkets;
+    using PartnerRelationsKeeperLib for PartnerRelationsKeeperLib.Partners;
 
-    MarketPartnerLib.PartnerMarkets _partnerMarkets;
+    PartnerRelationsKeeperLib.Partners _partnerMarkets;
 
-    event LogMarketPartnerAdded(address indexed partnerAddress);
-    event LogMarketPartnerRemoved(address indexed exMemberAddress);
-    event LogMarketMembershipConfirmed(address indexed accAddress, address indexed marketAddress);
-    event LogMarketMembershipRevoked(address indexed accAddress, address indexed marketAddress);
+    event LogPartnerEntityAdded(address indexed partnerAddress);
+    event LogPartnerEntityRemoved(address indexed partnerAddress);
+    event LogAffiliationWithPartner(address indexed accAddress, address indexed partnerAddress);
+    event LogAffiliationWithPartnerRevoked(address indexed accAddress, address indexed partnerAddress);
 
     
     modifier onlyOnValidMarketMembership(address shopOwner, address market) {
-        require(_partnerMarkets._hasMarketMembership(shopOwner, market));
+        require(hasMarketMembership(shopOwner, market));
         _;
     }
 
-    modifier onlyRegisteredPartner(BaseMarketInterface market) {
-        require(_partnerMarkets._isMarketRegisteredPartner(address(market)), 'not partner');
+    modifier onlyRegisteredPartner(address market) {
+        require(isPartner(market), 'Not partner');
         _;
     }
 
@@ -39,10 +41,10 @@ contract MarketMemberBase is VotingMemberBase {
 
         uint numOfCampaigns = campaignNames.length;
 
-        require(numOfCampaigns == campaignTimePeriods.length && numOfCampaigns <= 25);
+        require(numOfCampaigns <= 25 && numOfCampaigns == campaignTimePeriods.length);
 
         for (uint i = 0; i < numOfCampaigns; i++) {
-            require(campaignNames[i] != 0x0 && campaignTimePeriods[i] > 5 minutes);
+            require(campaignTimePeriods[i] > 35 minutes);
 
             _availableCampaigns[i].name = campaignNames[i];
             _availableCampaigns[i].activeTimespan = campaignTimePeriods[i];
@@ -51,59 +53,88 @@ contract MarketMemberBase is VotingMemberBase {
         _initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
     }
 
+    function addMarketPartner (address market) 
+        external 
+        onlyValidAddress(market)
+        onlyWhenInitialized
+        onlyOwner
+    returns(bool) {
+        require(!_partnerMarkets._isRegisteredPartner(market), 'Registered');
+
+        return _partnerMarkets._addPartner(market);
+    }
+
+    function removeMarketPartner (address market) 
+        public 
+        onlyOwner
+        onlyRegisteredPartner(market)
+    returns(bool) {
+        return _partnerMarkets._removePartner(market);
+    }
+
+    function isPartner (address market) 
+        view
+        public 
+        onlyValidAddress(market)
+        onlyWhenInitialized
+    returns(bool) {
+
+        return _partnerMarkets._isRegisteredPartner(market);
+    }
+
     /// @dev Checks whether given member has market membership
-    /// @param accAddress Account addressof the member
-    /// @param market Targeted market   
-    function hasMarketMembership (address accAddress, BaseMarketInterface market)  
+    /// @param accAddress Member address 
+    /// @param market Market address   
+    /// @return true if affiliated with market, false otherwise
+    function hasMarketMembership (address accAddress, address market)  
         view 
         public
-        onlyWhenInitialized
         onlyValidAddress(accAddress)
-        onlyValidAddress(address(market))
+        onlyWhenMember(accAddress, true)
         onlyRegisteredPartner(market)
     returns(bool) {
 
-        require(isMember(accAddress), 'not member');
-
-        return _partnerMarkets._hasMarketMembership(address(market), accAddress);
+        return _partnerMarkets._hasMembership(market, accAddress);
     }
 
-    function addMarketPartner (BaseMarketInterface market) 
+    function requestMarketMembership (address market) 
+        public 
+        onlyMember
+        onlyRegisteredPartner(market)
+    returns(bool) {
+        return _partnerMarkets._addMembership(market, msg.sender);
+    }
+
+    function revokeMarketMembership (address market) 
+        public 
+        onlyMember
+        onlyRegisteredPartner(market)
+    returns(bool) {
+        return _partnerMarkets._revokeMembership(market, msg.sender);
+    }
+
+    ///@dev Used for a revokation of membership 
+    ///@return Membership revocation status
+    function triggerMembershipRevocation(address accAddress) 
         external 
-        onlyOwner
-    returns(bool) {
-        require(!_partnerMarkets._isMarketRegisteredPartner(address(market)));
-
-        return _partnerMarkets._addMarketPartner(address(market));
-    }
-
-    function removeMarketPartner (BaseMarketInterface market) 
-        public 
-        onlyOwner
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._removeMarketPartner(address(market));
-    }
-
-    function confirmMarketMembership (BaseMarketInterface market) 
-        public 
+        onlyValidAddress(accAddress) 
+        onlyWhenInitialized
         onlyMember
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._addMarketMembership(address(market), msg.sender);
-    }
+    returns (bool) {
+        require(owner != accAddress);
 
-    function revokeMarketMembership (BaseMarketInterface market) 
-        public 
-        onlyMember
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._revokeMarketMembership(address(market), msg.sender);
-    }
+        require(_revokeMembership(accAddress));
+
+        require(_revokeAllMarketMembership(accAddress));
+
+        return true;
+    } 
 
     function _revokeAllMarketMembership (address accAddress) 
         internal 
     returns(bool) {
-        _partnerMarkets._removeAllMarketMemberships(accAddress);
+        _partnerMarkets._removeAllMemberships(accAddress);
+
+        return true;
     }
 }

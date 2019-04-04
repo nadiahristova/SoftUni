@@ -78,7 +78,6 @@ library AddressRepositoryLib {
             // we are saving the new index for the moved value
             self._valueIndexMap[_returnCombinedKey(lastValidRecod, relatedInfo)] == repoValueIndex;
         } else {
-            assert(length == 1);
             delete self._values[relatedInfo];
         }
 

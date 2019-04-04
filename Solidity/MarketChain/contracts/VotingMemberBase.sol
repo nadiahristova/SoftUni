@@ -4,7 +4,6 @@ import "./Ownable.sol";
 import "./BaseContract.sol";
 import "./Initializable.sol";
 
-import "../libraries/MarketPartnerLib.sol";
 import "../libraries/VotingMemberBaseLib.sol";
 
 import "../interfaces/MemberBaseInterface.sol";
@@ -119,16 +118,9 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     /// @notice Only owner can do this, campaign id should be > 2
     /// @param accAddress Member address
     /// @return true if campaign was launched, false otherwise
-    function launchCampaign (address accAddress, uint campaignId) 
-        public 
-        onlyValidAddress(accAddress)
-        onlyNaturalNumber(campaignId)
-        onlyWhenInitialized
-        onlyOwner 
-        onlyWhenMember(accAddress, true)
+    function _launchCampaign (address accAddress, uint campaignId) 
+        internal 
     returns(bool) {
-        require(campaignId > 1); 
-        require(_availableCampaigns[campaignId].name != 0x0); // campaign is existing
 
         return _memberBase._setVotingCampaign(campaignId, accAddress, now + _availableCampaigns[campaignId].activeTimespan);
     }
@@ -144,7 +136,7 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     returns (bool) {
         require(campaignId > 2);
 
-        return _memberBase._resetVotingCampaingn(campaignId, accAddress);
+        return _resetVotingCampaingn(campaignId, accAddress);
     }
 
     ///@dev Checkes whether an account is a member of the member base
@@ -159,28 +151,21 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     }
 
     ///@dev Add new member to a member base if voted
-    function registerMember(address accAddress) 
-        external 
-        onlyWhenInitialized
-        onlyValidAddress(accAddress)
-        onlyMember  
-        onlyWhenMember(accAddress, false)
-    returns (bool) {
-
+    function _registerMember(address accAddress) 
+        internal 
+    {
         require(_memberBase._isCampaignSupported(1, accAddress), "Not voted");
         
         require(_memberBase._registerMember(accAddress, INITIAL_VOTE_WEIGHT));
 
-        require(_memberBase._resetVotingCampaingn(1, accAddress));
-
-        return true;
+        require(_resetVotingCampaingn(1, accAddress));
     }
 
     // what will happen with the markets
     ///@dev Used for a request or confirmation of membership revocation 
     ///@return Membership revocation status
     function revokeMembership() 
-        public 
+        external 
         onlyWhenInitialized
         onlyMember
         onlyWhenNoActiveCampaignsForMember(msg.sender)
@@ -190,8 +175,8 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._revokeMembership(msg.sender);
     } 
 
-    ///@dev Used for a revokation of membership 
-    ///@return Membership revocation status
+    ///@dev Used for a revokation of membership of a member that has been voted out
+    ///@return 
     function triggerMembershipRevocation(address accAddress) 
         external 
         onlyValidAddress(accAddress) 
@@ -200,8 +185,21 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     returns (bool) {
         require(owner != accAddress);
 
-        return _revokeMembership(accAddress);
+        require(_revokeMembership(accAddress));
+
+        require(_resetVotingCampaingn(2, accAddress));
     } 
+
+    function getVoteWeight (address accAddress) 
+        view 
+        external 
+        onlyValidAddress(accAddress)
+        onlyWhenInitialized
+        onlyMember
+        returns(uint) {
+
+        return _memberBase._getVoteWeight(accAddress);
+    }
 
     ///@dev Used for a foreceful revokation of membership 
     ///@return Membership revocation status
@@ -215,22 +213,21 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return false;
     } 
 
-    function supportMember( // support campaign
+    function _resetVotingCampaingn(uint campaignId, address accAddress) 
+        internal 
+    returns (bool) {
+        return _memberBase._resetVotingCampaingn(campaignId, accAddress);
+    } 
+
+    function _supportMember( // support campaign
             address accAddress,
             uint248 votingCampaignId)
-        external 
-        onlyValidAddress(accAddress) 
-        onlyNaturalNumber(votingCampaignId)
-        onlyWhenInitialized
-        onlyMember
+        internal 
     {
-        address supporter = msg.sender;
-        
-        require(supporter != accAddress);
-
-        require(_memberBase._supportMember(supporter, votingCampaignId, accAddress, MAX_VOTES_PER_CAMPAIGN, 
+        require(_memberBase._supportMember(msg.sender, votingCampaignId, accAddress, MAX_VOTES_PER_CAMPAIGN, 
             _decisiveVoteWeightProportion, _decisiveVoteCountProportion));
     } 
+
 
     function _upMemberVoteWeight (address accAddress, uint weight) internal {
         require(_memberBase._updateMemberVoteWeight(accAddress, weight, true));

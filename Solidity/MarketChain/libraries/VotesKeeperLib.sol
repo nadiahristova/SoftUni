@@ -45,33 +45,41 @@ library VotesKeeperLib {
         return self.activeCampaignsCount[accAddress] != 0;
     }
 
-    function _updateOverallVotesWeight(VotesKeeper storage self, uint weight, bool increase) 
-        internal {
-        if(increase) {
-            self.overallVotesWeight = self.overallVotesWeight.add(weight);
-        } else {
-            self.overallVotesWeight = self.overallVotesWeight.sub(weight);
-        }
-    }
-
     function _updateMemberVoteWeight(
             VotesKeeper storage self, 
             address accAddress,
             uint weight, 
             bool increase) 
         internal {
+
+        uint memberVoteWeight = self.voteWeightMap[accAddress];
+
         if(increase) {
-            self.voteWeightMap[accAddress] = self.voteWeightMap[accAddress].add(weight);
+            self.voteWeightMap[accAddress] = memberVoteWeight.add(weight);
         } else {
-            self.voteWeightMap[accAddress] = self.voteWeightMap[accAddress].sub(weight);
+
+            assert(memberVoteWeight >= weight);
+
+            if(memberVoteWeight == weight) {
+                delete self.voteWeightMap[accAddress];
+            } else {
+                self.voteWeightMap[accAddress] = memberVoteWeight.sub(weight);
+            }
         }
+
+        _updateOverallVotesWeight(self, weight, increase);
     }
 
     function _updateOverallMemberCount(VotesKeeper storage self, bool increase) internal {
         if(increase) {
             self.overallMemberCount = self.overallMemberCount.add(1);
         } else {
-            self.overallMemberCount = self.overallMemberCount.sub(1);
+
+            uint memCount = self.overallMemberCount;
+
+            assert(memCount != 0);
+
+            self.overallMemberCount = memCount.sub(1);
         }
     }
 
@@ -85,6 +93,7 @@ library VotesKeeperLib {
         internal 
         onlyOngoingCampaign(self, accAddress, votingCampaignId)
     returns(bool) {
+
         return !self.campains[accAddress].inProgress;
     }
 
@@ -161,10 +170,15 @@ library VotesKeeperLib {
                 return false;
         }
 
-        uint currentVotesWeight = campaign.gatheredVotesWeight.add(importance);
-        uint currentNomOfSupporters = campaign.supporters.length;
+        uint currentVotesWeight = campaign.gatheredVotesWeight;
 
-        require(currentNomOfSupporters <= maxNumOfVoters);
+        if(importance > 0) {
+            currentVotesWeight = currentVotesWeight.add(importance);
+        }
+
+        uint currentNumOfSupporters = campaign.supporters.length;
+
+        require(currentNumOfSupporters <= maxNumOfVoters);
         
         emit LogVotingCampaignSupported(supporter, accAddress);
         
@@ -197,5 +211,18 @@ library VotesKeeperLib {
         }
         
         delete self.campains[accAddress].supporters;
+    }
+
+    function _getVoteWeight (VotesKeeper storage self, address accAddress) internal view returns(uint) {
+        return self.voteWeightMap[accAddress];
+    }
+
+    function _updateOverallVotesWeight(VotesKeeper storage self, uint weight, bool increase) 
+        private {
+        if(increase) {
+            self.overallVotesWeight = self.overallVotesWeight.add(weight);
+        } else {
+            self.overallVotesWeight = self.overallVotesWeight.sub(weight);
+        }
     }
 }

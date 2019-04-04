@@ -32,7 +32,6 @@ library VotingMemberBaseLib {
         self._votes._updateOverallMemberCount(true);
 
         if(voteWeight > 0) { 
-            self._votes._updateOverallVotesWeight(voteWeight, true);
             self._votes._updateMemberVoteWeight(candidateMember, voteWeight, true);
         }
 
@@ -48,15 +47,7 @@ library VotingMemberBaseLib {
         MemberBaseLib.RevokeMembershipStatus status = self._members._revokeMembership(accAddress);
 
         if(status == MemberBaseLib.RevokeMembershipStatus.Removed){
-            self._votes._updateOverallMemberCount(false);
-
-            uint memberVoteWeight =  self._votes.voteWeightMap[accAddress];
-
-            if(memberVoteWeight != 0) {
-                self._votes._updateOverallVotesWeight(memberVoteWeight, false);
-            }
-
-            delete self._votes.voteWeightMap[accAddress];
+            _resetVotingRecordsForMember(self, accAddress);
         }
 
         return status;
@@ -66,22 +57,12 @@ library VotingMemberBaseLib {
     function _revokeMembershipForced(Members storage self, address accAddress) 
         internal 
     returns (bool) {
+        _resetVotingRecordsForMember(self, accAddress);
+
         return self._members._revokeMembershipForced(accAddress);
     } 
 
     /** VOTING REGION */
-
-    function _updateOverallVotesWeight (
-            Members storage self, 
-            uint weight, 
-            bool increase)
-        internal 
-        returns (bool) {
-
-        self._votes._updateOverallVotesWeight(weight, increase);
-
-        return true;
-    }
     
     function _updateOverallMemberCount (Members storage self, bool increase) private returns (bool) {
         self._votes._updateOverallMemberCount(increase);
@@ -152,4 +133,18 @@ library VotingMemberBaseLib {
     returns (bool) {
         return self._votes._setVotingCampaign(accAddress, votingCampaignId, validUntil);
     } 
+
+    function _getVoteWeight (Members storage self, address accAddress) internal view returns(uint) {
+        return self._votes._getVoteWeight(accAddress);
+    }
+
+    function _resetVotingRecordsForMember (Members storage self, address accAddress) private returns(bool) {
+        self._votes._updateOverallMemberCount(false);
+
+        uint memberVoteWeight =  self._votes.voteWeightMap[accAddress];
+
+        if(memberVoteWeight != 0) {
+            self._votes._updateMemberVoteWeight(accAddress, memberVoteWeight, false);
+        }
+    }
 }

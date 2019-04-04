@@ -1,5 +1,7 @@
 pragma solidity >=0.5.6 <0.6.0;
 
+pragma experimental ABIEncoderV2;
+
 import "../libraries/ECDSA.sol";
 
 contract InvoiceProductPurchaseValidator {
@@ -9,18 +11,18 @@ contract InvoiceProductPurchaseValidator {
 
     struct InvoiceDetails {
         address seller;
-        address buyer;
-        address producerBase;
+        //address buyer;
+        //address producerBase;
         uint256 productId;
-        uint256 storeFrontId;
-        uint256 amount;
+        //uint256 storeFrontId;
         uint256 pricePerUnit;
-        uint256 validUntil;
+        //uint256 nonce; 
+        //uint256 validUntil;
     }
 
     function _validateProductPurchase (
-            InvoiceDetails memory invoice,
             uint256 nonce, 
+            InvoiceDetails memory invoice,
             bytes memory signature) 
         internal 
     returns (bool) {
@@ -28,8 +30,8 @@ contract InvoiceProductPurchaseValidator {
         require (!seenNonces[invoice.seller][nonce]);
 
         // This recreates the message hash that was signed on the client.
-        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.producerBase, invoice.productId, 
-        invoice.storeFrontId, invoice.amount, invoice.pricePerUnit, invoice.validUntil, nonce));
+        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.productId, 
+        invoice.pricePerUnit, nonce)); // invoice.validUntil, invoice.buyer, invoice.storeFrontId, 
         bytes32 messageHash = hash.toEthSignedMessageHash();
         
         // Verify that the message's signer is the owner of the order
@@ -42,10 +44,11 @@ contract InvoiceProductPurchaseValidator {
         return true;
     }
 
-    function _hasValidState(InvoiceDetails memory invoice) internal view returns (bool) {
+    function _hasValidState(InvoiceDetails memory invoice) internal pure returns (bool) {
         return invoice.seller != address(0) 
-            && invoice.amount >= 0 
-            && invoice.pricePerUnit > 0 
-            && invoice.validUntil >= now;
+            //& invoice.nonce > 0
+            //&& invoice.amount >= 0 
+            && invoice.pricePerUnit > 0;
+            //&& invoice.validUntil >= now;
     }
 }

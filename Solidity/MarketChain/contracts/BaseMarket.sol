@@ -32,7 +32,7 @@ import "../interfaces/ProducerBaseInterface.sol";
 // Note: voting should be pausable
 
 // onlyWhenInitialized, onlyValidAddress
-contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByRegion, InvoiceProductPurchaseValidator {
+contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurchaseValidator {
     using SafeMath for uint256;
 
     ///@dev keep track of participants in the market chain and their vote weight
@@ -102,7 +102,18 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByReg
     }
 
     modifier onlyMemberBaseCall () {
-        require(_associatedClientMemberBase[msg.sender] || _associatedProducerMemberBase[msg.sender] );
+        require(_associatedClientMemberBase[msg.sender] || _associatedProducerMemberBase[msg.sender]);
+        _;
+    }
+
+     modifier onlyWhenStoreOwner (address storeOwner, address producerBase, bool isOwner) {
+        require(isMember(storeOwner));
+        require((_openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0) == isOwner);
+        _;
+    }
+
+     modifier onlyWhenStoreFrontOwner (address storeOwner, address producerBase, uint storeFrontId, bool isOwner) {
+        require((_isStoreFrontToStoreFrontIdMap[_returnStoreLocatorKey(storeOwner, producerBase)][storeFrontId] != 0) == isOwner);
         _;
     }
 
@@ -111,18 +122,15 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByReg
     
     
     ///@dev Initializes constants needed for some ground rules and limitations
-    function initialize (
+    function _initialize (
             uint[2] memory defaultCampaignTimePeriods, 
             uint profit_fee, uint decisiveVoteWeightProportion, 
             uint decisiveVoteCountProportion, 
             uint initialOwnerVoteWeight, 
             bytes32[] memory campaignNames, 
             uint[] memory campaignTimePeriods) 
-        public
-        onlyOwner {
-
-        require(!_isInitialized);
-
+        internal
+    {
         require(profit_fee > 0 && profit_fee <= 99);
 
         uint numOfCampaigns = campaignNames.length;
@@ -163,18 +171,17 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByReg
 
         emit LogProducerBaseAssigned(memberBaseAddress);
     }
+    
 
     // todo change so empty address can also register store
     function openStore (ProducerBaseInterface memberBase, bytes32 name) 
         onlyMember
+        onlyWhenStoreOwner(msg.sender, address(memberBase), false)
         external { 
 
         require(name != 0x0); // use name as a marker
         address storeOwner = msg.sender;
         address producerBase = address(memberBase);
-
-        require(!_hasStore(storeOwner, producerBase));
-
 
         bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
 
@@ -183,87 +190,91 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByReg
         emit LogNewStoreOpened(storeOwner, producerBase);
     }
 
+
     function addStoreFront (ProducerBaseInterface memberBase, uint storeFrontId) 
         external 
         onlyPartnerProducerBase(address(memberBase)) // TODO maybe remove
-        onlyMember
+        onlyWhenStoreOwner(msg.sender, address(memberBase), true)
+        onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, false)
     returns (bool) {
-        address storeOwner = msg.sender;
 
-        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
-
-        return _addStoreFront(storeOwner, storeFrontId, address(memberBase));
+        return _addStoreFront(msg.sender, storeFrontId, address(memberBase));
     }  
+
+    
 
     function memberBaseAddStoreFront (address storeOwner, uint storeFrontId) 
         public 
         onlyPartnerProducerBase(msg.sender)
-        onlyMarketMember(storeOwner)
+        onlyWhenStoreOwner(storeOwner, msg.sender, true)
+        onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
     returns (bool) {
 
-        address memberBase = msg.sender;
-
-        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
+       // address memberBase = msg.sender;
         
-        return _addStoreFront(storeOwner, storeFrontId, memberBase);
+        return _addStoreFront(storeOwner, storeFrontId, msg.sender);
     }  
 
     function removeStoreFront (ProducerBaseInterface memberBase, uint256 storeFrontId) 
         external
         onlyPartnerProducerBase(address(memberBase))
-        onlyMember
+        onlyWhenStoreOwner(msg.sender, address(memberBase), true)
+        onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, true)
     returns (bool) {
-        address storeOwner = msg.sender;
+        // address storeOwner = msg.sender;
 
-        require(_hasStoreFront(_returnStoreLocatorKey(storeOwner, address(memberBase)), storeFrontId));
-
-        return _removeStoreFront(storeOwner, storeFrontId, address(memberBase));
+        return _removeStoreFront(msg.sender, storeFrontId, address(memberBase));
     }  
 
     function notifyForStoreFrontDeletion (address storeOwner, uint storeFrontId) 
         public
         onlyPartnerProducerBase(msg.sender)
-        onlyMarketMember(storeOwner)
+        onlyWhenStoreOwner(storeOwner, msg.sender, true)
+        onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
     returns (bool) {
 
-        address memberBase = msg.sender;
+        // address memberBase = msg.sender;
 
-        require(!_hasStoreFront(_returnStoreLocatorKey(storeOwner, memberBase), storeFrontId));
-
-        return _removeStoreFront(storeOwner, storeFrontId, memberBase);
+        return _removeStoreFront(storeOwner, storeFrontId, msg.sender);
     } 
-
 
     function buyProduct (
             InvoiceDetails memory invoice,
+            address producerBase,
+            uint256 storeFrontId,
+            uint256 amount,
             uint256 nonce, 
             bytes memory signature) 
         public 
         payable
-        onlyNaturalNumber(nonce)
-        onlyValidAddress(invoice.producerBase)
-        onlyPartnerProducerBase(invoice.producerBase)
-        onlyMarketMember(invoice.seller)
+        //onlyNaturalNumber(nonce)
+        onlyValidAddress(producerBase)
+        onlyPartnerProducerBase(producerBase)
+        onlyWhenStoreOwner(invoice.seller, producerBase, true)
+        onlyWhenStoreFrontOwner(invoice.seller, producerBase, storeFrontId, true)
     returns(bool) {
 
         require(_hasValidState(invoice));
 
-        require(_hasStoreFront(_returnStoreLocatorKey(invoice.seller, invoice.producerBase), invoice.storeFrontId));
-
         address payable buyer = msg.sender;
 
-        require(invoice.buyer == buyer);
+        //require(invoice.buyer == buyer);
         
-        bool isValidInvoice = _validateProductPurchase(invoice, nonce, signature);
+        bool isValidInvoice = _validateProductPurchase(nonce, invoice, signature);
         
         require(isValidInvoice);
 
+        uint256 amount = amount;// stack too deep error
+        uint256 pricePerUnit = invoice.pricePerUnit;// stack too deep error
+
         uint256 pricePaid = msg.value;
-        uint256 productPrice = invoice.amount.mul(invoice.pricePerUnit);
+
+        uint256 productPrice = amount.mul(pricePerUnit);
 
         require(pricePaid >= productPrice);
 
-        bool successfulRegistration = ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature);
+
+        bool successfulRegistration = ProducerBaseInterface(producerBase).registerPurchaseWithInvoice(buyer, invoice, signature);
 
         require(successfulRegistration);
 
@@ -281,34 +292,21 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, AdministrableByReg
         _upMemberVoteWeight(buyer, 1);
         _upMemberVoteWeight(seller, 2);
 
-        emit PurchaseRegistered(buyer, seller, invoice.producerBase, productId);
+        emit PurchaseRegistered(buyer, seller, producerBase, productId);
 
         return true;
     }
 
-    function retrieveProfit () 
-        external
-        payable
-        onlyMember 
-    returns (bool) {
-        address payable storeOwner = msg.sender;
+    // function retrieveProfit () 
+    //     external
+    //     payable
+    // returns (bool) {
+    //     return true;
+    // }
 
-        uint accumulatedProfitFromSales = _accumulatedProfit[storeOwner];
-
-        if (accumulatedProfitFromSales > 0) {
-            uint profit = accumulatedProfitFromSales.mul(100 - _profit_fee).div(100); // take market fee
-
-            storeOwner.transfer(profit);
-
-            delete _accumulatedProfit[storeOwner];
-
-            return true;
-        }
-
-        return false;
+    function getAccumolatedProfit () external view onlyMember returns(uint) {
+        return _accumulatedProfit[msg.sender];
     }
-
-
 
     function _addStoreFront (address storeOwner, uint storeFrontId, address producerBase) private returns(bool) {
         bytes32 storeLocatorKey = _returnStoreLocatorKey(storeOwner, producerBase);
