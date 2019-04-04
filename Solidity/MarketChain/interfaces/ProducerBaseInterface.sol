@@ -38,7 +38,7 @@ contract ProducerBaseInterface {
         external;
 
     function registerPurchaseWithInvoice (
-            address client,
             InvoiceProductPurchaseValidator.InvoiceDetails memory invoice,
+            uint256 nonce, 
             bytes memory signature) public returns (bool);
 }

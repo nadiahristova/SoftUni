@@ -15,28 +15,19 @@ import "../interfaces/ProducerBaseInterface.sol";
 
 // TODO: delegate call fro factory contracts solidity
 
-
 // TODO: upgradable pattern here
-// TODO: Donation 
 // TODO: STANDART Contract in producer base => standart name
-// TODO: remove membership drama
-// TODO: product return by 10's
-
 
 // TODO: delegate call with store add/remove
 // TODO: market catches notifications on store change and item change
 // maybe implement it off-chain
-// TODO: add mortal
 
 
 // Note: voting should be pausable
 
 // onlyWhenInitialized, onlyValidAddress
-contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurchaseValidator {
+contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, VotingMemberBase  {
     using SafeMath for uint256;
-
-    ///@dev keep track of participants in the market chain and their vote weight
-    // address of Member Base Contract => member address => member info - maybe turn to bool ?
 
     struct Store {
         bytes32 name;
@@ -47,7 +38,7 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
     ///@dev maps storefront key to index of value of _openedStoreFrtontsByMember
     ///@notice in case value 0 - this means that a storeFront is not opened
     mapping(bytes32 => mapping(uint => uint)) _isStoreFrontToStoreFrontIdMap;
-    //mapping(address => mapping(address => bool)) _approvedClientBase; ??
+    //mapping(address => mapping(address => bool)) _approvedClientBase; 
 
     mapping(address => uint) _accumulatedProfit;
 
@@ -55,9 +46,6 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
     uint constant INVENTORY_CAP_PER_STOREFRONT = 30;
 
     uint _profit_fee; // percents
-
-    // const cost for publishing store fronts getter
-    // cost for notifiying new item added
 
     mapping(address => bool) _associatedClientMemberBase;
     mapping(address => bool) _associatedProducerMemberBase;
@@ -116,9 +104,6 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
         require((_isStoreFrontToStoreFrontIdMap[_returnStoreLocatorKey(storeOwner, producerBase)][storeFrontId] != 0) == isOwner);
         _;
     }
-
-    ///@dev Checks whether given account is a member to a registered memberbase
-    ///@param accountAddress 
     
     
     ///@dev Initializes constants needed for some ground rules and limitations
@@ -201,16 +186,12 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
         return _addStoreFront(msg.sender, storeFrontId, address(memberBase));
     }  
 
-    
-
     function memberBaseAddStoreFront (address storeOwner, uint storeFrontId) 
         public 
         onlyPartnerProducerBase(msg.sender)
         onlyWhenStoreOwner(storeOwner, msg.sender, true)
         onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
     returns (bool) {
-
-       // address memberBase = msg.sender;
         
         return _addStoreFront(storeOwner, storeFrontId, msg.sender);
     }  
@@ -221,7 +202,6 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
         onlyWhenStoreOwner(msg.sender, address(memberBase), true)
         onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, true)
     returns (bool) {
-        // address storeOwner = msg.sender;
 
         return _removeStoreFront(msg.sender, storeFrontId, address(memberBase));
     }  
@@ -233,76 +213,52 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
         onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
     returns (bool) {
 
-        // address memberBase = msg.sender;
-
         return _removeStoreFront(storeOwner, storeFrontId, msg.sender);
     } 
 
     function buyProduct (
             InvoiceDetails memory invoice,
-            address producerBase,
-            uint256 storeFrontId,
-            uint256 amount,
             uint256 nonce, 
             bytes memory signature) 
         public 
         payable
-        //onlyNaturalNumber(nonce)
-        onlyValidAddress(producerBase)
-        onlyPartnerProducerBase(producerBase)
-        onlyWhenStoreOwner(invoice.seller, producerBase, true)
-        onlyWhenStoreFrontOwner(invoice.seller, producerBase, storeFrontId, true)
+        onlyNaturalNumber(nonce)
+        onlyValidInvoice(invoice)
+        onlyPartnerProducerBase(invoice.producerBase)
     returns(bool) {
-
-        require(_hasValidState(invoice));
 
         address payable buyer = msg.sender;
 
-        //require(invoice.buyer == buyer);
+        require(invoice.buyer == buyer);
         
-        bool isValidInvoice = _validateProductPurchase(nonce, invoice, signature);
-        
-        require(isValidInvoice);
+        require(_validateProductPurchase(invoice, nonce, signature));
 
-        uint256 amount = amount;// stack too deep error
-        uint256 pricePerUnit = invoice.pricePerUnit;// stack too deep error
+        uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
 
-        uint256 pricePaid = msg.value;
+        uint256 excessPaymet = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
 
-        uint256 productPrice = amount.mul(pricePerUnit);
+        require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature));// validate storeFrontId and product Id
 
-        require(pricePaid >= productPrice);
-
-
-        bool successfulRegistration = ProducerBaseInterface(producerBase).registerPurchaseWithInvoice(buyer, invoice, signature);
-
-        require(successfulRegistration);
-
-        address seller = invoice.seller;
-        uint256 productId = invoice.productId;
-
-        _accumulatedProfit[seller] = _accumulatedProfit[seller].add(productPrice);
-
-        uint256 excessPaymet = pricePaid.sub(productPrice);
+        _accumulatedProfit[invoice.seller] = _accumulatedProfit[invoice.seller].add(productPrice);
 
         if(excessPaymet > 0) {
             buyer.transfer(excessPaymet);
         }
 
         _upMemberVoteWeight(buyer, 1);
-        _upMemberVoteWeight(seller, 2);
+        _upMemberVoteWeight(invoice.seller, 2);
 
-        emit PurchaseRegistered(buyer, seller, producerBase, productId);
+        emit PurchaseRegistered(buyer, invoice.seller, invoice.producerBase, invoice.productId);
 
         return true;
     }
 
-    // function retrieveProfit () 
-    //     external
-    //     payable
-    // returns (bool) {
-    //     return true;
-    // }
+    function retrieveProfit () 
+        external
+        payable
+    returns (bool) {
+        return true;
+    }
 
     function getAccumolatedProfit () external view onlyMember returns(uint) {
         return _accumulatedProfit[msg.sender];
@@ -349,7 +305,6 @@ contract BaseMarket is BaseMarketInterface, VotingMemberBase, InvoiceProductPurc
     returns(bytes32) {
         return keccak256(abi.encodePacked(storeOwner, memberBase));
     }
-
 
     function _hasStore (address storeOwner, address producerBase) 
         view

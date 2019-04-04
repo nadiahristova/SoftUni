@@ -278,36 +278,27 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     }
 
     function registerPurchaseWithInvoice (
-            address client,
-            uint256 storeFronId,
-            uint256 amount,
             InvoiceDetails memory invoice,
             uint256 nonce, 
             bytes memory signature) 
         public 
         onlyNaturalNumber(nonce)
+        onlyValidInvoice(invoice)
         onlyOnValidMarketMembership(invoice.seller, msg.sender)
     returns (bool) {
 
-        require(_hasValidState(invoice));
-
-        require(isMember(invoice.seller));
-        
-        require(_storeFronts._isStoreFrontExisting(invoice.seller, storeFronId) 
-            && !_storeFronts._isStoreFrontDiabled(invoice.seller, storeFronId));
+        require(_storeFronts._isStoreFrontExisting(invoice.seller, invoice.storeFrontId) 
+            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId));
+            
         require(_inventory._isProductExisting(invoice.productId));
 
-        address market = msg.sender;
+        require(_validateProductPurchase(invoice, nonce, signature));
 
-        bool isValidInvoice = _validateProductPurchase(nonce, invoice, signature);
-        
-        require(isValidInvoice);
-
-        _inventory._decreaseAmount(invoice.productId, amount);
+        _inventory._decreaseAmount(invoice.productId, invoice.amount);
 
         _upMemberVoteWeight(invoice.seller, 5);
 
-        emit LogPurchaseRegistered(client, invoice.seller, market, invoice.productId);
+        emit LogPurchaseRegistered(invoice.buyer, invoice.seller, msg.sender, invoice.productId);
 
         return true;
     }
