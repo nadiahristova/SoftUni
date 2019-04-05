@@ -44,12 +44,12 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     event LogMembershipRequestPending(address indexed accAddress);
 
     modifier onlyMember() {
-        require(_memberBase._isMember(msg.sender), 'Unauthorised');
+        require(_memberBase._isMember(msg.sender), '3');
         _;
     }
 
     modifier onlyWhenMember (address accAddress, bool isMember) {
-        require(_memberBase._isMember(accAddress) == isMember, 'Unauthorised');
+        require(_memberBase._isMember(accAddress) == isMember, '3');
         _;
     }
 
@@ -114,17 +114,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._hasActiveCampaigns(accaddress);
     }
 
-    /// @dev Launches not basic campaign for given member
-    /// @notice Only owner can do this, campaign id should be > 2
-    /// @param accAddress Member address
-    /// @return true if campaign was launched, false otherwise
-    function _launchCampaign (address accAddress, uint campaignId) 
-        internal 
-    returns(bool) {
-
-        return _memberBase._setVotingCampaign(campaignId, accAddress, now + _availableCampaigns[campaignId].activeTimespan);
-    }
-
     function removeVotingCampaign(address accAddress, uint campaignId) 
         public 
         onlyValidAddress(accAddress)
@@ -150,16 +139,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._isMember(accAddress);
     }
 
-    ///@dev Add new member to a member base if voted
-    function _registerMember(address accAddress) 
-        internal 
-    {
-        require(_memberBase._isCampaignSupported(1, accAddress), "Not voted");
-        
-        require(_memberBase._registerMember(accAddress, INITIAL_VOTE_WEIGHT));
-
-        require(_resetVotingCampaingn(1, accAddress));
-    }
 
     // what will happen with the markets
     ///@dev Used for a request or confirmation of membership revocation 
@@ -199,6 +178,28 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         returns(uint) {
 
         return _memberBase._getVoteWeight(accAddress);
+    }
+
+    ///@dev Add new member to a member base if voted
+    function _registerMember(address accAddress) 
+        internal 
+    {
+        require(_memberBase._isCampaignSupported(1, accAddress), "Not voted");
+        
+        require(_memberBase._registerMember(accAddress, INITIAL_VOTE_WEIGHT));
+
+        require(_resetVotingCampaingn(1, accAddress));
+    }
+    
+    /// @dev Launches not basic campaign for given member
+    /// @notice Only owner can do this, campaign id should be > 2
+    /// @param accAddress Member address
+    /// @return true if campaign was launched, false otherwise
+    function _launchCampaign (address accAddress, uint campaignId) 
+        internal 
+    returns(bool) {
+
+        return _memberBase._setVotingCampaign(campaignId, accAddress, now + _availableCampaigns[campaignId].activeTimespan);
     }
 
     ///@dev Used for a foreceful revokation of membership 

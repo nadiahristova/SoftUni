@@ -18,6 +18,7 @@ module.exports = function(deployer, network) {
   function deployLibraries() {
       deployer.deploy(SafeMathLib);
       deployer.link(SafeMathLib, VotesKeeperLib);
+      deployer.link(SafeMathLib, InventoryLib);
 
       deployer.deploy(VotesKeeperLib);
       deployer.link(VotesKeeperLib, VotingMemberBaseLib);
@@ -41,19 +42,19 @@ module.exports = function(deployer, network) {
       deployer.link(ECDSA, RegionalMarket);
   }
 
-  if(network == "development"){
+  if(network == "development" || network == "develop"){
       deployLibraries();
 
       deployer.deploy(ProducerBase);
 
       deployer.deploy(RegionalMarket);
     } else if (network == 'ropsten') {
-      deployLibraries();
+        deployLibraries();
 
-      deployer.deploy(ProducerBase)
-        .then(() => ProducerBase.deployed())
-        .then((instance) => instance.initialize([2592000, 1728000], 2, 3, 50));
+        deployer.deploy(ProducerBase)
+          .then(() => ProducerBase.deployed())
+          .then((instance) => instance.initialize([2592000, 1728000], 2, 3, 50));
 
-      deployer.deploy(RegionalMarket);
-    }
+        deployer.deploy(RegionalMarket);
+      }
 };

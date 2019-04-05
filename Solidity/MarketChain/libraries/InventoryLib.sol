@@ -2,7 +2,12 @@ pragma solidity >=0.5.6 <0.6.0;
 
 pragma experimental ABIEncoderV2;
 
+import "./SafeMath.sol";
+
 library InventoryLib {
+    using SafeMath for uint256;
+
+    uint constant MAX_ENTITIES_BY_PAGE = 10;
 
     struct Store {
         StoreFront[] storeFronts;
@@ -260,6 +265,39 @@ library InventoryLib {
         internal 
     returns (Product memory) {
         return self._products[productId];
+    }
+
+
+    function _getStoreFronts (StoreFronts storage self, address storeOwner, uint pageNum) 
+        view
+        internal 
+    returns (StoreFront[] memory) {
+        StoreFront[] memory storeFronts = new StoreFront[](MAX_ENTITIES_BY_PAGE);
+
+        uint overAll_SF_Count = self.stores[storeOwner].storeFronts.length;
+        uint pageStartIndex = pageNum.mul(MAX_ENTITIES_BY_PAGE);
+
+        if(pageStartIndex < overAll_SF_Count) {
+
+            uint pageEndIndex = (pageNum.add(1)).mul(MAX_ENTITIES_BY_PAGE).sub(1);
+
+            for(uint i = pageStartIndex; i < overAll_SF_Count && i <= pageEndIndex; i++){
+              
+                uint localIndex = i.sub(pageStartIndex);
+                storeFronts[localIndex] = self.stores[storeOwner].storeFronts[i];
+            }
+        }
+
+        return storeFronts;
+    }
+
+    function _getStoreFrontById (StoreFronts storage self, address storeOwner, uint storeFrontId) 
+        view
+        internal 
+    returns (StoreFront memory) {
+        uint storeFrontIndex = self.stores[storeOwner].storeFrontsMap[storeFrontId].sub(1); // SafeMath makes sure this equation return a natural number 
+
+        return self.stores[storeOwner].storeFronts[storeFrontIndex];
     }
     
     function _isProductExisting (ProductStock storage self, uint productId) 

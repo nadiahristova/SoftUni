@@ -73,35 +73,29 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
     event PurchaseRegistered(address indexed buyer, address indexed seller, address indexed producerBase, uint productId);
 
-
-    modifier onlyMarketMember (address accAddress) {
-        require(isMember(accAddress));
-        _;
-    }
     
-    modifier onlyPartnerClientBase (address memberBase) {
-        require(_associatedClientMemberBase[memberBase]);
-        _;
-    }
+    // modifier onlyPartnerClientBase (address memberBase) {
+    //     require(_associatedClientMemberBase[memberBase]);
+    //     _;
+    // }
 
     modifier onlyPartnerProducerBase (address memberBase) {
-        require(_associatedProducerMemberBase[memberBase]);
+        require(_associatedProducerMemberBase[memberBase], '11');
         _;
     }
 
-    modifier onlyMemberBaseCall () {
-        require(_associatedClientMemberBase[msg.sender] || _associatedProducerMemberBase[msg.sender]);
-        _;
-    }
+    // modifier onlyMemberBaseCall () {
+    //     require(_associatedClientMemberBase[msg.sender] || _associatedProducerMemberBase[msg.sender]);
+    //     _;
+    // }
 
      modifier onlyWhenStoreOwner (address storeOwner, address producerBase, bool isOwner) {
-        require(isMember(storeOwner));
-        require((_openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0) == isOwner);
+        require((_openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0) == isOwner, '12');
         _;
     }
 
      modifier onlyWhenStoreFrontOwner (address storeOwner, address producerBase, uint storeFrontId, bool isOwner) {
-        require((_isStoreFrontToStoreFrontIdMap[_returnStoreLocatorKey(storeOwner, producerBase)][storeFrontId] != 0) == isOwner);
+        require(hasStoreFront(storeOwner, producerBase, storeFrontId) == isOwner);
         _;
     }
     
@@ -130,15 +124,14 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
             _availableCampaigns[i].activeTimespan = campaignTimePeriods[i];
         }
         
-        super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
+        _initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
     }
 
     ///@dev Affiliate client base to the market environment
-    ///@param memberBase Client Base Contract
-    function affiliateClientBase (ClientBaseInterface memberBase) external onlyWhenInitialized onlyOwner {
-        address memberBaseAddress = address(memberBase);
+    ///@param memberBaseAddress Client Base Contract address
+    function affiliateClientBase (address memberBaseAddress) external onlyWhenInitialized onlyOwner {
 
-        require(!_associatedClientMemberBase[memberBaseAddress]);
+        require(!_associatedClientMemberBase[memberBaseAddress],'9');
 
         _associatedClientMemberBase[memberBaseAddress] = true;
 
@@ -146,11 +139,10 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
     }
 
     ///@dev Affiliate client base to the market environment
-    ///@param memberBase Producer Base Contract
-    function affiliateProducerBase (ProducerBaseInterface memberBase) external onlyWhenInitialized onlyOwner {
-        address memberBaseAddress = address(memberBase);
+    ///@param memberBaseAddress Producer Base Contract address
+    function affiliateProducerBase (address memberBaseAddress) external onlyWhenInitialized onlyOwner {
 
-        require(!_associatedProducerMemberBase[memberBaseAddress]);
+        require(!_associatedProducerMemberBase[memberBaseAddress],'9');
 
         _associatedProducerMemberBase[memberBaseAddress] = true;
 
@@ -158,15 +150,14 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
     }
     
 
-    // todo change so empty address can also register store
-    function openStore (ProducerBaseInterface memberBase, bytes32 name) 
+    // todo change so that an empty address can also register store
+    function openStore (address producerBase, bytes32 name) 
         onlyMember
-        onlyWhenStoreOwner(msg.sender, address(memberBase), false)
+        onlyPartnerProducerBase(producerBase)
+        onlyWhenStoreOwner(msg.sender, producerBase, false)
         external { 
-
-        require(name != 0x0); // use name as a marker
+        require(name != 0x0, '10'); // use name as a marker
         address storeOwner = msg.sender;
-        address producerBase = address(memberBase);
 
         bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
 
@@ -176,29 +167,32 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
     }
 
 
-    function addStoreFront (ProducerBaseInterface memberBase, uint storeFrontId) 
-        external 
-        onlyPartnerProducerBase(address(memberBase)) // TODO maybe remove
-        onlyWhenStoreOwner(msg.sender, address(memberBase), true)
-        onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, false)
-    returns (bool) {
+    // function addStoreFront (address memberBase, uint storeFrontId) 
+    //     external 
+    //     onlyPartnerProducerBase(memberBase) // TODO maybe remove
+    //     onlyMember
+    //     onlyWhenStoreOwner(msg.sender, memberBase, true)
+    //     onlyWhenStoreFrontOwner(msg.sender, memberBase, storeFrontId, false)
+    // returns (bool) {
 
-        return _addStoreFront(msg.sender, storeFrontId, address(memberBase));
-    }  
+    //     return _addStoreFront(msg.sender, storeFrontId, memberBase);
+    // }  
 
     function memberBaseAddStoreFront (address storeOwner, uint storeFrontId) 
         public 
-        onlyPartnerProducerBase(msg.sender)
+        onlyWhenMember(storeOwner, true)
         onlyWhenStoreOwner(storeOwner, msg.sender, true)
-        onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
+        onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, false)
     returns (bool) {
+
+        _addStoreFront(storeOwner, storeFrontId, msg.sender);
         
-        return _addStoreFront(storeOwner, storeFrontId, msg.sender);
+        return true;
     }  
 
     function removeStoreFront (ProducerBaseInterface memberBase, uint256 storeFrontId) 
         external
-        onlyPartnerProducerBase(address(memberBase))
+        onlyMember
         onlyWhenStoreOwner(msg.sender, address(memberBase), true)
         onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, true)
     returns (bool) {
@@ -208,7 +202,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
     function notifyForStoreFrontDeletion (address storeOwner, uint storeFrontId) 
         public
-        onlyPartnerProducerBase(msg.sender)
+        onlyWhenMember(storeOwner, true)
         onlyWhenStoreOwner(storeOwner, msg.sender, true)
         onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
     returns (bool) {
@@ -224,6 +218,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         payable
         onlyNaturalNumber(nonce)
         onlyValidInvoice(invoice)
+        onlyWhenMember(invoice.seller, true)
         onlyPartnerProducerBase(invoice.producerBase)
     returns(bool) {
 
@@ -262,6 +257,18 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
     function getAccumolatedProfit () external view onlyMember returns(uint) {
         return _accumulatedProfit[msg.sender];
+    }
+
+    function hasStoreFront(address storeOwner, address producerBase, uint storeFrontId)
+        view
+        public 
+        onlyNaturalNumber(storeFrontId)
+        onlyValidAddress(storeOwner)
+        onlyWhenInitialized
+        onlyPartnerProducerBase(producerBase)
+    returns (bool) {
+
+        return _isStoreFrontToStoreFrontIdMap[_returnStoreLocatorKey(storeOwner, producerBase)][storeFrontId] != 0;
     }
 
     function _addStoreFront (address storeOwner, uint storeFrontId, address producerBase) private returns(bool) {

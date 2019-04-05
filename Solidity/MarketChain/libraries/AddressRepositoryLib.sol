@@ -8,15 +8,9 @@ library AddressRepositoryLib {
     uint128 constant MAX_NUM_OF_VALUES_PER_KEY = 55;
 
     struct Repository {
-        /** ///@dev Maps hashed country's ISO Code and country region to set of admin account addresses */
 
         ///@dev Maps hashed information key relative to the values in the repository
         mapping(bytes32 => address[]) _values;
-
-        /** 
-            * ///@dev Maps hashed value of given country ISO Code, admin's address and given's country region to the value of 
-            * /// admin's address index + 1 in _values 
-        */
 
         ///@dev Maps hash of the combination between hashed relative information and the value itself, to the value's index + 1 in the _values 
         mapping(bytes32 => uint) _valueIndexMap;

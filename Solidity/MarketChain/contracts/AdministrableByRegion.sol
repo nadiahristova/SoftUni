@@ -20,7 +20,7 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
     }
 
     modifier onlyValidLocation(Location memory location){
-        require(location.iSOCode != 0x0 && location.province != 0x0);
+        require(location.iSOCode != 0x0 && location.province != 0x0, 'Inv param');
         _;
     }
 
@@ -47,7 +47,6 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
         onlyOwner 
     returns (bool) {
         require(accAddress != owner);
-        require(!isAdmin(accAddress));
 
         _adminRepository.add(accAddress, _returnLocationKey(location));
 

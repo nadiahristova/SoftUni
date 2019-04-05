@@ -10,7 +10,7 @@ contract Initializable {
     event Initialized();
 
     modifier onlyWhenInitialized() {
-        require(_isInitialized, 'not init');
+        require(_isInitialized, '0');
         _;
     }
 

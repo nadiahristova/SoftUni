@@ -48,9 +48,9 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         public 
         onlyOwner
     {
-        require(!_isInitialized);
+        require(!_isInitialized, 'Init');
 
-        require(donationRoundTimePeriod <= 30 days);
+        require(donationRoundTimePeriod >= 30 days, 'Round period');
         _donationRoundTimePeriod = donationRoundTimePeriod;
 
         bytes32[] memory campaignNames = new bytes32[](1);
@@ -81,27 +81,18 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
         return true;
     }
-
-    /// @dev Launches not basic campaign for given member
-    /// @param accAddress Member address
-    /// @return true if campaign was launched, false otherwise
-    function launchCampaign (address accAddress, uint campaignId) 
+    
+    function launchMembershipRevocationCampaign (address accAddress) 
         public 
         onlyValidAddress(accAddress)
-        onlyNaturalNumber(campaignId)
         onlyWhenInitialized
+        onlyOwner 
         onlyWhenMember(accAddress, true)
     returns(bool) {
-        require(campaignId > 1 && campaignId != 3); 
-        require(_availableCampaigns[campaignId].name != 0x0); // campaign is existing
 
-        return _launchCampaign(accAddress, campaignId);
+        return _launchCampaign(accAddress, 2);
     }
-
-    /// @dev Admin can suggest producer for funding
-    /// @notice Determine if Bugs will accept `(food)` to eat
-    /// @param food The name of a food to evaluate (English)
-    /// @return true if Bugs will eat it, false otherwise
+    
     function suggestForFunding (address storeOwner, address memberBase) 
         external 
         onlyValidAddress(storeOwner)
@@ -125,9 +116,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         require(!info.isValidFundingCandidate);//already proposed
         require(info.lastlyWonFunding + TIME_BETWEEN_WON_CANDIDACIES <= now, 'Wait time');
 
-        uint length = _fundings[regionKey].candidates.push(storeOwner);
-
-        require(length <= MAX_NUM_CANDIDATES_FOR_FUNDING, 'No spots');
+        require(_fundings[regionKey].candidates.push(storeOwner) <= MAX_NUM_CANDIDATES_FOR_FUNDING, 'No spots');
 
         _additionalInfo[storeOwner].isValidFundingCandidate = true;
 
@@ -147,7 +136,6 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         onlyNaturalNumber(votingCampaignId)
         onlyWhenInitialized
         onlyMember
-        onlyWhenMember(storeOwner, true)
     {
         address supporter = msg.sender;
 

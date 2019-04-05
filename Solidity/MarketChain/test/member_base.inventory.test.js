@@ -1,290 +1,255 @@
 var ProducerBase = artifacts.require("ProducerBase");
-var Market = artifacts.require("BaseMarket");
+var Market = artifacts.require("RegionalMarket");
 
 const { shouldFail, expectEvent, BN, time } = require('openzeppelin-test-helpers');
-const { expect } = require('chai');
+const { shared_func, MSG, ENUMS } = require('./_utils.js')
+const { VOTING_CAMPAIGN } = ENUMS
 
 
-contract('ProducerBase', function ([owner, storeOwner1, storeOwner2, not_a_member]) {
+contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member]) {
 
-    let memberBase;
+    let member_base;
     let market;
 
-    const votingCampaigns = {
-        GRANT_MEMBERSHIP: new BN(1),
-        REVOKE_MEMBERSHIP: new BN(2)
-    }
+    let default_product = shared_func.default_product;
+    let product = shared_func.product1;
 
-    const gmCampaignActivePeriod = time.duration.days(30)
-    const rmCampaignActivePeriod = time.duration.days(20)
 
-    const defaultProduct = {
-        specificationId: new BN(1),
-        pricePerUnit: new BN(100),
-        amount: new BN(15),
-        hasNegotiablePrice: false
-    }
-
-    const product = {
-        specificationId: new BN(1),
-        pricePerUnit: new BN(150),
-        amount: new BN(1000),
-        hasNegotiablePrice: true
-    }
-
-    const onlyOwner_msg = 'Only owner'
-    const unauthorised_msg = 'Unauthorised'
-    const registered_msg = 'Registered'
-    const not_a_partner_msg = 'Not partner'
-    const not_existing_SF = 'Not existing'
-    const enabled_SF_msg = 'Enabled'
-    const wait_time_msg = 'Wait time'
-
-    const registerMember = async function (supporter, candidateMember, memberBase){
-
-        await memberBase.requestMembership({ from: candidateMember })
-        await memberBase.launchMembershipGrantingCampaign(candidateMember, { from: supporter })
-
-        await memberBase.supportMember(candidateMember, 1, { from: supporter })
-
-        await memberBase.registerMember(candidateMember, { from: supporter })
-    }
-
-    const registerMarket = async function (owner, memberBase) {
-
-        return await memberBase.addMarketPartner(market.address, { from: owner })
-    }
-
-    const addDefaultProduct = async function (storeFrontId, storeOwner, memberBase) {
-        
-        return await memberBase.addProductToStoreFront(storeFrontId, defaultProduct.specificationId, defaultProduct.pricePerUnit, 
-            defaultProduct.amount, defaultProduct.hasNegotiablePrice, { from: storeOwner });
-    }
-
-    const updateProduct = async function (storeFrontId, productId, storeOwner, memberBase) {
-        
-        return await memberBase.updateProduct(storeFrontId, productId, product.pricePerUnit, 
+    const updateProduct = async function (storeFrontId, productId, storeOwner, member_base) {
+        return await member_base.updateProduct(storeFrontId, productId, product.pricePerUnit, 
             product.amount, product.hasNegotiablePrice, { from: storeOwner });
     }
 
+    const getFirstIndexValue =  (item) => { return parseInt(item[0]) }
+
+    const areArraysIdentical = function (a, b) {
+        var i = a.length;
+        if (i != b.length) return false;
+        while (i--) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    };
+
     before(() => {
-        web3.eth.defaultAccount = storeOwner1;
+        web3.eth.defaultAccount = storeOwner;
     });
 
     beforeEach(async () => {
         market = await Market.deployed()
 
-        memberBase = await ProducerBase.new()
-        await memberBase.initialize([gmCampaignActivePeriod, rmCampaignActivePeriod], 2, 3, 50, [], [])
+        member_base = await ProducerBase.new()
+        await shared_func.initializeProducerBase(member_base)
 
-        await registerMember(owner, storeOwner1, memberBase)
-        await registerMarket(owner, memberBase)
+        await shared_func.registerMember(owner, storeOwner, member_base)
+        await shared_func.registerMarket(owner, market, member_base)
     });
 
+    /** 
     it("should be able to open store front", async () => {
         const expectedStoreFrontId = new BN(1);
 
-        const result = await memberBase.addStoreFront({ from: storeOwner1 });
+        const result = await member_base.addStoreFront({ from: storeOwner });
 
-        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner1, storeFrontId: expectedStoreFrontId })
+        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner, storeFrontId: expectedStoreFrontId })
     })
 
     it("should be able to increase store front ids correctly", async () => {
         const expectedStoreFrontId = new BN(3);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await memberBase.addStoreFront({ from: owner });
-        const result = await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
+        await member_base.addStoreFront({ from: owner });
+        const result = await member_base.addStoreFront({ from: storeOwner });
 
-        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner1, storeFrontId: expectedStoreFrontId })
+        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner, storeFrontId: expectedStoreFrontId })
     })
 
     it("should be able to increase store front ids correctly", async () => {
         const expectedStoreFrontId = new BN(3);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await memberBase.addStoreFront({ from: owner });
-        const result = await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
+        await member_base.addStoreFront({ from: owner });
+        const result = await member_base.addStoreFront({ from: storeOwner });
 
-        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner1, storeFrontId: expectedStoreFrontId })
+        expectEvent.inLogs(result.logs, 'LogStoreFrontCreated', { ownerAddress: storeOwner, storeFrontId: expectedStoreFrontId })
     })
 
     it("should NOT be able to create store front on not-a-member request", async () => {
         
-        await shouldFail.reverting(memberBase.addStoreFront({ from: not_a_member }), unauthorised_msg);
+        await shouldFail.reverting(member_base.addStoreFront({ from: not_a_member }), MSG.UNAUTHORISED);
     })
 
     it("should be able to remove existing store front on Store Front's owner request", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        const result = await memberBase.removeStoreFront(expected_removedSFId, { from: storeOwner1 });
+        const result = await member_base.removeStoreFront(expected_removedSFId, { from: storeOwner });
 
-        expectEvent.inLogs(result.logs, 'LogStoreFrontRemoved', { ownerAddress: storeOwner1, storeFrontId: expected_removedSFId })
+        expectEvent.inLogs(result.logs, 'LogStoreFrontRemoved', { ownerAddress: storeOwner, storeFrontId: expected_removedSFId })
     })
 
     it("should NOT be able to remove existing store front on not-a-member request", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.removeStoreFront(expected_removedSFId, { from: not_a_member }), unauthorised_msg);
+        await shouldFail.reverting(member_base.removeStoreFront(expected_removedSFId, { from: not_a_member }), MSG.UNAUTHORISED);
     })
 
     it("should NOT be able to remove existing store front on other than SF owner request", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.removeStoreFront(expected_removedSFId, { from: owner }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeStoreFront(expected_removedSFId, { from: owner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should NOT be able to remove none existing store front", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.removeStoreFront(expected_removedSFId + 1, { from: storeOwner1 }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeStoreFront(expected_removedSFId + 1, { from: storeOwner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should be able to disable store front", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        const { logs } = await memberBase.disableStoreFront(expected_removedSFId, { from: storeOwner1 });
+        const { logs } = await member_base.disableStoreFront(expected_removedSFId, { from: storeOwner });
 
-        expectEvent.inLogs(logs, 'LogStoreFrontDisabled', { ownerAddress: storeOwner1, storeFrontId: expected_removedSFId })
+        expectEvent.inLogs(logs, 'LogStoreFrontDisabled', { ownerAddress: storeOwner, storeFrontId: expected_removedSFId })
     })
 
     it("should NOT be able to disable none existing store front", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.removeStoreFront(expected_removedSFId + 1, { from: storeOwner1 }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeStoreFront(expected_removedSFId + 1, { from: storeOwner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should NOT be able to disable existing store front on other than SF owner's request", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.removeStoreFront(expected_removedSFId, { from: owner }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeStoreFront(expected_removedSFId, { from: owner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should NOT be able to enable already enabled store front", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(memberBase.enableStoreFront(expected_removedSFId, { from: storeOwner1 }), enabled_SF_msg);
+        await shouldFail.reverting(member_base.enableStoreFront(expected_removedSFId, { from: storeOwner }), MSG.ENABLED_STORE_FRONT);
     })
 
     it("should be able to enable already disabled store front", async () => {
         const expected_removedSFId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await memberBase.disableStoreFront(expected_removedSFId, { from: storeOwner1 });
+        await member_base.disableStoreFront(expected_removedSFId, { from: storeOwner });
 
-        const { logs } = await memberBase.enableStoreFront(expected_removedSFId, { from: storeOwner1 });
+        const { logs } = await member_base.enableStoreFront(expected_removedSFId, { from: storeOwner });
 
-        expectEvent.inLogs(logs, 'LogStoreFrontEnabled', { ownerAddress: storeOwner1, storeFrontId: expected_removedSFId })
+        expectEvent.inLogs(logs, 'LogStoreFrontEnabled', { ownerAddress: storeOwner, storeFrontId: expected_removedSFId })
     })
 
     it("should be able to add product", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        const { logs } = await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        const { logs } = await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        expectEvent.inLogs(logs, 'LogProductAddedToStoreFront', { ownerAddress: storeOwner1, storeFrontId: expected_SFId, productId: expected_ProductId })
+        expectEvent.inLogs(logs, 'LogProductAddedToStoreFront', { ownerAddress: storeOwner, storeFrontId: expected_SFId, productId: expected_ProductId })
     })
 
     it("should NOT be able to enable to add product when not a member", async () => {
         const expected_SFId = 1;
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(addDefaultProduct(expected_SFId, not_a_member, memberBase), unauthorised_msg)
+        await shouldFail.reverting(shared_func.addProduct(expected_SFId, not_a_member, member_base, default_product), MSG.UNAUTHORISED)
     })
 
     it("should NOT be able to add product to none existing store front", async () => {
         const expected_SFId = 1;
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(addDefaultProduct(expected_SFId + 1, storeOwner1, memberBase, { from: not_a_member }), unauthorised_msg)
+        await shouldFail.reverting(shared_func.addProduct(expected_SFId + 1, not_a_member, member_base, default_product), MSG.UNAUTHORISED)
     })
 
     it("should NOT be able to add product to disabled store front", async () => {
         const expected_SFId = 1;
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await memberBase.disableStoreFront(expected_SFId, { from: storeOwner1 });
+        await member_base.addStoreFront({ from: storeOwner });
+        await member_base.disableStoreFront(expected_SFId, { from: storeOwner });
 
-        await shouldFail.reverting(addDefaultProduct(expected_SFId + 1, storeOwner1, memberBase, { from: not_a_member }))
+        await shouldFail.reverting(shared_func.addProduct(expected_SFId + 1, not_a_member, member_base, default_product))
     })
 
     it("should be able to remove product", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        const { logs } = await memberBase.removeProductFromStoreFront(expected_SFId, expected_ProductId, { from: storeOwner1 });
+        const { logs } = await member_base.removeProductFromStoreFront(expected_SFId, expected_ProductId, { from: storeOwner });
 
-        expectEvent.inLogs(logs, 'LogProductRemovedFromStoreFront', { ownerAddress: storeOwner1, storeFrontId: expected_SFId, productId: expected_ProductId })
+        expectEvent.inLogs(logs, 'LogProductRemovedFromStoreFront', { ownerAddress: storeOwner, storeFrontId: expected_SFId, productId: expected_ProductId })
     })
 
     it("should NOT be able to remove product on other than SF's owner request", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(memberBase.removeProductFromStoreFront(expected_SFId, expected_ProductId, { from: owner }), unauthorised_msg);
+        await shouldFail.reverting(member_base.removeProductFromStoreFront(expected_SFId, expected_ProductId, { from: owner }), MSG.UNAUTHORISED);
     })
 
     it("should NOT be able to remove product when Store Front is non existing", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(memberBase.removeProductFromStoreFront(expected_SFId + 1, expected_ProductId, { from: storeOwner1 }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeProductFromStoreFront(expected_SFId + 1, expected_ProductId, { from: storeOwner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should NOT be able to remove product when product is non existing", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(memberBase.removeProductFromStoreFront(expected_SFId, expected_ProductId + 1, { from: storeOwner1 }), not_existing_SF);
+        await shouldFail.reverting(member_base.removeProductFromStoreFront(expected_SFId, expected_ProductId + 1, { from: storeOwner }), MSG.NOT_EXISTING_STORE_FRONT);
     })
-
+    
     it("should be able to update product", async () => {
         const expected_SFId = 1;
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
         await time.increase(time.duration.seconds(5 * 60 + 1));
 
-        const { logs } = await updateProduct(expected_SFId, expected_ProductId, storeOwner1, memberBase) 
+        const { logs } = await updateProduct(expected_SFId, expected_ProductId, storeOwner, member_base) 
 
-        expectEvent.inLogs(logs, 'LogProductPricePerUnitUpdated', { productId: expected_ProductId, oldPrice: defaultProduct.pricePerUnit, newPrice: product.pricePerUnit })
-        expectEvent.inLogs(logs, 'LogProductProducedAmountUpdated', { productId: expected_ProductId, oldAmount: defaultProduct.amount, newAmount: product.amount })
+        expectEvent.inLogs(logs, 'LogProductPricePerUnitUpdated', { productId: expected_ProductId, oldPrice: default_product.pricePerUnit, newPrice: product.pricePerUnit })
+        expectEvent.inLogs(logs, 'LogProductProducedAmountUpdated', { productId: expected_ProductId, oldAmount: default_product.amount, newAmount: product.amount })
         expectEvent.inLogs(logs, 'LogProductPriceNegotiabilityUpdated', { productId: expected_ProductId, priceIsNegotiable: product.hasNegotiablePrice })
     })
 
@@ -292,39 +257,78 @@ contract('ProducerBase', function ([owner, storeOwner1, storeOwner2, not_a_membe
         const expected_SFId = 1;
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId, storeOwner1, memberBase), wait_time_msg) 
+        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId, storeOwner, member_base), MSG.WAIT_TIME) 
     })
 
     it("should NOT be able to update product on other than SF's owner request", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId, owner, memberBase), unauthorised_msg);
+        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId, owner, member_base), MSG.UNAUTHORISED);
     })
 
     it("should NOT be able to update product when Store Front is non existing", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(updateProduct(expected_SFId + 1, expected_ProductId, storeOwner1, memberBase), not_existing_SF);
+        await shouldFail.reverting(updateProduct(expected_SFId + 1, expected_ProductId, storeOwner, member_base), MSG.NOT_EXISTING_STORE_FRONT);
     })
 
     it("should NOT be able to update product when product is non existing", async () => {
         const expected_SFId = new BN(1);
         const expected_ProductId = new BN(1);
 
-        await memberBase.addStoreFront({ from: storeOwner1 });
-        await addDefaultProduct(expected_SFId, storeOwner1, memberBase);
+        await member_base.addStoreFront({ from: storeOwner });
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
 
-        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId + 1, storeOwner1, memberBase), not_existing_SF)
+        await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId + 1, storeOwner, member_base), MSG.NOT_EXISTING_STORE_FRONT)
+    })
+
+    it("should allow a member with a store to retrieve page of 10 store front information at a time", async () => {
+
+        let expected_SF_Ids_P0 = [...Array(11).keys()]
+        expected_SF_Ids_P0.shift()
+
+        let expected_SF_Ids_P1 = Array(10).fill(0)
+        expected_SF_Ids_P1[0] = 11
+        expected_SF_Ids_P1[1] = 12
+
+        for(let i = 0; i < 12; i++) {
+            await member_base.addStoreFront({ from: storeOwner }); // create store front
+        }
+
+        const result_P0 = await member_base.getStoreFrontsByPageNum(storeOwner, 0); // create store front
+        const received_SF_Ids_P0 = result_P0.map(getFirstIndexValue)
+
+        const result_P1 = await member_base.getStoreFrontsByPageNum(storeOwner, 1); // create store front
+        const received_SF_Ids_P1 = result_P1.map(getFirstIndexValue)
+
+        assert.equal(areArraysIdentical(expected_SF_Ids_P0, received_SF_Ids_P0), true, 'SF ids for first page are not correct')
+        assert.equal(areArraysIdentical(expected_SF_Ids_P1, received_SF_Ids_P1), true, 'SF ids for second page are not correct')
+    })
+*/
+
+    it("should NOT allow a not-a-member to publish store front to a market", async () => {
+        await shouldFail.reverting(member_base.publishStoreFrontToMarket(market.address, 2, { from: not_a_member }), MSG.UNAUTHORISED)
+    })
+
+    it("should NOT allow a member to publish store front that does not exist", async () => {
+        await shouldFail.reverting(member_base.publishStoreFrontToMarket(market.address, 2, { from: storeOwner }), MSG.NOT_EXISTING_STORE_FRONT)
+    })
+
+    it("should NOT allow a member to publish disabled store front", async () => {
+        await member_base.addStoreFront({ from: storeOwner });
+        await member_base.disableStoreFront(1, { from: storeOwner });
+
+        await shouldFail.reverting(member_base.publishStoreFrontToMarket(market.address, 1, { from: storeOwner }))
     })
 })

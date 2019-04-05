@@ -13,7 +13,7 @@ contract Ownable is BaseContract {
     }
 
     modifier onlyOwner () {
-        require(msg.sender == owner, 'Only owner');
+        require(msg.sender == owner, '2');
         _;
     }
 

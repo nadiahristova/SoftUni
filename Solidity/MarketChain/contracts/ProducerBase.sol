@@ -27,17 +27,17 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
 
     modifier onlyExistingStoreFront (uint storeFrontId) {
-         require(_storeFronts._isStoreFrontExisting(msg.sender, storeFrontId), 'Not existing');
+         require(_storeFronts._isStoreFrontExisting(msg.sender, storeFrontId), '6');
          _;
     }
 
     modifier onlyOnNotDisabledStoreFront(uint storeFronId) {
-        require(!_storeFronts._isStoreFrontDiabled(msg.sender, storeFronId), 'Enabled');
+        require(!_storeFronts._isStoreFrontDiabled(msg.sender, storeFronId), '8');
         _;
     }
 
     modifier onlyExistingProduct (uint storeFrontId, uint productId) {
-         require(_inventory._isProductExisting(productId), 'Not existing');
+         require(_inventory._isProductExisting(productId), '7');
          _;
     }
 
@@ -71,7 +71,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         public
         onlyOwner {
 
-        require(!_isInitialized);
+        require(!_isInitialized, 'Init');
         
         super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
             initialOwnerVoteWeight, new bytes32[](0),  new uint[](0));
@@ -98,18 +98,15 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     /// @notice Only owner can do this, campaign id should be > 2
     /// @param accAddress Member address
     /// @return true if campaign was launched, false otherwise
-    function launchCampaign (address accAddress, uint campaignId) 
+    function launchMembershipRevocationCampaign (address accAddress) 
         public 
         onlyValidAddress(accAddress)
-        onlyNaturalNumber(campaignId)
         onlyWhenInitialized
         onlyOwner 
         onlyWhenMember(accAddress, true)
     returns(bool) {
-        require(campaignId > 1); 
-        require(_availableCampaigns[campaignId].name != 0x0); // campaign is existing
 
-        return _launchCampaign(accAddress, campaignId);
+        return _launchCampaign(accAddress, 2);
     }
 
     function registerMember(address accAddress) 
@@ -193,20 +190,20 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         _storeFronts._enableStoreFront(storeOwner, storeFrontId);
     }
 
-    function pushStoreFrontToMarket(BaseMarketInterface market, uint storeFrontId) 
+    function publishStoreFrontToMarket(address market, uint storeFrontId) 
             external
             onlyMember  
             onlyExistingStoreFront(storeFrontId)
             onlyOnNotDisabledStoreFront(storeFrontId)
-            onlyOnValidMarketMembership(msg.sender, address(market))
+            onlyOnValidMarketMembership(msg.sender, market)
     {
         address storeOwner = msg.sender;
 
-        require(market.memberBaseAddStoreFront(storeOwner, storeFrontId));
+        require(BaseMarketInterface(market).memberBaseAddStoreFront(storeOwner, storeFrontId));
 
         _upMemberVoteWeight(storeOwner, 5);
 
-        emit LogStoreFrontShared(storeOwner, storeFrontId, address(market));
+        emit LogStoreFrontShared(storeOwner, storeFrontId, market);
     }
 
     /** Product Logic */
@@ -303,7 +300,27 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return true;
     }
 
-    function _getProduct (uint productId) private view returns(InventoryLib.Product memory) {
+    function getStoreFrontsByPageNum (address storeOwner, uint pageNum) 
+        public 
+        view 
+        onlyValidAddress(storeOwner)
+        onlyNaturalNumber(pageNum)
+        onlyWhenInitialized
+    returns(InventoryLib.StoreFront[] memory) {
+        return _storeFronts._getStoreFronts(storeOwner, pageNum);
+    }
+
+    function getStoreFrontById (address storeOwner, uint storeFrontId) 
+        public 
+        view 
+        onlyValidAddress(storeOwner)
+        onlyNaturalNumber(storeFrontId)
+        onlyWhenInitialized
+    returns(InventoryLib.StoreFront memory) {
+        return _storeFronts._getStoreFrontById(storeOwner, storeFrontId);
+    }
+
+    function getProduct (uint productId) onlyNaturalNumber(productId) private view returns(InventoryLib.Product memory) {
         return _inventory._products[productId];
     }
 
