@@ -37,19 +37,39 @@ contract InvoiceProductPurchaseValidator {
         internal 
     returns (bool) {
 
-        require (!seenNonces[invoice.seller][nonce]);
+        require (!seenNonces[invoice.seller][nonce], '15');
 
         // This recreates the message hash that was signed on the client.
-        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.productId, invoice.amount, invoice.pricePerUnit, invoice.validUntil, nonce)); 
+        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.productId, invoice.amount, 
+        invoice.pricePerUnit, invoice.validUntil, nonce)); 
         bytes32 messageHash = hash.toEthSignedMessageHash();
         
         // Verify that the message's signer is the owner of the order
         address signer = messageHash.recover(signature);
 
-        require(invoice.seller == signer);
+        require(invoice.seller == signer, '14');
 
         seenNonces[invoice.seller][nonce] = true;
 
         return true;
+    }
+
+    function _returnHash (
+            InvoiceDetails memory invoice,
+            uint256 nonce, 
+            bytes memory signature) 
+        public 
+        pure
+    returns (address) {
+
+        // This recreates the message hash that was signed on the client.
+        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.productId, invoice.amount, 
+        invoice.pricePerUnit, invoice.validUntil, nonce)); 
+        
+        bytes32 messageHash = hash.toEthSignedMessageHash();
+        
+        address signer = messageHash.recover(signature);
+
+        return signer;
     }
 }

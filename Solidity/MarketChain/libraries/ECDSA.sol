@@ -14,6 +14,7 @@ library ECDSA {
      * @param signature bytes signature, the signature is generated using web3.eth.sign()
      */
     function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
+
         // Check the signature length
         if (signature.length != 65) {
             return (address(0));

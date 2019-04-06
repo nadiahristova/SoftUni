@@ -102,6 +102,7 @@ module.exports = {
     NOT_AFFILIATED: '11',
     STORE_OWNER: '12',
     WAIT_TIME: 'Wait time',
-
+    INVALID_SIGNATURE: '14',
+    SEEN_NONCE: '15'
   }
 }

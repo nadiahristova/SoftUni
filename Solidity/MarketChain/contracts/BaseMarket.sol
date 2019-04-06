@@ -186,7 +186,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
     returns (bool) {
 
         _addStoreFront(storeOwner, storeFrontId, msg.sender);
-        
+
         return true;
     }  
 
@@ -228,6 +228,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         
         require(_validateProductPurchase(invoice, nonce, signature));
 
+        require(false, 'test2');
         uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
 
         uint256 excessPaymet = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
