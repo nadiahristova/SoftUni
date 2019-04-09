@@ -45,9 +45,13 @@ module.exports = function(deployer, network) {
   if(network == "development" || network == "develop"){
       deployLibraries();
 
-      deployer.deploy(ProducerBase);
+      deployer.deploy(ProducerBase)
+        .then(() => ProducerBase.deployed())
+            .then((instance) => instance.initialize([2592000, 1728000], 2, 3, 50));
 
-      deployer.deploy(RegionalMarket);
+      deployer.deploy(RegionalMarket)
+        .then(() => RegionalMarket.deployed())
+          .then((instance) => instance.initialize([2592000, 1728000], 2, 2, 3, 23328000, 50));
     } else if (network == 'ropsten') {
         deployLibraries();
 

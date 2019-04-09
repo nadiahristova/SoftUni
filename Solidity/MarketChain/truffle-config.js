@@ -48,7 +48,7 @@ module.exports = {
      gas: 6700000,           // Gas sent with each transaction (default: ~6700000)  
      gasPrice: 20000000000,        
      network_id: "*",       // Any network (default: none)
-    }
+    },
 
     // Another network with more advanced options...
     // advanced: {

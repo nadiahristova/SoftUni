@@ -82,6 +82,15 @@ contract MarketMemberBase is VotingMemberBase {
         return _partnerMarkets._isRegisteredPartner(market);
     }
 
+    function getMarketPartners () 
+        view
+        public 
+        onlyWhenInitialized
+    returns(address[25] memory) {
+
+        return _partnerMarkets._getPartners();
+    }
+
     /// @dev Checks whether given member has market membership
     /// @param accAddress Member address 
     /// @param market Market address   

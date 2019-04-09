@@ -76,7 +76,6 @@ contract('BaseMarket', function ([owner, producer, client, not_a_member]) {
     before(() => {
         web3.eth.defaultAccount = producer;
     });
-
     beforeEach(async () => {
         market = await Market.new()
         producer_base = await ProducerBase.deployed()
@@ -195,7 +194,7 @@ contract('BaseMarket', function ([owner, producer, client, not_a_member]) {
     // })
 
     it("should blat", async () => {
-
+/** 
         let expected_SFId = 1; 
         let expected_productId = 1; 
 
@@ -234,8 +233,12 @@ contract('BaseMarket', function ([owner, producer, client, not_a_member]) {
         console.log('producer: >> ' + producer + ' <<')
         console.log('Signer: >> ' + result + ' <<')
   
-    })
+        */
+       let address = producer_base.address;
 
+       //console.log(producer_base)
+       console.log(address)
+    })
     // it("should blat", async () => {
 
     //     let expected_SFId = 1; 

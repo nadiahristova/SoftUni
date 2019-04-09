@@ -20,6 +20,10 @@ library PartnerRelationsKeeperLib {
         _;
     }
 
+    function _getPartners (Partners storage self) internal view returns(address[25] memory) {
+      return self._partners;
+    }
+
     function _addPartner (Partners storage self, address partner) 
         internal 
         onlyContractAddress(partner)

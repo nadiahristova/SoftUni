@@ -40,7 +40,13 @@ module.exports = {
       await memberBase.initialize([this.grant_membership_ative_period, this.revoke_membership_active_period], this.decisive_vote_weight_proportion, this.decisive_vote_count_proportion, this.initial_owner_vote_weight);
     },
     initializeRegionalMarket: async function (market) {
-       await market.initialize([this.grant_membership_ative_period, this.revoke_membership_active_period], this.profitprofit_fee, this.decisive_vote_weight_proportion, this.decisive_vote_count_proportion, this.donation_round_period, this.initial_owner_vote_weight);
+       await market.initialize(
+         [this.grant_membership_ative_period, this.revoke_membership_active_period], 
+         this.profitprofit_fee, 
+         this.decisive_vote_weight_proportion, 
+         this.decisive_vote_count_proportion, 
+         this.donation_round_period, 
+         this.initial_owner_vote_weight);
     },
     registerMember: async function (supporter, candidateMember, memberBase){
 
@@ -103,6 +109,7 @@ module.exports = {
     STORE_OWNER: '12',
     WAIT_TIME: 'Wait time',
     INVALID_SIGNATURE: '14',
-    SEEN_NONCE: '15'
+    SEEN_NONCE: '15',
+    FORBIDDEN_FOR_OWNER: '16'
   }
 }

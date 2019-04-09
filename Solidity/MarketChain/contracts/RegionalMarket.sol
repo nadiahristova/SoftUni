@@ -67,7 +67,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
     ///@notice Province name should be between 1 and 30 letters
     ///@param location ISO Code of country and Province name
     function registerMember(Location memory location)
-        public 
+        public
         onlyWhenInitialized
         onlyValidLocation(location)
         onlyWhenMember(msg.sender, false)
@@ -77,7 +77,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
         _additionalInfo[accAddress].location = location;
 
-        _registerMember(accAddress);
+        VotingMemberBase._registerMember(accAddress);
 
         return true;
     }
@@ -195,6 +195,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         if(approvedCandidateCount > 0) {
             uint fundsPerPerson = _fundsPerRegion[regionKey].div(approvedCandidateCount);
 
+
             for(uint i; i < approvedCandidateCount; i++) {
                 _accumulatedProfit[approvedCandidates[i]] += fundsPerPerson;
                 
@@ -262,6 +263,8 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
         require(sendFunds > 0);
 
+        require(AdministrableByRegion.returnAdminsPerProvince(location).length > 0, 'Not supported');
+
         if(isMember(sender) && sendFunds >= 1 ether) {
             _upMemberVoteWeight(sender, 5);
         }
@@ -273,6 +276,14 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         _fundsPerRegion[_returnLocationKey(location)] = currentAvailableFunds;
 
         emit LogRegisteredDonationForRegion(location.iSOCode, location.province, sendFunds, currentAvailableFunds);
+    }
+
+    // TODO: make is Member private?
+    function getMembershipInfo(address accAddress) public view returns (bool isMember, bool isAdmin,bool isOwner){
+        (bool _member, bool _owner) = _getMembershipInfo(accAddress);
+        bool _isAdmin = _adminRepository.contains(accAddress);
+
+        return (_member, _isAdmin, _owner);
     }
 
     function() external payable {

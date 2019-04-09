@@ -125,7 +125,7 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
     returns (bool) {
         require(campaignId > 2);
 
-        return _resetVotingCampaingn(campaignId, accAddress);
+        return VotingMemberBase._resetVotingCampaingn(campaignId, accAddress);
     }
 
     ///@dev Checkes whether an account is a member of the member base
@@ -139,6 +139,13 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._isMember(accAddress);
     }
 
+    function transferOwnership(address newOwner) 
+        public 
+        onlyValidAddress(newOwner) 
+        onlyWhenMember(newOwner, true) {
+
+        Ownable.transferOwnership(newOwner);
+    }
 
     // what will happen with the markets
     ///@dev Used for a request or confirmation of membership revocation 
@@ -149,7 +156,7 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         onlyMember
         onlyWhenNoActiveCampaignsForMember(msg.sender)
     returns (MemberBaseLib.RevokeMembershipStatus) {
-        require(owner != msg.sender);
+        require(Ownable.owner != msg.sender, '16');
 
         return _memberBase._revokeMembership(msg.sender);
     } 
@@ -162,11 +169,11 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         onlyWhenInitialized
         onlyMember
     returns (bool) {
-        require(owner != accAddress);
+        require(Ownable.owner != accAddress);
 
-        require(_revokeMembership(accAddress));
+        require(VotingMemberBase._revokeMembership(accAddress));
 
-        require(_resetVotingCampaingn(2, accAddress));
+        require(VotingMemberBase._resetVotingCampaingn(2, accAddress));
     } 
 
     function getVoteWeight (address accAddress) 
@@ -180,6 +187,17 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._getVoteWeight(accAddress);
     }
 
+    function _getMembershipInfo(address accAddress) internal view returns (bool, bool){
+
+        if (!_memberBase._isMember(accAddress)) {
+            return (false, false);
+        } else if(Ownable.owner == accAddress) {
+            return (true, true);
+        }
+
+        return (true, false);
+    }
+
     ///@dev Add new member to a member base if voted
     function _registerMember(address accAddress) 
         internal 
@@ -188,7 +206,7 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         
         require(_memberBase._registerMember(accAddress, INITIAL_VOTE_WEIGHT));
 
-        require(_resetVotingCampaingn(1, accAddress));
+        require(VotingMemberBase._resetVotingCampaingn(1, accAddress));
     }
     
     /// @dev Launches not basic campaign for given member

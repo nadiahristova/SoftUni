@@ -2,7 +2,7 @@ pragma solidity >=0.4.22 <0.6.0;
 
 import "./BaseContract.sol";
 
-contract Ownable is BaseContract {
+contract Ownable {
     address public owner;
     
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -22,9 +22,9 @@ contract Ownable is BaseContract {
         _;
     }
     
-    function transferOwnership(address newOwner) public onlyOwner onlyValidAddress(newOwner) {
-        emit OwnershipTransferred(owner, newOwner);
-        
+    function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
+
+        emit OwnershipTransferred(owner, newOwner);
     }
 }

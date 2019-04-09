@@ -324,6 +324,10 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _inventory._products[productId];
     }
 
+    function getMembershipInfo(address accAddress) public view returns (bool isMember, bool isOwner){
+        (isMember, isOwner) = _getMembershipInfo(accAddress);
+    }
+
     function () payable external {
         revert();
     }

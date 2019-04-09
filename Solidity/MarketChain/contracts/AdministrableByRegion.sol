@@ -12,7 +12,7 @@ import "../libraries/AddressRepositoryLib.sol";
 contract AdministrableByRegion is BaseContract, Ownable, Initializable {
     using AddressRepositoryLib for AddressRepositoryLib.Repository;
 
-    AddressRepositoryLib.Repository private _adminRepository;
+    AddressRepositoryLib.Repository internal _adminRepository;
 
     modifier onlyAdmin(){
         require(isAdmin(msg.sender));
