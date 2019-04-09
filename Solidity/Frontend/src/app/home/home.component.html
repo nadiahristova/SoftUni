@@ -1,9 +1,140 @@
 <div class="main-content">
   <div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-header card-header-tabs card-header-primary">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <!-- <span class="nav-tabs-title">Member Bases:</span> -->
+                            <ul class="nav nav-tabs " data-tabs="tabs">
+                                <li class="nav-item">
+                                    <a mat-button class="nav-link active" href="#guilds" data-toggle="tab">
+                                        <i class="material-icons">account_balance</i> Guilds
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                                <li class="nav-item disabled">
+                                    <a mat-button class="nav-link disabled" href="#clients"  data-toggle="tab">
+                                        <i class="material-icons">accessibility_new</i> Client Base
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a mat-button class="nav-link" href="#markets" data-toggle="tab">
+                                        <i class="material-icons">shopping_cart</i> Available Markets
+                                        <div class="ripple-container"></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div *ngIf="producerBaseDeployed.length > 0"  class="tab-pane active" id="guilds">
+                            <table class="table">
+                                <tbody>
+                                    <tr *ngFor="let pb of producerBaseDeployed; let i = index">
+                                        <td>
+                                            <a mat-button [className]="membershipData[pb.address] ? 'nav-link' : 'nav-link disabled'" (click)="producerBaseLoginClickEvent($event, i)">
+                                                {{pb.address}}
+                                                <div class="ripple-container"></div>
+                                            </a>
+                                        </td>
+                                        <td>
 
-        <button (click)="myClickFunction($event)">
-                Click Me
-             </button>
+                                        </td>
+                                        <td class="td-actions text-right">
+                                                <button mat-raised-button type="button" matTooltip="Appy for Membership" [matTooltipPosition]="'below'" 
+                                                    [className]="membershipData[pb.address].is_member ? 'd-none' : 'btn btn-primary btn-link btn-sm btn-just-icon'"
+                                                    (click)="applyForMembershipPB(i)">
+                                                    <i class="material-icons">{{membershipData[pb.address].is_pending ? 'alarm_on' : 'send'}}</i>
+                                                </button>
+                                                <button mat-raised-button type="button" matTooltip="Revoke Membership" [matTooltipPosition]="'below'" 
+                                                    [className]="membershipData[pb.address].is_member && !membershipData[pb.address].is_owner? 'btn btn-primary btn-link btn-sm btn-just-icon' : 'd-none'" 
+                                                    (click)="revokeMembershipPB($event, i)">
+                                                    <i class="material-icons">close</i>
+                                                </button>
+                                                <!-- transfer ownership -->
+                                                <form #transfOwnershipForm = "ngForm" (ngSubmit) = "transferOwnershipPB(i, transfOwnershipForm)" [className]="!membershipData[pb.address].is_owner && 'd-none'">
+                                                    <div class="form-group">
+                                                        <label for="tr-member-input">Transfere Ownership:</label> 
+                                                        <input type="text" class="form-control" name="accAddress" id="tr-member-input" placeholder="Account address" ngModel required length="42">
+                                                    </div>
+                                                    <button mat-raised-button type="submit" value="submit" matTooltip="Transfer Ownership" [matTooltipPosition]="'below'" 
+                                                        class="btn btn-primary btn-link btn-just-icon">
+                                                        <i class="material-icons">compare_arrows</i>
+                                                    </button>
+                                                </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane " id="clients">
+                        </div>
+
+                        <div *ngIf="marketDeployed.length > 0" class="tab-pane" id="markets">
+                            <table class="table">
+                                <tbody>
+                                    <tr *ngFor="let market of marketDeployed; let i = index">
+                                        <td>
+                                            <a mat-button [className]="membershipData[market.address] ? 'nav-link' : 'nav-link disabled'" (click)="marketLoginClickEvent($event, i)">
+                                                {{market.address}}
+                                                <div class="ripple-container"></div>
+                                            </a>
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <form #donateForm = "ngForm" (ngSubmit) = "donate(i, donateForm)">
+                                                <div class="form-group">
+                                                    <label for="tr-member-input">Make a donation:</label> 
+                                                    <input type="text" class="form-control" name="donation" id="tr-member-input-m" placeholder="Ether" ngModel required>
+                                                    <input type="text" class="form-control" name="isoCode" placeholder="ISO Code" ngModel required>
+                                                    <input type="text" class="form-control" name="province" placeholder="Province" ngModel required>
+                                                </div>
+                                                <button mat-raised-button type="submit" value="submit" matTooltip="Make a donation" [matTooltipPosition]="'below'" 
+                                                    class="btn btn-primary btn-link btn-just-icon">
+                                                    <i class="material-icons">redo</i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td class="td-actions text-right">
+                                            <button mat-raised-button type="button" matTooltip="Appy for Membership" [matTooltipPosition]="'below'" 
+                                                [className]="membershipData[market.address].is_member ? 'd-none' : 'btn btn-primary btn-link btn-sm btn-just-icon'"
+                                                (click)="applyForMembershipPB(i)">
+                                                <i class="material-icons">{{membershipData[market.address].is_pending ? 'alarm_on' : 'send'}}</i>
+                                            </button>
+                                            <button mat-raised-button type="button" matTooltip="Revoke Membership" [matTooltipPosition]="'below'" 
+                                                [className]="membershipData[market.address].is_member && !membershipData[market.address].is_owner? 'btn btn-primary btn-link btn-sm btn-just-icon' : 'd-none'" 
+                                                (click)="revokeMembershipPB($event, i)">
+                                                <i class="material-icons">close</i>
+                                            </button>
+                                            <!-- transfer ownership -->
+                                            <form #transfOwnershipMarket = "ngForm" (ngSubmit) = "transferOwnershipPB(i, transfOwnershipMarket)" [className]="!membershipData[market.address].is_owner && 'd-none'">
+                                                <div class="form-group">
+                                                    <label for="tr-member-input">Transfere Ownership:</label> 
+                                                    <input type="text" class="form-control" name="accAddress" id="tr-member-input-m" placeholder="Account address" ngModel required length="42">
+                                                </div>
+                                                <button mat-raised-button type="submit" value="submit" matTooltip="Transfer Ownership" [matTooltipPosition]="'below'" 
+                                                    class="btn btn-primary btn-link btn-just-icon">
+                                                    <i class="material-icons">compare_arrows</i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
       <!-- <div class="row">
           <div class="col-lg-3 col-md-6 col-sm-6">
               <div class="card card-stats">
@@ -172,10 +303,10 @@
                                           </td>
                                           <td>Sign contract for "What are conference organizers afraid of?"</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -193,10 +324,10 @@
                                           </td>
                                           <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -215,10 +346,10 @@
                                           <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
                                           </td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -236,10 +367,10 @@
                                           </td>
                                           <td>Create 4 Invisible User Experiences you Never Knew About</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -264,10 +395,10 @@
                                           <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
                                           </td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -285,10 +416,10 @@
                                           </td>
                                           <td>Sign contract for "What are conference organizers afraid of?"</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -312,10 +443,10 @@
                                           </td>
                                           <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -334,10 +465,10 @@
                                           <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
                                           </td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -355,10 +486,10 @@
                                           </td>
                                           <td>Sign contract for "What are conference organizers afraid of?"</td>
                                           <td class="td-actions text-right">
-                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Edit Task" [matTooltipPosition]="'below'" class="btn btn-primary btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">edit</i>
                                               </button>
-                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'above'" class="btn btn-danger btn-link btn-sm btn-just-icon">
+                                              <button mat-raised-button type="button" matTooltip="Remove" [matTooltipPosition]="'below'" class="btn btn-danger btn-link btn-sm btn-just-icon">
                                                   <i class="material-icons">close</i>
                                               </button>
                                           </td>
@@ -414,6 +545,6 @@
                   </div>
               </div>
           </div>
-      </div> -->
+      </div>  -->
   </div>
 </div>

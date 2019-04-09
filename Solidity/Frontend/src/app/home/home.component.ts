@@ -1,16 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar  } from '@angular/material';
+import { Router } from "@angular/router"
 
 import * as Chartist from 'chartist';
+import TruffleContract from 'truffle-contract';
 
 import { Web3Service } from '../service-proxies/web3.service';
+import { LocalStorageService } from '../service-proxies/local-storage.service';
 import { ProducersWEB3Service } from '../service-proxies/producerWEB3.service';
+
+import { MemberBaseInfo } from '../service-proxies/local-storage.service';
 
 let producerBaseABI = require('../../../../MarketChain/build/contracts/ProducerBase.json')
 let regionalMarketABI = require('../../../../MarketChain/build/contracts/RegionalMarket.json')
 
 
 declare let require: any;
+declare let window: any;
+
+const Web3 = require('web3');
 
 
 @Component({
@@ -21,10 +29,13 @@ declare let require: any;
 export class HomeComponent implements OnInit {
   status = '';
 
-  ProducerBase: any;
-  Market: any;
+  marketDeployed: any[] = [];
+  clientBaseDeployed: any[] = [];
+  producerBaseDeployed: any[] = [];
   
   accounts: string[];
+
+  membershipData: { [key: string] : MemberBaseInfo } = { }
 
   model = {
     amount: 5,
@@ -33,126 +44,270 @@ export class HomeComponent implements OnInit {
     account: ''
   };
 
+  constructor(
+    private web3Service: Web3Service, 
+    private matSnackBar: MatSnackBar, 
+    private localStoreage: LocalStorageService, 
+    private router: Router) { 
 
-  constructor(private web3Service: Web3Service, private matSnackBar: MatSnackBar) { 
     console.log('Constructor: ' + web3Service);
   }
   
   ngOnInit(): void {
-    console.log('OnInit: ' + this.web3Service);
-    console.log(this);
+    console.log('OnInit');
 
     this.watchAccount();
+
     this.web3Service.artifactsToContract(producerBaseABI)
       .then((ProducerBaseAbstraction) => {
-        this.ProducerBase = ProducerBaseAbstraction;
-
-        this.ProducerBase.deployed().then(deployed => {
-          console.log(deployed);
-          
-          const transaction = deployed.getMarketPartners.call();
-
-          if (!transaction) {
-            this.setStatus('Transaction failed!');
-          } else {
-            this.setStatus('Transaction complete!');
-          }
-          // deployed.getMarketPartners.sendTransaction({from: this.model.account}, (err, ev) => {
-          //   console.log('Transfer event came in, refreshing balance');
-          //   console.log('Accounts' + this.model.account)
-          //   //this.refreshBalance();
-          // });
+        ProducerBaseAbstraction.deployed().then((inst) => {
+            this.producerBaseDeployed.push(inst)
+          });
         });
 
-      });
+    this.web3Service.artifactsToContract(regionalMarketABI)
+      .then((MarketAbstraction) => {
+          MarketAbstraction.deployed().then((inst) => this.marketDeployed.push(inst))
+        });
+
+    let that = this
+
+    window.ethereum.on('accountsChanged', async function (accounts) {
+      const delay = new Promise(resolve => setTimeout(resolve, 1500));
+      await delay;
+
+      await that.SettleMemberships()
+    })
+
+    new Promise(resolve => this.SettleMemberships())
+  }
+
+  async SettleMemberships() {
+    if (this.producerBaseDeployed.length == 0) {
+      const delay = new Promise(resolve => setTimeout(resolve, 1000));
+      await delay;
+      return await this.SettleMemberships();
+    }
+
+    this.localStoreage.setLoggedInEntityForCurrentUser(undefined)
+
+    let that = this
+
+    this.producerBaseDeployed.forEach(async function (abs) {
+      await that.refreshMembership(abs);
+    });
+
+    this.marketDeployed.forEach(async function (abs) {
+      await that.refreshMembership(abs);
+    });
+  }
+
+  async refreshMembership(memberBase){
+    
+    let account = this.web3Service.getDefaultAccount()
+
+    try {
+      const transaction = await memberBase.getMembershipInfo.call(account);
+      
+      let isMember = transaction["isMember"]
+      let isAdmin = false;
+      let isOwner = transaction["isOwner"]
+
+      this.membershipData[memberBase.address] = { is_member: isMember, is_owner: isOwner, is_admin: isAdmin, is_pending: false }
+
+      if (!transaction) {
+        this.setStatus('Transaction failed! Cannot validate membership');
+      } else if (isMember) {
+
+        this.localStoreage.addOrUpdateCurrentUserMembershipInfo(memberBase.address, isMember, isAdmin, isOwner, false);
+
+      } else {
+
+        this.setStatus('Membership information gathered.');
+      }
+    } catch (e) {
+      console.log(e);
+      this.setStatus('Error getting membership; see log.');
+    }
+  }
+
+  async applyForMembershipPB(index) {
+    
+    this.applyForMembership(this.producerBaseDeployed, index)
+  }
+
+  async applyForMembershipM(index) {
+    
+    this.applyForMembership(this.marketDeployed, index)
+  }
+
+  private async applyForMembership(memberBases, index) {
+    if (index >= 0 && index < memberBases.length) {
+      try {
+        const default_account = this.web3Service.getDefaultAccount()
+
+        const transaction = await memberBases[index].requestMembership({ from: default_account });
+
+        console.log(transaction)
+
+        if (!transaction) {
+          this.setStatus('Transaction failed! Cannot request membership.');
+        } else {
+          this.setStatus('Transaction succeeded!');
+
+          this.membershipData[memberBases[index].address].is_pending = true;
+        }
+      } catch (e) {
+        console.log(e);
+        this.setStatus('Error requesting membership; see log. Did you already applied for membership?');
+      }
+    }
+  }
+
+  async revokeMembershipPB(event, index) {
+    
+    this.revokeMembership(this.producerBaseDeployed, index)
+  }
+
+  async revokeMembershipM(event, index) {
+    
+    this.revokeMembership(this.marketDeployed, index)
+  }
+
+  private async revokeMembership(memberBases, index) {
+    if (index >= 0 && index < memberBases.length) {
+      try {
+    
+        const default_account = this.web3Service.getDefaultAccount()
+
+        const transaction = await memberBases[index].revokeMembership({ from: default_account });
+
+        if (!transaction) {
+          this.setStatus('Transaction failed! Cannot revoke membership.');
+        } else 
+        /// options.... states
+        {
+          this.setStatus('Transaction succeeded!');
+        }
+      } catch (e) {
+        console.log(e);
+        this.setStatus('Error revoking membership; see log. Are you perhaps the owner of the organisation?');
+      }
+    }
+  }
+
+  async transferOwnershipPB(index, formData) {
+    this.transferOwnership(this.producerBaseDeployed, index, formData.value.accAddress)
+
+    formData.reset()
+  }
+
+  async transferOwnershipM(event, index, newOwner) {
+    
+    this.transferOwnership(this.marketDeployed, index, newOwner)
+  }
+
+  private async transferOwnership(memberBases, index, newOwner) {
+    if (index >= 0 && index < memberBases.length) {
+      try {
+    
+        const default_account = this.web3Service.getDefaultAccount()
+
+        const transaction = await memberBases[index].transferOwnership(newOwner, { from: default_account });
+
+
+        if (!transaction) {
+          this.setStatus('Transaction failed! Cannot transfere ownership.');
+        } else {
+          this.setStatus('Ownership transferred!');
+
+          this.membershipData[memberBases[index].address].is_owner = false;
+        }
+      } catch (e) {
+        console.log(e);
+        this.setStatus('Error on ownership transfer; see log.');
+      }
+    }
+  }
+
+  producerBaseLoginClickEvent(event, index) { 
+    this.login(this.producerBaseDeployed, index)
+  }
+
+  marketLoginClickEvent(event, index) { 
+    this.login(this.marketDeployed, index)
+  }
+
+  login(member_bases, index) { 
+    if (index >= 0 && index < member_bases.length) {
+      let entityAddress = member_bases[index].address;
+
+      if(this.membershipData[entityAddress].is_member){
+        
+        this.localStoreage.setLoggedInEntityForCurrentUser(entityAddress)
+
+        this.router.navigate(['/community'])
+
+        this.setStatus('Logging in...');
+      }
+
+      return;
+    }
+  }
+  
+  async donate(index, formData){
+
+    if (index >= 0 && index < this.marketDeployed.length) {
+      let donation = formData.value.donation
+      let isoCode = formData.value.isoCode
+      let province = formData.value.province
+
+      formData.reset();
+
+      if(isoCode.length != 2 || province.length > 30){
+        this.setStatus('Location data incorrect');
+
+        return
+      }
+      
+      let donationInWei = this.web3Service.changeCurrency(donation, 'ether', 'wei');
+
+      let currentUserBalance = this.web3Service.getDefaultAccountBalance()
+
+      if (currentUserBalance < donationInWei) {
+
+        this.setStatus('Donation exceeds user\'s balance');
+        return
+      }
+
+      try {
+        const default_account = this.web3Service.getDefaultAccount()
+
+        isoCode = Web3.utils.fromAscii(isoCode, 2);
+        province = Web3.utils.fromAscii(province, 30);
+
+        const transaction = await this.marketDeployed[index].donateToProvince({ iSOCode: isoCode, province: province }, { from: default_account, value: donationInWei });
+
+        if (!transaction) {
+          this.setStatus('Transaction failed! Cannot make a donation.');
+        } else {
+          this.setStatus('Donation successful!');
+        }
+      } catch (e) {
+        console.log(e);
+        this.setStatus('Error on donation; see log.');
+      }
+    }
   }
 
   watchAccount() {
     this.web3Service.accountsObservable.subscribe((accounts) => {
+
+      console.log('in')
       this.accounts = accounts;
       this.model.account = accounts[0];
-      //this.refreshBalance();
     });
   }
-
-  setStatus(status) {
-    this.matSnackBar.open(status, null, {duration: 3000});
-  }
-
-  async sendCoin() {
-    if (!this.ProducerBase) {
-      this.setStatus('Metacoin is not loaded, unable to send transaction');
-      return;
-    }
-
-    const amount = this.model.amount;
-    const receiver = this.model.receiver;
-
-    console.log('Sending coins' + amount + ' to ' + receiver);
-
-    this.setStatus('Initiating transaction... (please wait)');
-    try {
-      const deployedProducerBase = await this.ProducerBase.deployed();
-      const transaction = await deployedProducerBase.sendCoin.sendTransaction(receiver, amount, {from: this.model.account});
-
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        this.setStatus('Transaction complete!');
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error sending coin; see log.');
-    }
-  }
-
-  async myClickFunction(event) { 
-    //alert(await this.producerWEB3.getMarketPartners());
-    await this.test()
-  }
-
-  async test() {
-    if (!this.ProducerBase) {
-      this.setStatus('ProducerBase is not loaded, unable to send transaction');
-      return;
-    }
-
-    const amount = this.model.amount;
-    const receiver = this.model.receiver;
-
-    console.log('Sending coins' + amount + ' to ' + receiver);
-
-    this.setStatus('Initiating transaction... (please wait)');
-    try {
-      const deployedProducerBase = await this.ProducerBase.deployed();
-      const transaction = await deployedProducerBase.getMarketPartners.call({from: this.model.account});
-
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        this.setStatus('Transaction complete!');
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error getting markets see log.');
-    }
-  }
-
-  // async refreshBalance() {
-  //   console.log('Refreshing balance');
-
-  //   try {
-  //     const deployedProducerBase = await this.ProducerBase.deployed();
-  //     console.log(deployedProducerBase);
-  //     console.log('Account', this.model.account);
-  //     const metaCoinBalance = await deployedProducerBase.getBalance.call(this.model.account);
-  //     console.log('Found balance: ' + metaCoinBalance);
-  //     this.model.balance = metaCoinBalance;
-  //   } catch (e) {
-  //     console.log(e);
-  //     this.setStatus('Error getting balance; see log.');
-  //   }
-  // }
 
   setAmount(e) {
     console.log('Setting amount: ' + e.target.value);
@@ -162,6 +317,10 @@ export class HomeComponent implements OnInit {
   setReceiver(e) {
     console.log('Setting receiver: ' + e.target.value);
     this.model.receiver = e.target.value;
+  }
+  
+  setStatus(status) {
+    this.matSnackBar.open(status, null, {duration: 3000});
   }
 
   

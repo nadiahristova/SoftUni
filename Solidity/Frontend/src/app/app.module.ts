@@ -10,6 +10,8 @@ import { ComponentsModule } from './components/components.module';
 
 import { AppComponent } from './app.component';
 
+
+import { DialogComponent } from './components/dialog/dialog.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { TableListComponent } from './table-list/table-list.component';
@@ -20,14 +22,13 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { UpgradeComponent } from './upgrade/upgrade.component';
 import { HomeComponent } from './home/home.component';
 
-import { MatSnackBarModule  } from '@angular/material';
+import { MatSnackBarModule, MatDialogModule  } from '@angular/material';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import {
   AgmCoreModule
 } from '@agm/core';
-
-//import { ProducersWEB3Service } from './service-proxies/producerWEB3.service';
+import { CommunityComponent } from './community/community.component';
 
 @NgModule({
   imports: [
@@ -38,6 +39,8 @@ import {
     RouterModule,
     AppRoutingModule,
     MatSnackBarModule,
+    MatDialogModule,
+    //UtilModule,
     AgmCoreModule.forRoot({
       apiKey: 'YOUR_GOOGLE_MAPS_API_KEY'
     })
@@ -47,6 +50,7 @@ import {
     AdminLayoutComponent,
   ],
   providers: [  ],
+  entryComponents: [ DialogComponent ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

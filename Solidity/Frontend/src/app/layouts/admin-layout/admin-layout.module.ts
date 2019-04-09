@@ -12,6 +12,10 @@ import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { UpgradeComponent } from '../../upgrade/upgrade.component';
 import { HomeComponent } from '../../home/home.component';
+import { CommunityComponent } from '../../community/community.component'
+
+
+//import { UtilModule } from '../../utils/util.module'
 
 import {
   MatButtonModule,
@@ -32,6 +36,7 @@ import {
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    //UtilModule
   ],
   declarations: [
     HomeComponent,
@@ -43,7 +48,9 @@ import {
     MapsComponent,
     NotificationsComponent,
     UpgradeComponent,
+    CommunityComponent
   ]
 })
 
-export class AdminLayoutModule {}
+export class AdminLayoutModule {
+}

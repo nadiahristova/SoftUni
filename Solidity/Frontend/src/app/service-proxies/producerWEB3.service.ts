@@ -1,10 +1,10 @@
 import { Injectable, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { from, of } from 'rxjs'
-import { map, filter, scan, tap, take, catchError } from 'rxjs/operators';
+// import { Observable } from 'rxjs/Rx';
+// import { from, of } from 'rxjs'
+// import { map, filter, scan, tap, take, catchError } from 'rxjs/operators';
 
-import * as web3 from 'web3'
-import * as TruffleContract from 'truffle-contract';
+// import * as web3 from 'web3'
+// import * as TruffleContract from 'truffle-contract';
 
 declare let require: any;
 declare let window: any;
