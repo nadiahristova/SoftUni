@@ -133,6 +133,14 @@ export class Web3Service {
     });
   }
 
+  public async getNonce(accAddress){
+    return await this.web3.eth.getTransactionCount(this.getDefaultAccount(), 'pending')
+  }
+
+  public async signHash(hash, accAddress) {
+    return await this.web3.eth.sign(hash, accAddress)
+  }
+
   changeCurrency(balance, current, desired) {
     if(current == 'wei') {
       return this.web3.utils.fromWei(balance, desired)

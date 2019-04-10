@@ -7,13 +7,13 @@ import TruffleContract from 'truffle-contract';
 
 import { Web3Service } from '../service-proxies/web3.service';
 import { LocalStorageService } from '../service-proxies/local-storage.service';
-import { ProducersWEB3Service } from '../service-proxies/producerWEB3.service';
 
-import { MemberBaseInfo } from '../service-proxies/local-storage.service';
+import { MembershipInfo } from '../service-proxies/local-storage.service';
 
 let producerBaseABI = require('../../../../MarketChain/build/contracts/ProducerBase.json')
 let regionalMarketABI = require('../../../../MarketChain/build/contracts/RegionalMarket.json')
 
+declare var $: any;
 
 declare let require: any;
 declare let window: any;
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
   
   accounts: string[];
 
-  membershipData: { [key: string] : MemberBaseInfo } = { }
+  membershipData: { [key: string] : MembershipInfo } = { }
 
   model = {
     amount: 5,
@@ -49,8 +49,6 @@ export class HomeComponent implements OnInit {
     private matSnackBar: MatSnackBar, 
     private localStoreage: LocalStorageService, 
     private router: Router) { 
-
-    console.log('Constructor: ' + web3Service);
   }
   
   ngOnInit(): void {
@@ -88,8 +86,6 @@ export class HomeComponent implements OnInit {
       await delay;
       return await this.SettleMemberships();
     }
-
-    this.localStoreage.setLoggedInEntityForCurrentUser(undefined)
 
     let that = this
 
@@ -132,12 +128,16 @@ export class HomeComponent implements OnInit {
   }
 
   async applyForMembershipPB(index) {
-    
+        
+    this.localStoreage.addPendingMembershipRequests(this.web3Service.getDefaultAccount())
+
     this.applyForMembership(this.producerBaseDeployed, index)
   }
 
   async applyForMembershipM(index) {
-    
+        
+    this.localStoreage.addPendingMembershipRequestsMarket(this.web3Service.getDefaultAccount())
+
     this.applyForMembership(this.marketDeployed, index)
   }
 
@@ -184,14 +184,28 @@ export class HomeComponent implements OnInit {
 
         if (!transaction) {
           this.setStatus('Transaction failed! Cannot revoke membership.');
-        } else 
-        /// options.... states
-        {
+        } else {
           this.setStatus('Transaction succeeded!');
+
+          let transactionLogs = transaction.logs
+
+          transactionLogs.forEach(log => {
+            if(log.event == "LogMemberRequestingMembershipCancelation"){
+              this.showNotification('bottom','center', 'warning', 'Request for Leaving sent.')
+            } else if(log.event == "LogMemberLeaving"){
+              this.showNotification('bottom','center', 'success', 'Your request has been accepted.')
+              this.membershipData[memberBases[index].address].is_member = false;
+              this.membershipData[memberBases[index].address].is_admin = false;
+              this.membershipData[memberBases[index].address].is_pending = false;
+            } else if(log.event == "LogMemberReinstatement") {
+              this.showNotification('bottom','center', 'info', 'Time for decision had passed. The request is Reset.')
+            } else throw Error
+          });
+          
         }
       } catch (e) {
         console.log(e);
-        this.setStatus('Error revoking membership; see log. Are you perhaps the owner of the organisation?');
+        this.setStatus('Error revoking membership; see log. Are you perhaps the owner of the organisation or maybe the contemplation period did not pass?');
       }
     }
   }
@@ -300,6 +314,43 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  async register(index, formData){
+
+    if (index >= 0 && index < this.marketDeployed.length) {
+      let isoCode = formData.value.isoCode
+      let province = formData.value.province
+
+      formData.reset();
+
+      if(isoCode.length != 2 || province.length > 30){
+        this.setStatus('Location data incorrect');
+
+        return
+      }
+
+      try {
+        const default_account = this.web3Service.getDefaultAccount()
+
+        isoCode = Web3.utils.fromAscii(isoCode, 2);
+        province = Web3.utils.fromAscii(province, 30);
+
+        const transaction = await this.marketDeployed[index].registerMember({ iSOCode: isoCode, province: province }, { from: default_account });
+
+        if (!transaction) {
+          this.setStatus('Transaction failed! Cannot register account.');
+        } else {
+          this.setStatus('Registration successful!');
+
+          this.membershipData[this.marketDeployed[index].address].is_member = true;
+          this.localStoreage.addOrUpdateCurrentUserMembershipInfo(this.marketDeployed[index].address, true, false, false, false)
+        }
+      } catch (e) {
+        console.log(e);
+        this.setStatus('Error on registration; see log.');
+      }
+    }
+  }
+
   watchAccount() {
     this.web3Service.accountsObservable.subscribe((accounts) => {
 
@@ -323,144 +374,30 @@ export class HomeComponent implements OnInit {
     this.matSnackBar.open(status, null, {duration: 3000});
   }
 
-  
-  // startAnimationForLineChart(chart){
-  //     let seq: any, delays: any, durations: any;
-  //     seq = 0;
-  //     delays = 80;
-  //     durations = 500;
+  showNotification(from, align, color, msg){
+    //const type = ['','info','success','warning','danger'];
 
-  //     chart.on('draw', function(data) {
-  //       if(data.type === 'line' || data.type === 'area') {
-  //         data.element.animate({
-  //           d: {
-  //             begin: 600,
-  //             dur: 700,
-  //             from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
-  //             to: data.path.clone().stringify(),
-  //             easing: Chartist.Svg.Easing.easeOutQuint
-  //           }
-  //         });
-  //       } else if(data.type === 'point') {
-  //             seq++;
-  //             data.element.animate({
-  //               opacity: {
-  //                 begin: seq * delays,
-  //                 dur: durations,
-  //                 from: 0,
-  //                 to: 1,
-  //                 easing: 'ease'
-  //               }
-  //             });
-  //         }
-  //     });
+    $.notify({
+        icon: "notifications",
+        message: msg
 
-  //     seq = 0;
-  // };
-  // startAnimationForBarChart(chart){
-  //     let seq2: any, delays2: any, durations2: any;
-
-  //     seq2 = 0;
-  //     delays2 = 80;
-  //     durations2 = 500;
-  //     chart.on('draw', function(data) {
-  //       if(data.type === 'bar'){
-  //           seq2++;
-  //           data.element.animate({
-  //             opacity: {
-  //               begin: seq2 * delays2,
-  //               dur: durations2,
-  //               from: 0,
-  //               to: 1,
-  //               easing: 'ease'
-  //             }
-  //           });
-  //       }
-  //     });
-
-  //     seq2 = 0;
-  // };
-
-  // ngOnInit() {
-  //     /* ----------==========     Daily Sales Chart initialization For Documentation    ==========---------- */
-
-  //     const dataDailySalesChart: any = {
-  //         labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-  //         series: [
-  //             [12, 17, 7, 17, 23, 18, 38]
-  //         ]
-  //     };
-
-  //    const optionsDailySalesChart: any = {
-  //         lineSmooth: Chartist.Interpolation.cardinal({
-  //             tension: 0
-  //         }),
-  //         low: 0,
-  //         high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-  //         chartPadding: { top: 0, right: 0, bottom: 0, left: 0},
-  //     }
-
-  //     var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
-
-  //     this.startAnimationForLineChart(dailySalesChart);
-
-
-  //     /* ----------==========     Completed Tasks Chart initialization    ==========---------- */
-
-  //     const dataCompletedTasksChart: any = {
-  //         labels: ['12p', '3p', '6p', '9p', '12p', '3a', '6a', '9a'],
-  //         series: [
-  //             [230, 750, 450, 300, 280, 240, 200, 190]
-  //         ]
-  //     };
-
-  //    const optionsCompletedTasksChart: any = {
-  //         lineSmooth: Chartist.Interpolation.cardinal({
-  //             tension: 0
-  //         }),
-  //         low: 0,
-  //         high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-  //         chartPadding: { top: 0, right: 0, bottom: 0, left: 0}
-  //     }
-
-  //     var completedTasksChart = new Chartist.Line('#completedTasksChart', dataCompletedTasksChart, optionsCompletedTasksChart);
-
-  //     // start animation for the Completed Tasks Chart - Line Chart
-  //     this.startAnimationForLineChart(completedTasksChart);
-
-
-
-  //     /* ----------==========     Emails Subscription Chart initialization    ==========---------- */
-
-  //     var datawebsiteViewsChart = {
-  //       labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
-  //       series: [
-  //         [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895]
-
-  //       ]
-  //     };
-  //     var optionswebsiteViewsChart = {
-  //         axisX: {
-  //             showGrid: false
-  //         },
-  //         low: 0,
-  //         high: 1000,
-  //         chartPadding: { top: 0, right: 5, bottom: 0, left: 0}
-  //     };
-  //     var responsiveOptions: any[] = [
-  //       ['screen and (max-width: 640px)', {
-  //         seriesBarDistance: 5,
-  //         axisX: {
-  //           labelInterpolationFnc: function (value) {
-  //             return value[0];
-  //           }
-  //         }
-  //       }]
-  //     ];
-  //     var websiteViewsChart = new Chartist.Bar('#websiteViewsChart', datawebsiteViewsChart, optionswebsiteViewsChart, responsiveOptions);
-
-  //     //start animation for the Emails Subscription Chart
-  //     this.startAnimationForBarChart(websiteViewsChart);
-  // }
-
+    },{
+        type: color,
+        timer: 4000,
+        placement: {
+            from: from,
+            align: align
+        },
+        template: '<div data-notify="container" class="col-xl-4 col-lg-4 col-11 col-sm-4 col-md-4 alert alert-{0} alert-with-icon" role="alert">' +
+          '<button mat-button  type="button" aria-hidden="true" class="close mat-button" data-notify="dismiss">  <i class="material-icons">close</i></button>' +
+          '<i class="material-icons" data-notify="icon">notifications</i> ' +
+          '<span data-notify="title">{1}</span> ' +
+          '<span data-notify="message">{2}</span>' +
+          '<div class="progress" data-notify="progressbar">' +
+            '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+          '</div>' +
+          '<a href="{3}" target="{4}" data-notify="url"></a>' +
+        '</div>'
+    });
+  }
 }

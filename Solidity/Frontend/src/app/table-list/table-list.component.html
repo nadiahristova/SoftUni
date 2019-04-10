@@ -2,7 +2,52 @@
   <div class="container-fluid">
       <div class="row">
           <div class="col-md-12">
-              <div class="card">
+                <form #signOrderForm="ngForm" (ngSubmit)="signOrder(signOrderForm)">
+                    <div class="form-group">
+                        <label>Approve an order by signing:</label> 
+                        <input type="text" class="form-control" name="buyer" id="tr-member-input1" placeholder="Buyer" ngModel>
+                        <input type="text" class="form-control" name="producerBase" id="tr-member-input2" placeholder="Guild address" ngModel >
+                        <input type="text" class="form-control" name="storeFrontId" id="tr-member-input3" placeholder="Store Front Id" ngModel  >
+                        <input type="text" class="form-control" name="productId" id="tr-member-input4" placeholder="Product Id" ngModel >
+                        <input type="text" class="form-control" name="amount" id="tr-member-input5" placeholder="Amount" ngModel >
+                        <input type="text" class="form-control" name="pricePerUnit" id="tr-member-input6" placeholder="Price per unit" ngModel >
+                        <input type="text" class="form-control" name="validUntil" id="tr-member-input7" placeholder="Valid until" ngModel >
+
+                        <!-- <mat-form-field>
+                                <input matInput [matDatepicker]="validUntil" placeholder="Valid until">
+                                <mat-datepicker-toggle matSuffix [for]="validUntil"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field> -->
+                    </div>
+                    <button type="submit" value="submit" class="btn btn-danger btn-round">Sign order</button>
+                </form>
+                <input type="text" ng-readonly="checked" value="{{nonce}}" ng-readonly="all"/>
+                <input type="text" ng-readonly="checked" value="{{signedOrder}}" ng-readonly="all"/>
+                <br/>
+                <form #sendOrderForm="ngForm" (ngSubmit)="sendOrder(sendOrderForm)">
+                        <div class="form-group">
+                            <label>Buy product:</label> 
+                            <input type="text" class="form-control" name="seller" id="tr-member-input1" placeholder="Seller" ngModel>
+                            <input type="text" class="form-control" name="producerBase" id="tr-member-input2" placeholder="Guild address" ngModel >
+                            <input type="text" class="form-control" name="storeFrontId" id="tr-member-input3" placeholder="Store Front Id" ngModel  >
+                            <input type="text" class="form-control" name="productId" id="tr-member-input4" placeholder="Product Id" ngModel >
+                            <input type="text" class="form-control" name="amount" id="tr-member-input5" placeholder="Amount" ngModel >
+                            <input type="text" class="form-control" name="pricePerUnit" id="tr-member-input6" placeholder="Price per unit" ngModel >
+                            <input type="text" class="form-control" name="validUntil" id="tr-member-input7" placeholder="Valid until" ngModel >
+                            <input type="text" class="form-control" name="amountPayed" id="tr-member-input7" placeholder="Payments in wei" ngModel >
+                            <input type="text" class="form-control" name="nonce" id="tr-member-input7" placeholder="Nonce" ngModel >
+                            <input type="text" class="form-control" name="signature" id="tr-member-input7" placeholder="Signature of Order" ngModel >
+
+                            <!-- <mat-form-field>
+                                    <input matInput [matDatepicker]="validUntil" placeholder="Valid until">
+                                    <mat-datepicker-toggle matSuffix [for]="validUntil"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field> -->
+                        </div>
+                        <button type="submit" value="submit" class="btn btn-danger btn-round">Buy Product</button>
+                    </form>
+                <button class="btn btn-danger btn-round" (click) = "getProduct()">get product</button>
+              <!-- <div *ngIf="false" class="card">
                   <div class="card-header card-header-danger">
                       <h4 class="card-title ">Simple Table</h4>
                       <p class="card-category"> Here is a subtitle for this table</p>
@@ -134,9 +179,9 @@
                           </table>
                       </div>
                   </div>
-              </div>
+              </div> -->
           </div>
-          <div class="col-md-12">
+          <!-- <div  *ngIf="false"  class="col-md-12">
               <div class="card card-plain">
                   <div class="card-header card-header-danger">
                       <h4 class="card-title mt-0"> Table on Plain Background</h4>
@@ -270,7 +315,7 @@
                       </div>
                   </div>
               </div>
-          </div>
+          </div> -->
       </div>
   </div>
 </div>

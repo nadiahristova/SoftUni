@@ -1,3 +1,209 @@
-<p>
-  community works!
-</p>
+
+<div class="main-content">
+  <div class="container-fluid">
+    <span>Currently logged in: <h4 class="badge badge-info">{{currentlyLogedIn}}</h4></span>
+    <hr/>
+    <div class="row">
+      <div class="col-lg-6 col-md-12">
+            <!-- <button (click) = "test()">Click me</button>
+            <button (click) = "signOrderAcc()">signOrderAcc me</button>
+            <button (click) = "getProduct()">get product</button> -->
+          <div class="card">
+              <div class="card-header card-header-warning">
+                  <h4 class="card-title">Guilds</h4>
+                  <p class="card-category">Available guilds:</p>
+              </div>
+              <div *ngIf="producerBaseDeployed.length > 0" class="card-body table-responsive">
+                  <div *ngFor="let pb of producerBaseDeployed; let i = index" class="col-lg-12 col-md-12 col-sm-12">
+
+                    <span class="text-warning">{{pb.address}}</span> 
+                    <div class="card card-stats">
+                      <div class="card-header card-header-warning card-header-icon">
+                          <div class="card-icon" matTooltip="{{pb.address}}" [matTooltipPosition]="'below'">
+                              <i class="fa fa-university"></i>
+                          </div>
+                          <div>
+                              <p class="card-category">Membership Applications</p>
+                              <h4 *ngIf="pendReqForMembership" class="card-title" >
+                                <div *ngFor="let addr of pendReqForMembership; let i = index" class="container-fluid">
+                                    <a matTooltip="{{addr}}" (click)="launchMembershipGrantingCampaign(pb, addr, false)" [matTooltipPosition]="'below'" class="badge badge-info">Applicant {{i+1}}</a>
+                                </div>
+                              </h4>
+                          </div>
+                          <div *ngIf="approvedmembers && approvedmembers.length > 0" >
+                              <p class="card-category">Register Members:</p>
+                              <h4 class="card-title">
+                                <div *ngFor="let addr of approvedmembers; let i = index" class="container-fluid">
+                                    <a matTooltip="{{addr}}" (click)="approveMembershipRequest(pb, addr)" [matTooltipPosition]="'below'" class="badge badge-info">Applicant {{i+1}}</a>
+                                </div>
+                              </h4>
+                          </div> 
+                          <div>
+                        <div class="form-group">
+                            <button mat-raised-button type="button" matTooltip="Open Store Front" [matTooltipPosition]="'below'" 
+                            class ='btn btn-warning btn-link btn-lg btn-just-icon' (click)="openStoreFront(pb)">
+                                <i class="material-icons">fiber_new</i>
+                            </button>
+                        </div>
+                        <div>
+                            <form #addPartnerForm = "ngForm" (ngSubmit) = "addPartner(pb, addPartnerForm)">
+                                <div class="form-group">
+                                    <label for="tr-member-input">Add Partner Market:</label> 
+                                    <input type="text" class="form-control" name="marketAddress" id="tr-member-input" placeholder="Market address" ngModel required length="42">
+                                </div>
+                                <button mat-raised-button type="submit" value="submit" matTooltip="Add Partner Market" [matTooltipPosition]="'below'" 
+                                    class="btn btn-danger btn-link btn-just-icon">
+                                    <i class="material-icons">fiber_new</i>
+                                </button>
+                            </form>
+                          </div>
+                        <div>
+                            <form #reqMembershipForm = "ngForm" (ngSubmit) = "requestMembership(pb, reqMembershipForm)">
+                                <div class="form-group">
+                                    <label for="tr-member-input">Request Market membership:</label> 
+                                    <input type="text" class="form-control" name="marketAddress" id="tr-member-input" placeholder="Market address" ngModel required length="42">
+                                </div>
+                                <button mat-raised-button type="submit" value="submit" matTooltip="Request Market membership" [matTooltipPosition]="'below'" 
+                                    class="btn btn-danger btn-link btn-just-icon">
+                                    <i class="material-icons">swap_vert</i>
+                                </button>
+                            </form>
+                        </div>
+                        <form #enDisStoreFrontForm = "ngForm" (ngSubmit) = "enDisStoreFront(pb, enDisStoreFrontForm)">
+                            <div class="form-group">
+                                <label>Enable/Disable Store Front:</label> 
+                                <br/>
+                                <input type="radio" id='e' value=true name="enable" checked="checked"  ngModel><label for="e">Enable</label><br/>
+                                <input type="radio" id='d' value=false name="enable" ngModel> <label for="d">Disable</label>
+                                <input type="text" class="form-control" name="storeFrontId" id="tr-member-input" placeholder="Store Front Id" ngModel required length="42">
+                            </div>
+                            <button mat-raised-button type="submit" value="submit" matTooltip="Enable/Disable Store Front" [matTooltipPosition]="'below'" 
+                                class="btn btn-warning btn-link btn-just-icon">
+                                <i class="material-icons">done</i>
+                            </button>
+                        </form>
+                        <hr/>
+                        <form #publishStoreFrontForm = "ngForm" (ngSubmit) = "publishStoreFront(pb, publishStoreFrontForm)">
+                                <div class="form-group">
+                                    <label>Publish Store Front to Market:</label> 
+                                    <input type="text" class="form-control" name="storeFrontId" placeholder="Store Front Id" ngModel required>
+                                    <input type="text" class="form-control" name="marketAddress" placeholder="Market Address" ngModel required length="42">
+                                </div>
+                                <button mat-raised-button type="submit" value="submit" matTooltip="Publish Store Front" [matTooltipPosition]="'below'" 
+                                    class="btn btn-warning btn-link btn-just-icon">
+                                    <i class="material-icons">publish</i>
+                                </button>
+                            </form>
+                          </div>
+                          <form #addProductForm = "ngForm" (ngSubmit) = "addProduct(pb, addProductForm)">
+                                <div class="form-group">
+                                    <label>Add Product to Store Front:</label> 
+                                    <input type="text" class="form-control" name="storeFrontId" placeholder="Store Front Id" ngModel required>
+                                    <input type="text" class="form-control" name="specificationId" placeholder="Specification Id" ngModel required>
+                                    <input type="text" class="form-control" name="pricePerUnit" placeholder="Price Per Unit" ngModel required>
+                                    <input type="text" class="form-control" name="amount" placeholder="Amount" ngModel required>
+                                    
+                                    <input type="checkbox" class="form-control-lg" id="pr_has_NegotiablePrice" name="hasNegotiablePrice" ngModel required>
+                                    <label for="pr_has_NegotiablePrice">Has negotiable price</label>
+                                </div>
+                                <button mat-raised-button type="submit" value="submit" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                    class="btn btn-warning btn-link btn-just-icon">
+                                    <i class="material-icons">fiber_new</i>
+                                </button>
+                          </form>
+                      </div>
+                      <div class="card-footer">
+                          <div class="stats">
+                              <i class="material-icons">update</i> Just Updated
+                          </div>
+                          <p class="card-category">
+                            <br/>
+                              My reputation: <span class="badge badge-info">{{guildReputation[i]}}</span>
+                          </p>
+                      </div>
+                    </div>
+
+
+                  </div>
+              </div>
+        </div>
+      </div>
+
+
+
+      
+      <div class="col-lg-6 col-md-12">
+          <div class="card">
+              <div class="card-header card-header-danger">
+                  <h4 class="card-title">Markets</h4>
+                  <p class="card-category">Available markets</p>
+              </div>
+              <div *ngIf="marketDeployed.length > 0" class="card-body table-responsive">
+                  <div *ngFor="let market of marketDeployed; let i = index" class="col-lg-12 col-md-12 col-sm-12">
+                    
+                    <span class="text-danger">{{market.address}}</span> 
+                    <div class="card card-stats">
+                      <div class="card-header card-header-danger card-header-icon">
+                          <div class="card-icon" matTooltip="{{market.address}}" [matTooltipPosition]="'below'">
+                              <i class="fa fa-shopping-cart"></i>
+                          </div>
+                          <div>
+                              <p class="card-category">Membership Applications</p>
+                              <h4 *ngIf="pendReqForMembershipMK" class="card-title" >
+                                <div *ngFor="let addr of pendReqForMembershipMK; let i = index" class="container-fluid">
+                                    <a matTooltip="{{addr}}" (click)="launchMembershipGrantingCampaign(market, addr, true)" [matTooltipPosition]="'below'" class="badge badge-info">Applicant {{i+1}}</a>
+                                </div>
+                              </h4>
+                          </div>
+
+                          <div class="card-body table-responsive">
+                              <form #affiliateForm = "ngForm" (ngSubmit) = "affiliate(market, affiliateForm)">
+                                  <div class="form-group">
+                                      <label for="tr-member-input">Affiliate with guild:</label> 
+                                      <input type="text" class="form-control" name="accAddress" id="tr-member-input" placeholder="Guild address" ngModel required length="42">
+                                  </div>
+                                  <button mat-raised-button type="submit" value="submit" matTooltip="Affiliate" [matTooltipPosition]="'below'" 
+                                      class="btn btn-danger btn-link btn-just-icon">
+                                      <i class="material-icons">thumbs_up_down</i>
+                                  </button>
+                              </form>
+                          </div>
+                          <div>
+                            <form #openStoreForm = "ngForm" (ngSubmit) = "openStore(market, openStoreForm)">
+                                <div class="form-group">
+                                    <label for="tr-member-input">Open store:</label> 
+                                    <input type="text" class="form-control" name="storeName" placeholder="Store name" ngModel required >
+                                    <input type="text" class="form-control" name="guildAddress" placeholder="Guild address" ngModel required length="42">
+                                </div>
+                                <button mat-raised-button type="submit" value="submit" matTooltip="Open store" [matTooltipPosition]="'below'" 
+                                    class="btn btn-danger btn-link btn-just-icon">
+                                    <i class="material-icons">thumb_up</i>
+                                </button>
+                            </form>
+                          </div>
+                          
+                      </div>
+                      <div class="card-footer">
+                          <div class="stats">
+                              <i class="material-icons">update</i> Just Updated
+                          </div>
+                          <div class="card-category">
+                                <p>
+                                  My reputation: <span class="badge badge-info">{{marketReputation[i]}}</span>
+                                </p>
+                                <p >Sales: {{profits[i]}}
+                                    <button mat-raised-button type="button" matTooltip="Retrieve Weis" [matTooltipPosition]="'below'" 
+                                    class ='btn btn-danger btn-link btn-sm btn-just-icon' (click)="getProfit(market)">
+                                        <i class="material-icons">monetization_on</i>
+                                    </button>
+                                </p>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

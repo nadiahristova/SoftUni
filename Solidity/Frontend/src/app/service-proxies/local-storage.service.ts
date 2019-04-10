@@ -1,13 +1,14 @@
 import { Injectable, Inject } from '@angular/core';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 
-const STORAGE_KEY = 'user_memberships'
 const STORAGE_KEY_ENTITY = 'logged_entity'
+const STORAGE_KEY_PENDING = 'pending_mem_requests'
+const STORAGE_KEY_PENDING_MARKET = 'pending_mem_requests_market'
 
 
-export interface MemberBaseInfo {
-  [id:string] : { } 
-}
+// export interface MemberBaseInfo {
+//   [id:string] : MembershipInfo 
+// }
 
 export interface MembershipInfo {
   is_member: boolean;
@@ -24,37 +25,25 @@ export class LocalStorageService {
     constructor(@Inject(LOCAL_STORAGE) private storage: StorageService) { }
 
     public addOrUpdateCurrentUserMembershipInfo(
-      id: string, _is_member: boolean, 
-      _is_admin: boolean, _is_owner: boolean,
-      _is_pending: boolean ): void {
-        
-      const user = this.storage.get(STORAGE_KEY) || {};
+      id: string, _is_member: boolean | undefined, 
+      _is_admin: boolean | undefined, _is_owner: boolean | undefined,
+      _is_pending: boolean | undefined): void {
 
-      let membershipInfo : MembershipInfo = { 
-        is_member: _is_member || user[id].is_member, 
-        is_admin: _is_admin || user[id].is_admin, 
-        is_owner: _is_owner || user[id].is_owner,
-        is_pending: _is_pending ||  user[id].is_pending}
+      let userInfo = this.getCurrentUserMembershipInfoForMEmberBase(id)
 
-      user[id] = membershipInfo
+      userInfo.is_member = _is_member || userInfo.is_member;
+      userInfo.is_admin = _is_admin || userInfo.is_admin;
+      userInfo.is_owner = _is_owner || userInfo.is_owner;
+      userInfo.is_pending = _is_pending || userInfo.is_pending;
       
-      this.storage.set(STORAGE_KEY, user);
-
-      console.log(this.storage.get(STORAGE_KEY) || 'LocaL storage is empty');
+      this.storage.set(id, JSON.stringify(userInfo));
     }
 
-    public getCurrentUserMembershipInfo(): MemberBaseInfo {
+    public getCurrentUserMembershipInfoForMEmberBase(id: string) : MembershipInfo {
+      
+      let userInfo = this.storage.get(id) 
 
-      return this.storage.get(STORAGE_KEY) || { } ;
-    }
-
-    public getCurrentUserMembershipInfoForMEmberBase(id: string) {
-
-      if(!this.storage.get(STORAGE_KEY)) return undefined
-
-      let info : MemberBaseInfo = this.storage.get(STORAGE_KEY)
-
-      return info[id] || { } ;
+      return userInfo ? JSON.parse(userInfo) : { is_member: false, is_admin: false, is_owner: false, is_pending: false}
     }
 
     public getLoggedInEntityForCurrentUser() {
@@ -65,5 +54,63 @@ export class LocalStorageService {
     public setLoggedInEntityForCurrentUser(address: string) {
       
       this.storage.set(STORAGE_KEY_ENTITY, address)
+    }
+
+    public getPendingMembershipRequests() {
+      let req = this.storage.get(STORAGE_KEY_PENDING) 
+
+      return req ? JSON.parse(req) : [];
+    }
+
+    public addPendingMembershipRequests(address: string) {
+      
+      const requests = this.getPendingMembershipRequests()
+
+      requests.push(address)
+      
+      this.storage.set(STORAGE_KEY_PENDING, JSON.stringify(requests))
+    }
+
+    public removePendingMembershipRequests(address: string) {
+      
+      const requests = this.getPendingMembershipRequests()
+
+      const index = requests.indexOf(address, 0);
+      if (index > -1) {
+        requests.splice(index, 1);
+      }
+      
+      this.storage.set(STORAGE_KEY_PENDING, JSON.stringify(requests))
+    }
+
+    public getPendingMembershipRequestsMarket() {
+      let req = this.storage.get(STORAGE_KEY_PENDING_MARKET) 
+
+      return req ? JSON.parse(req) : [];
+    }
+
+    public addPendingMembershipRequestsMarket(address: string) {
+      
+      const requests = this.getPendingMembershipRequestsMarket()
+
+      requests.push(address)
+      
+      this.storage.set(STORAGE_KEY_PENDING_MARKET, JSON.stringify(requests))
+    }
+
+    public removePendingMembershipRequestsMArket(address: string) {
+      
+      const requests = this.getPendingMembershipRequestsMarket()
+
+      const index = requests.indexOf(address, 0);
+      if (index > -1) {
+        requests.splice(index, 1);
+      }
+      
+      this.storage.set(STORAGE_KEY_PENDING_MARKET, JSON.stringify(requests))
+    }
+
+    public clearStorage() {
+      this.storage.clear();
     }
 }
