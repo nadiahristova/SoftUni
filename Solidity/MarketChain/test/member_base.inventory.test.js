@@ -31,6 +31,13 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
         return true;
     };
 
+    const compareProductInfo = async function (product1, product2) {
+        await assert.equal(product1.specificationId == product2.specificationId, true, "specification id did not match")
+        await assert.equal(product1.amount == product2.amount, true, "amount did not match")
+        await assert.equal(product1.pricePerUnit == product2.pricePerUnit, true, "pricePerUnit did not match")
+        await assert.equal(product1.hasNegotiablePrice == product2.hasNegotiablePrice, true, "hasNegotiablePrice did not match") 
+    }
+
     before(() => {
         web3.eth.defaultAccount = storeOwner;
     });
@@ -44,8 +51,7 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
         await shared_func.registerMember(owner, storeOwner, member_base)
         await shared_func.registerMarket(owner, market, member_base)
     });
-
-    /** 
+    
     it("should be able to open store front", async () => {
         const expectedStoreFrontId = new BN(1);
 
@@ -293,6 +299,79 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
         await shouldFail.reverting(updateProduct(expected_SFId, expected_ProductId + 1, storeOwner, member_base), MSG.NOT_EXISTING_STORE_FRONT)
     })
 
+    it("should be able to retrieve product information", async () => {
+        const expected_SFId = 1;
+        const expected_ProductId = 1;
+        const expected_product_info = default_product;
+
+        await member_base.addStoreFront({ from: storeOwner });
+
+        await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
+        const result = await member_base.getProductById(expected_ProductId);
+
+        await compareProductInfo(result, expected_product_info)
+    })
+
+    it("should be able to retrieve product ids corretly by paging ", async () => {
+        const expected_SFId = 1;
+        const expected_product_info = default_product;
+
+        await member_base.addStoreFront({ from: storeOwner });
+
+        let expected_Product_Ids_P0 = [...Array(11).keys()]
+        expected_Product_Ids_P0.shift()
+
+        let expected_Product_Ids_P1 = Array(10).fill(0)
+        expected_Product_Ids_P1[0] = 11
+        expected_Product_Ids_P1[1] = 12
+
+        for(let i = 0; i < 12; i++) {
+            await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
+        }
+
+        const result_P0 = await member_base.getProductIdsByPageNum(storeOwner, expected_SFId, 0);
+        const received_Product_Ids_P0 = result_P0.map((id) => parseInt(id.toString()))
+
+        const result_P1 = await member_base.getProductIdsByPageNum(storeOwner, expected_SFId, 1); 
+        const received_Product_Ids_P1 = result_P1.map((id) => parseInt(id.toString()))
+
+        assert.equal(areArraysIdentical(expected_Product_Ids_P0, received_Product_Ids_P0), true, 'Product ids for first page are not correct')
+        assert.equal(areArraysIdentical(expected_Product_Ids_P1, received_Product_Ids_P1), true, 'Product ids for second page are not correct')
+    })
+
+    it("should be able to keep track of product ids corretly with deletion", async () => {
+        const expected_SFId = 1;
+        const expected_product_info = default_product;
+        const removed_productId_1 = 2
+        const removed_productId_2 = 5
+
+        await member_base.addStoreFront({ from: storeOwner });
+
+        let expected_Product_Ids_P0 = [...Array(11).keys()]
+        expected_Product_Ids_P0.shift()
+
+        let expected_Product_Ids_P1 = Array(10).fill(0)
+
+        for(let i = 0; i < 12; i++) {
+            await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
+        }
+
+        await member_base.removeProductFromStoreFront(expected_SFId, removed_productId_1, { from: storeOwner });
+        await member_base.removeProductFromStoreFront(expected_SFId, removed_productId_2, { from: storeOwner });
+
+        expected_Product_Ids_P0[removed_productId_1-1] = 12
+        expected_Product_Ids_P0[removed_productId_2-1] = 11
+
+        const result_P0 = await member_base.getProductIdsByPageNum(storeOwner, expected_SFId, 0);
+        const received_Product_Ids_P0 = result_P0.map((id) => parseInt(id.toString()))
+
+        const result_P1 = await member_base.getProductIdsByPageNum(storeOwner, expected_SFId, 1); 
+        const received_Product_Ids_P1 = result_P1.map((id) => parseInt(id.toString()))
+
+        assert.equal(areArraysIdentical(expected_Product_Ids_P0, received_Product_Ids_P0), true, 'Product ids for first page are not correct')
+        assert.equal(areArraysIdentical(expected_Product_Ids_P1, received_Product_Ids_P1), true, 'Product ids for second page are not correct')
+    })
+    
     it("should allow a member with a store to retrieve page of 10 store front information at a time", async () => {
 
         let expected_SF_Ids_P0 = [...Array(11).keys()]
@@ -315,7 +394,6 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
         assert.equal(areArraysIdentical(expected_SF_Ids_P0, received_SF_Ids_P0), true, 'SF ids for first page are not correct')
         assert.equal(areArraysIdentical(expected_SF_Ids_P1, received_SF_Ids_P1), true, 'SF ids for second page are not correct')
     })
-*/
 
     it("should NOT allow a not-a-member to publish store front to a market", async () => {
         await shouldFail.reverting(member_base.publishStoreFrontToMarket(market.address, 2, { from: not_a_member }), MSG.UNAUTHORISED)

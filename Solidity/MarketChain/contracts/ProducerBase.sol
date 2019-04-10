@@ -71,7 +71,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         public
         onlyOwner {
 
-        require(!_isInitialized, 'Init');
+        require(!_isInitialized, '1');
         
         super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
             initialOwnerVoteWeight, new bytes32[](0),  new uint[](0));
@@ -285,11 +285,11 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     returns (bool) {
 
         require(_storeFronts._isStoreFrontExisting(invoice.seller, invoice.storeFrontId) 
-            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId));
+            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId), '24');
             
-        require(_inventory._isProductExisting(invoice.productId));
+        require(_inventory._isProductExisting(invoice.productId), '25');
 
-        require(_validateProductPurchase(invoice, nonce, signature));
+        require(_validateProductPurchase(invoice, nonce, signature), '26');
 
         _inventory._decreaseAmount(invoice.productId, invoice.amount);
 
@@ -320,7 +320,31 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _storeFronts._getStoreFrontById(storeOwner, storeFrontId);
     }
 
-    function getProduct (uint productId) onlyNaturalNumber(productId) private view returns(InventoryLib.Product memory) {
+     function getProductsByPageNum (address storeOwner, uint storeFrontId, uint pageNum) 
+        public 
+        view 
+        onlyNaturalNumber(storeFrontId)
+        onlyNaturalNumber(pageNum)
+        onlyWhenInitialized
+    returns(InventoryLib.Product[] memory) {
+        require(_storeFronts._isStoreFrontExisting(storeOwner, storeFrontId), '6');
+
+        return _inventory._getProductsByPageNum(storeFrontId, pageNum);
+    }
+
+    function getProductIdsByPageNum (address storeOwner, uint storeFrontId, uint pageNum) 
+        public 
+        view 
+        onlyNaturalNumber(storeFrontId)
+        onlyNaturalNumber(pageNum)
+        onlyWhenInitialized
+    returns(uint[] memory) {
+        require(_storeFronts._isStoreFrontExisting(storeOwner, storeFrontId), '6');
+
+        return _inventory._getProductIdsByPageNum(storeFrontId, pageNum);
+    }
+
+    function getProductById (uint productId) onlyNaturalNumber(productId) public view returns(InventoryLib.Product memory) {
         return _inventory._products[productId];
     }
 

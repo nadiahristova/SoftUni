@@ -224,21 +224,20 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
         address payable buyer = msg.sender;
 
-        require(invoice.buyer == buyer);
+        require(invoice.buyer == buyer, '30');
         
-        require(_validateProductPurchase(invoice, nonce, signature));
+        require(_validateProductPurchase(invoice, nonce, signature), '22');
 
-        require(false, 'test2');
         uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
 
-        uint256 excessPaymet = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
+        uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
 
-        require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature));// validate storeFrontId and product Id
+        require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
 
         _accumulatedProfit[invoice.seller] = _accumulatedProfit[invoice.seller].add(productPrice);
 
-        if(excessPaymet > 0) {
-            buyer.transfer(excessPaymet);
+        if(excessPayment > 0) {
+            buyer.transfer(excessPayment);
         }
 
         _upMemberVoteWeight(buyer, 1);

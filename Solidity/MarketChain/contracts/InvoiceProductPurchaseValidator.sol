@@ -26,7 +26,7 @@ contract InvoiceProductPurchaseValidator {
             && invoice.buyer != address(0)
             && invoice.amount > 0 
             && invoice.pricePerUnit >= 0
-            && invoice.validUntil >= now);
+            && invoice.validUntil >= now, '31');
         _;
     }
 
@@ -40,8 +40,8 @@ contract InvoiceProductPurchaseValidator {
         require (!seenNonces[invoice.seller][nonce], '15');
 
         // This recreates the message hash that was signed on the client.
-        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.productId, invoice.amount, 
-        invoice.pricePerUnit, invoice.validUntil, nonce)); 
+        bytes32 hash = keccak256(abi.encodePacked(invoice.seller, invoice.buyer, invoice.productId, 
+        invoice.amount, invoice.pricePerUnit, invoice.validUntil, nonce)); 
         bytes32 messageHash = hash.toEthSignedMessageHash();
         
         // Verify that the message's signer is the owner of the order

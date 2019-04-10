@@ -48,7 +48,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         public 
         onlyOwner
     {
-        require(!_isInitialized, 'Init');
+        require(!_isInitialized, '1');
 
         require(donationRoundTimePeriod >= 30 days, 'Round period');
         _donationRoundTimePeriod = donationRoundTimePeriod;
@@ -229,7 +229,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         return _fundsPerRegion[_returnLocationKey(location)];
     }
 
-     function retrieveProfit () 
+    function retrieveProfit () 
         external
         payable
     returns (bool) {
@@ -237,11 +237,9 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
         uint accumulatedProfitFromSales = _accumulatedProfit[storeOwner];
 
-        require(accumulatedProfitFromSales > 0, 'No funds');
+        require(accumulatedProfitFromSales > 0, '19');
 
         uint profit = accumulatedProfitFromSales.mul(100 - _profit_fee).div(100); // take market fee
-
-        storeOwner.transfer(profit);
 
         // save market fee for donation
         uint marketFee = accumulatedProfitFromSales - profit;
@@ -251,6 +249,8 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         _fundsPerRegion[regionKey] += marketFee;
 
         delete _accumulatedProfit[storeOwner];
+
+        storeOwner.transfer(profit);
 
         emit LogProfitRetrieved(storeOwner);
 

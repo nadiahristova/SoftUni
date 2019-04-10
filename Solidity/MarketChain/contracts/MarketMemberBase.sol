@@ -21,7 +21,7 @@ contract MarketMemberBase is VotingMemberBase {
 
     
     modifier onlyOnValidMarketMembership(address shopOwner, address market) {
-        require(hasMarketMembership(shopOwner, market));
+        require(hasMarketMembership(shopOwner, market), '44');
         _;
     }
 

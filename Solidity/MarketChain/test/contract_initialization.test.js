@@ -15,14 +15,14 @@ contract('ProducerBase', function ([owner]) {
     });
 
     beforeEach(async () => {
-        member_base = await ProducerBase.deployed()
+       member_base = await ProducerBase.new()
 
-        await shared_func.initializeMemberBase(member_base)
+       await shared_func.initializeProducerBase(member_base)
     });
 
     it("should already be initialized", async () => {
 
-        await shouldFail.reverting(shared_func.initializeMemberBase(member_base), MSG.INITIALIZED)
+        await shouldFail.reverting(shared_func.initializeProducerBase(member_base), MSG.INITIALIZED)
     })
 })
 
@@ -36,7 +36,7 @@ contract('RegionalMarket', function ([owner]) {
     });
 
     beforeEach(async () => {
-        market = await RegionalMarket.deployed()
+        market = await RegionalMarket.new()
 
         await shared_func.initializeRegionalMarket(market)
     });

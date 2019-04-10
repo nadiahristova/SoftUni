@@ -44,9 +44,8 @@ library InventoryLib {
     struct ProductStock {
         uint256 _productIds;
 
-        mapping (uint => Product) _products; // product id to product
-        mapping (uint => uint) _productIdsToInventoryIndexMap; // product id to local index in _storeFrontInventory
-        mapping (uint => uint[]) _storeFrontInventory; // store front id to product ids
+        mapping (uint => Product) _products; // product id to product info
+        LinearRepositoryLib.Repo _catalogManager;    
     }
 
     event LogStoreFrontCreated(address indexed ownerAddress, uint indexed storeFrontId); 
@@ -163,23 +162,14 @@ library InventoryLib {
         internal
     returns(uint) {
             
-        uint newProductSFIndex = self._storeFrontInventory[storeFrontId].length;
+        uint newProductId = self._catalogManager._addItemToInventory(storeFrontId, maxNumProductsForStoreFront);
 
-        assert(newProductSFIndex < maxNumProductsForStoreFront);
-
-        uint newProductId = self._productIds + 1;
-
-        self._storeFrontInventory[storeFrontId].push(newProductId);
         self._products[newProductId] = Product({
-                //producer: storeOwner,
                 specificationId: specificationId, 
                 amount: amount, 
                 editedAt: now,
                 pricePerUnit: uint248(pricePerUnit), 
                 hasNegotiablePrice: hasNegotiablePrice});
-
-        self._productIdsToInventoryIndexMap[newProductId] = newProductSFIndex + 1;
-        self._productIds = newProductId;
 
         emit LogProductAddedToStoreFront(storeOwner, storeFrontId, newProductId);
 
@@ -192,25 +182,10 @@ library InventoryLib {
             uint storeFrontId,
             uint productId) 
         internal {
-            
-        uint productCount = self._storeFrontInventory[storeFrontId].length;
 
-        uint productIndex_deleted = self._productIdsToInventoryIndexMap[productId] - 1;
+        self._catalogManager._removeItemFromInventory(storeFrontId, productId);
 
-        assert(productIndex_deleted < productCount);
-
-        if(productCount > 1) {
-            Product memory endProduct = self._products[productId];
-
-            uint endProductId = self._storeFrontInventory[storeFrontId][productCount - 1];
-
-            self._productIdsToInventoryIndexMap[endProductId] = productIndex_deleted + 1;
-
-            self._products[productIndex_deleted] = endProduct;
-        }
-
-        self._storeFrontInventory[storeFrontId].pop();
-        delete self._productIdsToInventoryIndexMap[productId];
+        delete self._products[productId];
 
         emit LogProductRemovedFromStoreFront(storeOwner, storeFrontId, productId);
     }
@@ -226,7 +201,7 @@ library InventoryLib {
 
         Product memory product = self._products[productId];
 
-        require(product.editedAt + timeBetweenUpdates < now, 'Wait time');
+        require(product.editedAt + timeBetweenUpdates < now, '13');
 
         if(product.amount != amountProduced) {
             self._products[productId].amount = amountProduced;
@@ -272,7 +247,25 @@ library InventoryLib {
         view
         internal 
     returns (Product[] memory) {
-        
+        uint[] memory productIdsInPage = self._catalogManager._getItemIdsByPageNum(storeFrontId, pageNum, MAX_ENTITIES_BY_PAGE);
+
+        uint prIdCount = productIdsInPage.length;
+
+        Product[] memory productsInPage = new Product[](prIdCount);
+
+        for(uint index = 0; index <= prIdCount; index++){
+            productsInPage[index] = self._products[productIdsInPage[index]];
+        }
+
+        return productsInPage;
+    }
+
+    function _getProductIdsByPageNum(ProductStock storage self, uint storeFrontId, uint pageNum) 
+        view
+        internal 
+    returns (uint[] memory) {
+
+        return self._catalogManager._getItemIdsByPageNum(storeFrontId, pageNum, MAX_ENTITIES_BY_PAGE);
     }
 
     function _getStoreFronts (StoreFronts storage self, address storeOwner, uint pageNum) 
@@ -311,6 +304,6 @@ library InventoryLib {
         view
         internal 
     returns (bool) {
-        return self._productIdsToInventoryIndexMap[productId] != 0;
+        return self._catalogManager._inStock(productId);
     }
 }

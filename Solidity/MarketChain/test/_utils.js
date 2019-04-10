@@ -95,7 +95,7 @@ module.exports = {
   },
   MSG: {
     NOT_INITIALIZED: '0',
-    INITIALIZED: 'Init',
+    INITIALIZED: '1',
     ONLY_OWNER: '2',
     UNAUTHORISED: '3',
     REGISTERED: 'Registered',
@@ -107,9 +107,12 @@ module.exports = {
     EMPTY_STRING: '10',
     NOT_AFFILIATED: '11',
     STORE_OWNER: '12',
-    WAIT_TIME: 'Wait time',
+    WAIT_TIME: '13',
     INVALID_SIGNATURE: '14',
     SEEN_NONCE: '15',
-    FORBIDDEN_FOR_OWNER: '16'
+    FORBIDDEN_FOR_OWNER: '16', 
+    CONTEMPLATION_PERIOD_NOT_OVER: '17',
+    TOO_MANY_ITEMS_IN_INVENTORY: '18',
+    NO_FUNDS: '19'
   }
 }

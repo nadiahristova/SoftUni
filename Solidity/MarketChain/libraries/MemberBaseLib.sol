@@ -12,6 +12,7 @@ library MemberBaseLib {
     }
 
     uint constant REMOVAL_CONTEMPLATION_PERIOD = 2 days;
+    uint constant LEAVE_WINDOW_PERIOD = 3 days;
     
     enum MembershipActivityStatus { NotaMember, IsActiveMember, MembershipCancelationRequestSent, Blocked }
     enum RevokeMembershipStatus { MembershipReinstated, Pending, Removed }
@@ -56,6 +57,7 @@ library MemberBaseLib {
 
         MembershipActivityStatus status = self.members[accAddress].status;
 
+        // set pending request
         if(status == MembershipActivityStatus.IsActiveMember) {
             self.members[accAddress].status = MembershipActivityStatus.MembershipCancelationRequestSent;
             self.pendingRequestsForMembershipCancelation[accAddress] = now;
@@ -65,7 +67,13 @@ library MemberBaseLib {
             return RevokeMembershipStatus.Pending;
         }
 
-        if(self.pendingRequestsForMembershipCancelation[accAddress] + REMOVAL_CONTEMPLATION_PERIOD > now) {
+        uint endOfContemplationPeriod = self.pendingRequestsForMembershipCancelation[accAddress] + REMOVAL_CONTEMPLATION_PERIOD;
+
+        require(now > endOfContemplationPeriod, '17');
+
+        // remove membership
+        if(now <= endOfContemplationPeriod + LEAVE_WINDOW_PERIOD) {
+
             delete self.pendingRequestsForMembershipCancelation[accAddress];
             delete self.members[accAddress];
 
@@ -74,6 +82,7 @@ library MemberBaseLib {
             return RevokeMembershipStatus.Removed;
         }
 
+        // reset membership
         self.members[accAddress].status = MembershipActivityStatus.IsActiveMember;
 
         emit LogMemberReinstatement(accAddress);
