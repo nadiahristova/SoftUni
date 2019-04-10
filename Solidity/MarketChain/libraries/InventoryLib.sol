@@ -3,14 +3,17 @@ pragma solidity >=0.5.6 <0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "./SafeMath.sol";
+import "./LinearRepositoryLib.sol";
 
 library InventoryLib {
     using SafeMath for uint256;
+    using LinearRepositoryLib for LinearRepositoryLib.Repo;
 
     uint constant MAX_ENTITIES_BY_PAGE = 10;
 
     struct Store {
         StoreFront[] storeFronts;
+        // add mapping + library
         // map StoreFrontId to index in storeFronts + 1, 0 - indicates that such StoreFront does not exist
         mapping (uint => uint) storeFrontsMap;
     }
@@ -45,8 +48,6 @@ library InventoryLib {
         mapping (uint => uint) _productIdsToInventoryIndexMap; // product id to local index in _storeFrontInventory
         mapping (uint => uint[]) _storeFrontInventory; // store front id to product ids
     }
-    
-    // TODO add standart!
 
     event LogStoreFrontCreated(address indexed ownerAddress, uint indexed storeFrontId); 
     event LogStoreFrontRemoved(address indexed ownerAddress, uint indexed storeFrontId); 
@@ -267,6 +268,12 @@ library InventoryLib {
         return self._products[productId];
     }
 
+    function _getProductsByPageNum(ProductStock storage self, uint storeFrontId, uint pageNum) 
+        view
+        internal 
+    returns (Product[] memory) {
+        
+    }
 
     function _getStoreFronts (StoreFronts storage self, address storeOwner, uint pageNum) 
         view
