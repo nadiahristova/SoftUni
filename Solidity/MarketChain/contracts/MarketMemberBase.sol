@@ -7,7 +7,6 @@ import "../interfaces/BaseMarketInterface.sol";
 import "../libraries/PartnerRelationsKeeperLib.sol";
 
 
-// todo change name
 contract MarketMemberBase is VotingMemberBase {
     
     using PartnerRelationsKeeperLib for PartnerRelationsKeeperLib.Partners;
@@ -72,6 +71,25 @@ contract MarketMemberBase is VotingMemberBase {
         return _partnerMarkets._removePartner(market);
     }
 
+    /// @dev Resets active voting campaign for given user
+    /// @notice Only owner can trigget this function
+    /// @param accAddress Account Address
+    /// @param campaignId Id of the campaign
+    /// @return true if Bugs will eat it, false otherwise
+    function removeVotingCampaign(address accAddress, uint campaignId) 
+        external 
+        onlyValidAddress(accAddress)
+        onlyNaturalNumber(campaignId)
+        onlyValidAddress(accAddress)
+        onlyWhenInitialized
+        onlyOwner 
+        onlyWhenMember(accAddress, true)
+    {
+        require(campaignId > 2);
+
+        VotingMemberBase._resetVotingCampaingn(campaignId, accAddress);
+    }
+
     function isPartner (address market) 
         view
         public 
@@ -129,14 +147,12 @@ contract MarketMemberBase is VotingMemberBase {
         onlyValidAddress(accAddress) 
         onlyWhenInitialized
         onlyMember
-    returns (bool) {
+    {
         require(owner != accAddress);
 
         require(_revokeMembership(accAddress));
 
         require(_revokeAllMarketMembership(accAddress));
-
-        return true;
     } 
 
     function _revokeAllMarketMembership (address accAddress) 

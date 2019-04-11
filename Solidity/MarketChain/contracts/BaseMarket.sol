@@ -2,16 +2,12 @@ pragma solidity >=0.5.6 <0.6.0;
 
 pragma experimental ABIEncoderV2;
 
-import "./AdministrableByRegion.sol";
 import "./VotingMemberBase.sol";
-import "./InvoiceProductPurchaseValidator.sol";
+import "./AdministrableByRegion.sol";
 
 import "../libraries/SafeMath.sol";
 
 import "../interfaces/BaseMarketInterface.sol";
-import "../interfaces/MemberBaseInterface.sol";
-import "../interfaces/ClientBaseInterface.sol";
-import "../interfaces/ProducerBaseInterface.sol";
 
 // TODO: delegate call fro factory contracts solidity
 
@@ -130,7 +126,7 @@ contract BaseMarket is VotingMemberBase, BaseMarketInterface {
             _availableCampaigns[i].activeTimespan = campaignTimePeriods[i];
         }
         
-        _initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
+        VotingMemberBase._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
     }
 
     ///@dev Affiliate client base to the market environment

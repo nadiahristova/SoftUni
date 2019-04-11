@@ -4,9 +4,27 @@ pragma experimental ABIEncoderV2;
 
 import "./BaseMarket.sol";
 import "./AdministrableByRegion.sol";
+import "./InvoiceProductPurchaseValidator.sol";
+
+import "../interfaces/ProducerBaseInterface.sol";
+import "../interfaces/RegionalMarketInterface.sol";
 
 // Under Construction
-contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegion, BaseMarket {
+contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegion, BaseMarket, RegionalMarketInterface {
+    // min time period between 2 donation campaigns for given region
+    uint256 _donationRoundTimePeriod;
+
+    // funding campaigns per province hashed key
+    mapping(bytes32 => Funding) _fundings;
+
+    // additinal member information relevant to the curren implementation of the market
+    mapping(address => MemberInfo) _additionalInfo; 
+    // gathered funds through donation and fees for given region 
+    mapping(bytes32 => uint) _fundsPerRegion;
+    
+    uint constant TIME_BETWEEN_WON_CANDIDACIES = 356 days;
+    uint constant MAX_NUM_CANDIDATES_FOR_FUNDING = 15; 
+    uint constant MIN_AMOUNT_OF_FUNDS_BEFORE_DISTRIBUTION = 1000 * 1 ether;
 
     // DonationRelevant info
     struct MemberInfo {
@@ -19,17 +37,6 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         uint created; // flag for activity status of Funding
         address[] candidates;
     }
-
-    mapping(bytes32 => Funding) _fundings;
-
-    mapping(address => MemberInfo) _additionalInfo; 
-    mapping(bytes32 => uint) _fundsPerRegion; 
-
-    uint256 _donationRoundTimePeriod;
-    
-    uint constant TIME_BETWEEN_WON_CANDIDACIES = 356 days;
-    uint constant MAX_NUM_CANDIDATES_FOR_FUNDING = 15;
-
     
     event LogProfitRetrieved(address storeOwner);
     event LogSendFunding(address storeOwner, uint amount);
@@ -38,6 +45,13 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
     event LogFundingCampaignActivated(bytes2 iSOCode, bytes30 province);
     event LogRegisteredDonationForRegion(bytes2 iSOCode, bytes30 province, uint256 donation, uint256 overAllFunds);
 
+    ///@dev Initializes constants needed for some ground rules and limitations
+    ///@param defaultCampaignTimePeriods fixed size array - first value: time duration of membership granting campaign, second: time duration of membership revocation campaign
+    ///@param profit_fee percents kept by the market from the sales 
+    ///@param decisiveVoteWeightProportion denominator used for determining how much of overall vote weight is needed for a campaign to be successful
+    ///@param decisiveVoteCountProportion denominator used for determining how much of overall supporters member count is needed for a given campaign to be successful
+    ///@param initialOwnerVoteWeight vote weight of the owner by default
+    ///@notice Profit fee is between 0 and 99 percents
     function initialize (
             uint[2] memory defaultCampaignTimePeriods, 
             uint profit_fee, 
@@ -59,17 +73,17 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         uint[] memory campaignTimePeriods = new uint[](1);
         campaignTimePeriods[0] = donationRoundTimePeriod;
 
-        _initialize(defaultCampaignTimePeriods, profit_fee, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
+        BaseMarket._initialize(defaultCampaignTimePeriods, profit_fee, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
         initialOwnerVoteWeight, campaignNames, campaignTimePeriods);
     }
 
-    ///@dev Candidate member should register him/herself
+    ///@dev Candidate members should register themselves
     ///@notice Province name should be between 1 and 30 letters
     ///@param location ISO Code of country and Province name
     function registerMember(Location memory location)
         public
-        onlyWhenInitialized
         onlyValidLocation(location)
+        onlyWhenInitialized
         onlyWhenMember(msg.sender, false)
     returns (bool) {
 
@@ -81,7 +95,10 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
 
         return true;
     }
-    
+
+    ///@dev Owner fires campaign for membership revocation
+    ///@notice Only owner has this right
+    ///@param accAddress Account Address
     function launchMembershipRevocationCampaign (address accAddress) 
         public 
         onlyValidAddress(accAddress)
@@ -144,11 +161,11 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         require(admin != storeOwner);
 
         MemberInfo memory info = _additionalInfo[storeOwner];
-        bytes32 regionKey = _returnLocationKey(info.location);
+        bytes32 regionKey = AdministrableByRegion._returnLocationKey(info.location);
 
         require(_fundings[regionKey].created != 0); // campaign is active
 
-        require(_returnLocationKey(_additionalInfo[admin].location) == regionKey); // Admin should be of same region
+        require(AdministrableByRegion._returnLocationKey(_additionalInfo[admin].location) == regionKey); // Admin should be of same region
 
         require(!info.isValidFundingCandidate);//already proposed
         require(info.lastlyWonFunding + TIME_BETWEEN_WON_CANDIDACIES <= now, 'Wait time');
@@ -162,47 +179,49 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         emit LogStoreOwnerSuggestedForFunding(storeOwner, admin, info.location.iSOCode, info.location.province);
     }
 
-
-    function supportMember( // support campaign
-            address storeOwner,
+    /// @dev Member supports fellow member in certain campaign
+    /// @param member Target of the campaign 
+    /// @param votingCampaignId Local id of the campaign 
+    function supportMember( 
+            address member,
             uint248 votingCampaignId)
         external 
-        onlyValidAddress(storeOwner) 
+        onlyValidAddress(member) 
         onlyNaturalNumber(votingCampaignId)
         onlyWhenInitialized
         onlyMember
     {
         address supporter = msg.sender;
 
-        require(supporter != storeOwner);
+        require(supporter != member);
 
         if(votingCampaignId == 3) {
 
-            MemberInfo memory info = _additionalInfo[storeOwner];
-            bytes32 regionKey = _returnLocationKey(info.location);
+            MemberInfo memory info = _additionalInfo[member];
+            bytes32 regionKey = AdministrableByRegion._returnLocationKey(info.location);
             
             require(_fundings[regionKey].created != 0); // campaign is active
 
-            require(_returnLocationKey(_additionalInfo[supporter].location) != regionKey); // Supporter and supported should be from different regions
+            require(AdministrableByRegion._returnLocationKey(_additionalInfo[supporter].location) != regionKey); // Supporter and supported should be from different regions
 
             require(info.isValidFundingCandidate);//proposed by admin
         }
 
-        _supportMember(storeOwner, votingCampaignId);
+        VotingMemberBase._supportMember(member, votingCampaignId);
     } 
 
-    ///@dev Used for a foreceful revokation of membership 
-    ///@return Membership revocation status
+    ///@dev Used to trigger funding distribution in case of successfully ended campaign  
+    ///@param location ISO Code of country and Province name
     function triggerFundingDistribution(Location memory location) 
         public 
         onlyValidLocation(location)
         onlyWhenInitialized
     returns (bool) {
         
-        bytes32 regionKey = _returnLocationKey(location);
+        bytes32 regionKey = AdministrableByRegion._returnLocationKey(location);
 
         require(_fundings[regionKey].created != 0);
-        require(_fundsPerRegion[regionKey] > 1000); // not enough funds donated
+        require(_fundsPerRegion[regionKey] > MIN_AMOUNT_OF_FUNDS_BEFORE_DISTRIBUTION); // not enough funds donated
 
         Funding memory funding = _fundings[regionKey];
 
@@ -216,12 +235,12 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
 
         for(uint i; i < candidateCount; i++) {
             address candidate = candidates[i];
-            if(_memberBase._isCampaignSupported(3, candidate)) {
+            if(VotingMemberBase._memberBase._isCampaignSupported(3, candidate)) {
                 approvedCandidates[approvedCandidateCount] = candidate;
                 approvedCandidateCount++;
             }
 
-            _resetVotingCampaingn(3, candidate);
+            VotingMemberBase._resetVotingCampaingn(3, candidate);
 
             delete _additionalInfo[candidate].isValidFundingCandidate;
 
@@ -247,7 +266,15 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         return true;
     } 
 
-    function activateFundingCampaign (Location memory location) public onlyOwner{
+    /// @dev Start a funding campaign
+    /// @notice Only owner can trigger this function
+    /// @param location The name of a food to evaluate (English)
+    /// @return true if Bugs will eat it, false otherwise
+    function activateFundingCampaign (Location memory location) 
+        public
+        onlyValidLocation(location)  
+        onlyWhenInitialized
+        onlyOwner {
         bytes32 regionKey = _returnLocationKey(location);
         require(_fundings[regionKey].created == 0, 'Already activated');
 
@@ -256,17 +283,36 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         emit LogFundingCampaignActivated(location.iSOCode, location.province);
     }
 
-    function getDonationCandidates (Location memory location) public view returns(address[] memory) {
+    /// @dev Returns view of the candidates for donation
+    /// @param location ISO Code of country and Province name
+    /// @return dynamic array of addresses of the candidates for donation
+    function getDonationCandidates (Location memory location) 
+        public 
+        view 
+        onlyValidLocation(location)  
+        onlyWhenInitialized
+    returns(address[] memory) {
         return _fundings[_returnLocationKey(location)].candidates;
     }
 
-    function getAccumulatedFundsPerRegion (Location memory location) public view returns(uint) {
+    /// @dev Return gathered funds per country region
+    /// @param location ISO Code of country and Province name
+    /// @return Funds gathered through fees and donations per country region in wei
+    function getAccumulatedFundsPerRegion (Location memory location) 
+        public 
+        view 
+        onlyWhenInitialized
+    returns(uint) {
         return _fundsPerRegion[_returnLocationKey(location)];
     }
 
+    /// @dev Used by the participants in a funding campaign to retrieve funds
+    /// @notice Campaign has to be successful and funds are destributed between campaign participants
+    /// @return Gathered funds in wei
     function retrieveProfit () 
         external
-        payable {
+        payable 
+        onlyWhenInitialized {
 
         address payable storeOwner = msg.sender;
 
@@ -290,7 +336,14 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         emit LogProfitRetrieved(storeOwner);
     }
 
-    function donateToProvince(Location memory location) public payable {
+    /// @dev Make a donation to a given province in country
+    /// @notice Everyone can make a donation, no records are kept
+    /// @param location country ISO Code and Province name
+    function donateToProvince(Location memory location) 
+        public 
+        payable 
+        onlyValidLocation(location)
+        onlyWhenInitialized {
         uint sendFunds = msg.value;
         address sender = msg.sender;
 
@@ -311,8 +364,15 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         emit LogRegisteredDonationForRegion(location.iSOCode, location.province, sendFunds, currentAvailableFunds);
     }
 
-    // TODO: make is Member private?
-    function getMembershipInfo(address accAddress) public view returns (bool isMember, bool isAdmin,bool isOwner){
+    /// @dev Retrieve market membership information for given member
+    /// @param accAddress Account address of the mmeber
+    /// @return is member, is admin, is owner in market
+    function getMembershipInfo(address accAddress) 
+        public 
+        view 
+        onlyValidAddress(accAddress) 
+        onlyWhenInitialized
+    returns (bool isMember, bool isAdmin,bool isOwner){
         (bool _member, bool _owner) = _getMembershipInfo(accAddress);
         bool _isAdmin = _adminRepository.contains(accAddress);
 
@@ -365,6 +425,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         return true;
     }
 
+    // all donations should be done via donate function
     function() external payable {
         revert();
     }

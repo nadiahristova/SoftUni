@@ -1,9 +1,5 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-pragma experimental ABIEncoderV2;
-
-import "../interfaces/ProducerBaseInterface.sol";
-import "../interfaces/ClientBaseInterface.sol";
 import "./pure/IBaseMarket.sol";
 
 import "../contracts/InvoiceProductPurchaseValidator.sol";

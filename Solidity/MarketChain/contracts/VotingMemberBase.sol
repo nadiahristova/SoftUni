@@ -8,16 +8,21 @@ import "../libraries/VotingMemberBaseLib.sol";
 
 import "../interfaces/MemberBaseInterface.sol";
 
-// TODO Check if LIb can detect variables in base contract
-
 contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInterface {
     
     using VotingMemberBaseLib for VotingMemberBaseLib.Members;
 
+    //denominator used for determining how much of overall vote weight is needed for a given campaign to be successful
+    uint _decisiveVoteWeightProportion;
+    //denominator used for determining how much of overall supporters member count is needed for a given campaign to be successful
+    uint _decisiveVoteCountProportion;
+    
+    mapping (address => bool) _requestsForMembership;
+    // campaign id to campaign
+    mapping (uint => CampaignDetails) _availableCampaigns;
+
     VotingMemberBaseLib.Members _memberBase;
 
-    mapping (address => bool) _requestsForMembership;
-    mapping (uint => CampaignDetails) _availableCampaigns;
 
     uint constant MAX_VOTES_PER_CAMPAIGN = 125;
     uint constant INITIAL_VOTE_WEIGHT = 0;
@@ -26,9 +31,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         bytes32 name;
         uint activeTimespan; // secs
     }
-
-    uint _decisiveVoteWeightProportion;
-    uint _decisiveVoteCountProportion;
 
     event LogMemberRegistration(address indexed accAddress);
     event LogMemberLeaving(address indexed accAddress);
@@ -75,10 +77,16 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         _decisiveVoteWeightProportion = decisiveVoteWeightProportion;
         _decisiveVoteCountProportion = decisiveVoteCountProportion;
 
-        super._initialize();
+        Initializable._initialize();
     }
 
-    function requestMembership () external onlyWhenMember(msg.sender, false) onlyWhenInitialized returns(bool) {
+    /// @dev Account requests membeship
+    /// @return true if Bugs will eat it, false otherwise
+    function requestMembership () 
+        external 
+        onlyWhenInitialized 
+        onlyWhenMember(msg.sender, false) 
+    {
         address requester = msg.sender;
 
         emit LogMembershipRequested(requester);
@@ -88,15 +96,13 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         _requestsForMembership[requester] = true;
 
         emit LogMembershipRequestPending(requester);
-
-        return true;
     }
 
     /// @dev Member can launch Membershi Granting Campaign
     /// @notice Only member can trigger the campaign, an account needs to request membership first
     /// @param accAddress Account address 
     function launchMembershipGrantingCampaign (address accAddress) 
-        public 
+        external 
         onlyValidAddress(accAddress)
         onlyWhenInitialized
         onlyMember 
@@ -110,31 +116,21 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._setVotingCampaign(1, accAddress, now + _availableCampaigns[1].activeTimespan);
     }
 
-    function hasActiveCampaigns (address accaddress) view public returns(bool) {
+    /// @dev Checks whether given member has active campaigns
+    /// @param accaddress The name of a food to evaluate (English)
+    /// @return True if a campaign is in process, false otherwise
+    function hasActiveCampaigns (address accaddress) view public onlyWhenInitialized returns(bool) {
         return _memberBase._hasActiveCampaigns(accaddress);
     }
 
-    function removeVotingCampaign(address accAddress, uint campaignId) 
-        public 
-        onlyValidAddress(accAddress)
-        onlyNaturalNumber(campaignId)
-        onlyWhenInitialized
-        onlyValidAddress(accAddress)
-        onlyOwner 
-        onlyWhenMember(accAddress, true)
-    returns (bool) {
-        require(campaignId > 2);
-
-        return VotingMemberBase._resetVotingCampaingn(campaignId, accAddress);
-    }
-
-    ///@dev Checkes whether an account is a member of the member base
-    ///@param accAddress Account address
+    /// @dev Checkes whether an account is a member of the member base
+    /// @param accAddress Account address
+    /// @return True if is member, false otherwise
     function isMember(address accAddress)
         view
         public
-        onlyWhenInitialized
         onlyValidAddress(accAddress) 
+        onlyWhenInitialized
     returns (bool) {
         return _memberBase._isMember(accAddress);
     }
@@ -147,8 +143,8 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         Ownable.transferOwnership(newOwner);
     }
 
-    // what will happen with the markets
-    ///@dev Used for a request or confirmation of membership revocation 
+    ///@dev Revoke membership
+    ///@notice Used by the member him/herself
     ///@return Membership revocation status
     function revokeMembership() 
         external 
@@ -161,14 +157,15 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._revokeMembership(msg.sender);
     } 
 
-    ///@dev Used for a revokation of membership of a member that has been voted out
-    ///@return 
+    ///@dev Used to finalize membership revocation
+    ///@param accAddress Member account address
+    ///@notice Can be invoked by any member
     function triggerMembershipRevocation(address accAddress) 
         external 
         onlyValidAddress(accAddress) 
         onlyWhenInitialized
         onlyMember
-    returns (bool) {
+    {
         require(Ownable.owner != accAddress);
 
         require(VotingMemberBase._revokeMembership(accAddress));
@@ -176,13 +173,16 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         require(VotingMemberBase._resetVotingCampaingn(2, accAddress));
     } 
 
+    /// @dev Returns the vote weight of member
+    /// @param accAddress Member account address
+    /// @return Vote weight in the organisation   
     function getVoteWeight (address accAddress) 
         view 
         external 
         onlyValidAddress(accAddress)
         onlyWhenInitialized
         onlyMember
-        returns(uint) {
+    returns(uint) {
 
         return _memberBase._getVoteWeight(accAddress);
     }
@@ -209,10 +209,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         require(VotingMemberBase._resetVotingCampaingn(1, accAddress));
     }
     
-    /// @dev Launches not basic campaign for given member
-    /// @notice Only owner can do this, campaign id should be > 2
-    /// @param accAddress Member address
-    /// @return true if campaign was launched, false otherwise
     function _launchCampaign (address accAddress, uint campaignId) 
         internal 
     returns(bool) {
@@ -220,8 +216,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
         return _memberBase._setVotingCampaign(campaignId, accAddress, now + _availableCampaigns[campaignId].activeTimespan);
     }
 
-    ///@dev Used for a foreceful revokation of membership 
-    ///@return Membership revocation status
     function _revokeMembership(address accAddress) 
         internal 
     returns (bool) {
@@ -247,11 +241,12 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInt
             _decisiveVoteWeightProportion, _decisiveVoteCountProportion));
     } 
 
-
+    // increase vote weight by given amouont
     function _upMemberVoteWeight (address accAddress, uint weight) internal {
         require(_memberBase._updateMemberVoteWeight(accAddress, weight, true));
     }
 
+    // decrease vote weight by given amouont
     function _downMemberVoteWeight (address accAddress, uint weight) internal {
         require(_memberBase._updateMemberVoteWeight(accAddress, weight, false));
     }

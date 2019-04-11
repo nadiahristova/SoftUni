@@ -62,7 +62,6 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
     event LogPurchaseRegistered(address client, address producer, address market, uint256 productId);
 
-
     function initialize (
             uint[2] memory defaultCampaignTimePeriods, 
             uint decisiveVoteWeightProportion, 
