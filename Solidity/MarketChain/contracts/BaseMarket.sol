@@ -192,8 +192,17 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         return true;
     } 
 
+    /// @dev Used by the producer base affiliate for notifying of removal of store front
+    /// @notice Used only by the producer base affiliate
+    /// @param storeOwner account address of the store owner
+    /// @param storeFrontId id used for identifying store front in the environment of producer base affiliate
+    /// @return True on success, false otherwise
     function notifyForStoreFrontDeletion (address storeOwner, uint storeFrontId) 
         public
+        onlyValidAddress(storeOwner)
+        onlyNaturalNumber(storeFrontId)
+        onlyWhenInitialized
+        onlyPartnerProducerBase(msg.sender)
         onlyWhenMember(storeOwner, true)
         onlyWhenStoreOwner(storeOwner, msg.sender, true)
         onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, true)
@@ -202,43 +211,47 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         return _removeStoreFront(storeOwner, storeFrontId, msg.sender);
     } 
 
-    function buyProduct (
-            InvoiceDetails memory invoice,
-            uint256 nonce, 
-            bytes memory signature) 
-        public 
-        payable
-        onlyNaturalNumber(nonce)
-        onlyValidInvoice(invoice)
-        onlyWhenMember(invoice.seller, true)
-        onlyPartnerProducerBase(invoice.producerBase)
-    returns(bool) {
-
-        address payable buyer = msg.sender;
-
-        require(invoice.buyer == buyer, '30');
-        
-        require(_validateProductPurchase(invoice, nonce, signature), '22');
-
-        uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
-
-        uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
-
-        require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
-
-        _accumulatedProfit[invoice.seller] = _accumulatedProfit[invoice.seller].add(productPrice);
-
-        if(excessPayment > 0) {
-            buyer.transfer(excessPayment);
-        }
-
-        _upMemberVoteWeight(buyer, 1);
-        _upMemberVoteWeight(invoice.seller, 2);
-
-        emit PurchaseRegistered(buyer, invoice.seller, invoice.producerBase, invoice.productId);
-
-        return true;
+    function _registerSale(address seller, uint fundsWei) internal {
+        _accumulatedProfit[seller] = _accumulatedProfit[seller].add(fundsWei);
     }
+
+    // function buyProduct (
+    //         InvoiceDetails memory invoice,
+    //         uint256 nonce, 
+    //         bytes memory signature) 
+    //     public 
+    //     payable
+    //     onlyNaturalNumber(nonce)
+    //     onlyValidInvoice(invoice)
+    //     onlyWhenMember(invoice.seller, true)
+    //     onlyPartnerProducerBase(invoice.producerBase)
+    // returns(bool) {
+
+    //     address payable buyer = msg.sender;
+
+    //     require(invoice.buyer == buyer, '30');
+        
+    //     require(_validateProductPurchase(invoice, nonce, signature), '22');
+
+    //     uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
+
+    //     uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
+
+    //     require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
+
+    //     _accumulatedProfit[invoice.seller] = _accumulatedProfit[invoice.seller].add(productPrice);
+
+    //     if(excessPayment > 0) {
+    //         buyer.transfer(excessPayment);
+    //     }
+
+    //     _upMemberVoteWeight(buyer, 1);
+    //     _upMemberVoteWeight(invoice.seller, 2);
+
+    //     emit PurchaseRegistered(buyer, invoice.seller, invoice.producerBase, invoice.productId);
+
+    //     return true;
+    // }
 
     function retrieveProfit () 
         external

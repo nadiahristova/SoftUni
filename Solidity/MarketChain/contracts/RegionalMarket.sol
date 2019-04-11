@@ -321,6 +321,45 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         return (_member, _isAdmin, _owner);
     }
 
+    function buyProduct (
+            InvoiceDetails memory invoice,
+            uint256 nonce, 
+            bytes memory signature) 
+        public 
+        payable
+        onlyNaturalNumber(nonce)
+        onlyValidInvoice(invoice)
+        onlyWhenMember(invoice.seller, true)
+        onlyPartnerProducerBase(invoice.producerBase)
+    returns(bool) {
+
+        address payable buyer = msg.sender;
+
+        require(invoice.buyer == buyer, '30');
+        
+        // todo make it through delegate call
+        require(_validateProductPurchase(invoice, nonce, signature), '22');
+
+        uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
+
+        uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
+
+        BaseMarket._registerSale(invoice.seller, productPrice);
+
+        require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
+
+        if(excessPayment > 0) {
+            buyer.transfer(excessPayment);
+        }
+
+        VotingMemberBase._upMemberVoteWeight(buyer, 1);
+        VotingMemberBase._upMemberVoteWeight(invoice.seller, 2);
+
+        emit PurchaseRegistered(buyer, invoice.seller, invoice.producerBase, invoice.productId);
+
+        return true;
+    }
+
     function() external payable {
         revert();
     }
