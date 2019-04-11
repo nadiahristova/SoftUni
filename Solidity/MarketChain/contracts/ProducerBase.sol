@@ -72,7 +72,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
         require(!_isInitialized, '1');
         
-        super._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
+        MarketMemberBase._initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, 
             initialOwnerVoteWeight, new bytes32[](0),  new uint[](0));
     }
 

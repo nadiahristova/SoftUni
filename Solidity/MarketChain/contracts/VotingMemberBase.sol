@@ -6,9 +6,9 @@ import "./Initializable.sol";
 
 import "../libraries/VotingMemberBaseLib.sol";
 
-import "../interfaces/MemberBaseInterface.sol";
+import "../interfaces/VotingMemberBaseInterface.sol";
 
-contract VotingMemberBase is BaseContract, Ownable, Initializable, MemberBaseInterface {
+contract VotingMemberBase is BaseContract, Ownable, Initializable, VotingMemberBaseInterface {
     
     using VotingMemberBaseLib for VotingMemberBaseLib.Members;
 

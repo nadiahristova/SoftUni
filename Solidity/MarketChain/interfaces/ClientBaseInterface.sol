@@ -1,5 +1,7 @@
 pragma solidity ^0.5.6;
 
-interface ClientBaseInterface {
+import "./MarketMemberBaseInterface.sol";
+
+contract ClientBaseInterface is MarketMemberBaseInterface {
     
 }

@@ -2,12 +2,12 @@ pragma solidity >=0.5.6 <0.6.0;
 
 import "./VotingMemberBase.sol";
 
-import "../interfaces/BaseMarketInterface.sol";
+import "../interfaces/MarketMemberBaseInterface.sol";
 
 import "../libraries/PartnerRelationsKeeperLib.sol";
 
 
-contract MarketMemberBase is VotingMemberBase {
+contract MarketMemberBase is VotingMemberBase, MarketMemberBaseInterface {
     
     using PartnerRelationsKeeperLib for PartnerRelationsKeeperLib.Partners;
 
@@ -20,12 +20,12 @@ contract MarketMemberBase is VotingMemberBase {
 
     
     modifier onlyOnValidMarketMembership(address shopOwner, address market) {
-        require(hasMarketMembership(shopOwner, market), '44');
+        require(hasMarketMembership(shopOwner, market), '20');
         _;
     }
 
     modifier onlyRegisteredPartner(address market) {
-        require(isPartner(market), 'Not partner');
+        require(isPartner(market), '5');
         _;
     }
 
@@ -52,33 +52,38 @@ contract MarketMemberBase is VotingMemberBase {
         _initialize(defaultCampaignTimePeriods, decisiveVoteWeightProportion, decisiveVoteCountProportion, initialOwnerVoteWeight);
     }
 
+    /// @dev Add market partner
+    /// @param market Address of market partner
     function addMarketPartner (address market) 
         external 
         onlyValidAddress(market)
         onlyWhenInitialized
-        onlyOwner
-    returns(bool) {
-        require(!_partnerMarkets._isRegisteredPartner(market), 'Registered');
+        onlyOwner {
+            
+        require(!_partnerMarkets._isRegisteredPartner(market), '4');
 
-        return _partnerMarkets._addPartner(market);
+        require(_partnerMarkets._addPartner(market));
     }
 
+    /// @dev Remove market partner
+    /// @notice Only owner can remove market partner
+    /// @param market Address of market partner
     function removeMarketPartner (address market) 
-        public 
+        external 
+        onlyValidAddress(market)
         onlyOwner
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._removePartner(market);
+        onlyWhenInitialized
+        onlyRegisteredPartner(market) {
+
+        require(_partnerMarkets._removePartner(market));
     }
 
     /// @dev Resets active voting campaign for given user
-    /// @notice Only owner can trigget this function
+    /// @notice Only owner can trigger this function
     /// @param accAddress Account Address
     /// @param campaignId Id of the campaign
-    /// @return true if Bugs will eat it, false otherwise
     function removeVotingCampaign(address accAddress, uint campaignId) 
         external 
-        onlyValidAddress(accAddress)
         onlyNaturalNumber(campaignId)
         onlyValidAddress(accAddress)
         onlyWhenInitialized
@@ -90,6 +95,9 @@ contract MarketMemberBase is VotingMemberBase {
         VotingMemberBase._resetVotingCampaingn(campaignId, accAddress);
     }
 
+    /// @dev Checks whether given market is a partner
+    /// @param market Market contract address
+    /// @return True if partner, false otherwise
     function isPartner (address market) 
         view
         public 
@@ -100,9 +108,12 @@ contract MarketMemberBase is VotingMemberBase {
         return _partnerMarkets._isRegisteredPartner(market);
     }
 
+    /// @dev Gets fixed array of market partner contract addresses
+    /// @notice Max num of partner contracts is 25
+    /// @return Market partner contract addresses
     function getMarketPartners () 
         view
-        public 
+        external 
         onlyWhenInitialized
     returns(address[25] memory) {
 
@@ -112,11 +123,12 @@ contract MarketMemberBase is VotingMemberBase {
     /// @dev Checks whether given member has market membership
     /// @param accAddress Member address 
     /// @param market Market address   
-    /// @return true if affiliated with market, false otherwise
+    /// @return True if affiliated with market, false otherwise
     function hasMarketMembership (address accAddress, address market)  
         view 
         public
         onlyValidAddress(accAddress)
+        onlyWhenInitialized
         onlyWhenMember(accAddress, true)
         onlyRegisteredPartner(market)
     returns(bool) {
@@ -124,35 +136,43 @@ contract MarketMemberBase is VotingMemberBase {
         return _partnerMarkets._hasMembership(market, accAddress);
     }
 
+    /// @dev Request market membership
+    /// @param market The address of market
     function requestMarketMembership (address market) 
-        public 
+        external 
+        onlyValidAddress(market)
+        onlyWhenInitialized
         onlyMember
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._addMembership(market, msg.sender);
+        onlyRegisteredPartner(market) {
+
+        _partnerMarkets._addMembership(market, msg.sender);
     }
 
+    /// @dev Revoke market membership
+    /// @param market The address of market
     function revokeMarketMembership (address market) 
-        public 
+        external 
+        onlyValidAddress(market)
+        onlyWhenInitialized
         onlyMember
-        onlyRegisteredPartner(market)
-    returns(bool) {
-        return _partnerMarkets._revokeMembership(market, msg.sender);
+        onlyRegisteredPartner(market) {
+
+        _partnerMarkets._revokeMembership(market, msg.sender);
     }
 
     ///@dev Used for a revokation of membership 
+    ///@param accAddress Account address of member
     ///@return Membership revocation status
     function triggerMembershipRevocation(address accAddress) 
         external 
         onlyValidAddress(accAddress) 
         onlyWhenInitialized
-        onlyMember
-    {
+        onlyMember {
         require(owner != accAddress);
 
-        require(_revokeMembership(accAddress));
+        VotingMemberBase._revokeMembership(accAddress);
 
-        require(_revokeAllMarketMembership(accAddress));
+        _revokeAllMarketMembership(accAddress);
     } 
 
     function _revokeAllMarketMembership (address accAddress) 

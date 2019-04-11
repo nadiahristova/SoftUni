@@ -98,8 +98,8 @@ module.exports = {
     INITIALIZED: '1',
     ONLY_OWNER: '2',
     UNAUTHORISED: '3',
-    REGISTERED: 'Registered',
-    NOT_A_PARTNER: 'Not partner',
+    REGISTERED: '4',
+    NOT_A_PARTNER: '5',
     NOT_EXISTING_STORE_FRONT: '6',
     NOT_EXISTING_STORE_PRODUCT: '7',
     ENABLED_STORE_FRONT: '8',
@@ -113,6 +113,7 @@ module.exports = {
     FORBIDDEN_FOR_OWNER: '16', 
     CONTEMPLATION_PERIOD_NOT_OVER: '17',
     TOO_MANY_ITEMS_IN_INVENTORY: '18',
-    NO_FUNDS: '19'
+    NO_FUNDS: '19',
+    MARKET_MEMBERSHIP_NOT_VALID: '20'
   }
 }
