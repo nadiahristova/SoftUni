@@ -25,7 +25,7 @@ import "../interfaces/ProducerBaseInterface.sol";
 
 // Note: voting should be pausable
 
-contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, VotingMemberBase  {
+contract BaseMarket is VotingMemberBase, BaseMarketInterface {
     using SafeMath for uint256;
 
     uint _profit_fee; // percents
@@ -162,14 +162,6 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
         emit LogProducerBaseAssigned(memberBaseAddress);
     }
-    
-    function _openStore (address producerBase, address storeOwner,  bytes32 name) internal { 
-        bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
-
-        _openedStoreFrtontsByMember[storeFrontHashedKey].name = name;
-
-        emit LogNewStoreOpened(storeOwner, producerBase);
-    }
 
     /// @dev Used by a producer affiliate for store front publishing
     /// @notice Store owner has to be member of producer base affiliate and the market itself
@@ -211,83 +203,39 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         return _removeStoreFront(storeOwner, storeFrontId, msg.sender);
     } 
 
-    function _registerSale(address seller, uint fundsWei) internal {
-        _accumulatedProfit[seller] = _accumulatedProfit[seller].add(fundsWei);
-    }
-
-    // function buyProduct (
-    //         InvoiceDetails memory invoice,
-    //         uint256 nonce, 
-    //         bytes memory signature) 
-    //     public 
-    //     payable
-    //     onlyNaturalNumber(nonce)
-    //     onlyValidInvoice(invoice)
-    //     onlyWhenMember(invoice.seller, true)
-    //     onlyPartnerProducerBase(invoice.producerBase)
-    // returns(bool) {
-
-    //     address payable buyer = msg.sender;
-
-    //     require(invoice.buyer == buyer, '30');
-        
-    //     require(_validateProductPurchase(invoice, nonce, signature), '22');
-
-    //     uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
-
-    //     uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
-
-    //     require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
-
-    //     _accumulatedProfit[invoice.seller] = _accumulatedProfit[invoice.seller].add(productPrice);
-
-    //     if(excessPayment > 0) {
-    //         buyer.transfer(excessPayment);
-    //     }
-
-    //     _upMemberVoteWeight(buyer, 1);
-    //     _upMemberVoteWeight(invoice.seller, 2);
-
-    //     emit PurchaseRegistered(buyer, invoice.seller, invoice.producerBase, invoice.productId);
-
-    //     return true;
-    // }
-
-    function retrieveProfit () 
-        external
-        payable
-    returns (bool) {
-        return true;
-    }
-
+    /// @dev Views accumulated profit from sales
+    /// @notice Accessable only to market members
+    /// @return Accumolated profit
     function getAccumolatedProfit () external view onlyMember returns(uint) {
         return _accumulatedProfit[msg.sender];
     }
 
+    /// @dev Checks whether store owner had published particular Store Front to the market
+    /// @param storeOwner account address of the store owner
+    /// @param producerBase address of the producer base
+    /// @param storeFrontId id used for identifying store front in the environment of producer base affiliate
+    /// @return true if Store Front had been published, false otherwise
     function hasStoreFront(address storeOwner, address producerBase, uint storeFrontId)
         view
         public 
         onlyNaturalNumber(storeFrontId)
         onlyValidAddress(storeOwner)
+        onlyValidAddress(producerBase)
         onlyWhenInitialized
         onlyPartnerProducerBase(producerBase)
     returns (bool) {
 
         return _isStoreFrontToStoreFrontIdMap[_returnStoreLocatorKey(storeOwner, producerBase)][storeFrontId] != 0;
     }
+    
+    function retrieveProfit () external payable { }
+    
+    function _openStore (address producerBase, address storeOwner,  bytes32 name) internal { 
+        bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
 
-    function _addStoreFront (address storeOwner, uint storeFrontId, address producerBase) private returns(bool) {
-        bytes32 storeLocatorKey = _returnStoreLocatorKey(storeOwner, producerBase);
+        _openedStoreFrtontsByMember[storeFrontHashedKey].name = name;
 
-        uint alreadyClaimedStoreFrontSlotCount = _openedStoreFrtontsByMember[storeLocatorKey].storeFronts.length;
-
-        require(alreadyClaimedStoreFrontSlotCount < MAX_STOREFRONTS_PER_STORE);
-
-        // newIndexAccordingToOccupiedSlot = index of occupied slot in _openedStoreFrtontsByMember + 1
-        uint newIndexAccordingToOccupiedSlot = _openedStoreFrtontsByMember[storeLocatorKey].storeFronts.push(storeFrontId);
-        _isStoreFrontToStoreFrontIdMap[storeLocatorKey][storeFrontId] = newIndexAccordingToOccupiedSlot;
-
-        emit LogMemberAddedStoreFront(storeOwner, producerBase, storeFrontId);
+        emit LogNewStoreOpened(storeOwner, producerBase);
     }
 
     function _removeStoreFront (address storeOwner, uint storeFrontId, address producerBase) internal returns(bool) {
@@ -309,6 +257,24 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         emit LogMemberRemovedStoreFront(storeOwner, producerBase, storeFrontId);
 
         return true;
+    }
+    
+    function _registerSale(address seller, uint fundsWei) internal {
+        _accumulatedProfit[seller] = _accumulatedProfit[seller].add(fundsWei);
+    }
+
+    function _addStoreFront (address storeOwner, uint storeFrontId, address producerBase) private returns(bool) {
+        bytes32 storeLocatorKey = _returnStoreLocatorKey(storeOwner, producerBase);
+
+        uint alreadyClaimedStoreFrontSlotCount = _openedStoreFrtontsByMember[storeLocatorKey].storeFronts.length;
+
+        require(alreadyClaimedStoreFrontSlotCount < MAX_STOREFRONTS_PER_STORE);
+
+        // newIndexAccordingToOccupiedSlot = index of occupied slot in _openedStoreFrtontsByMember + 1
+        uint newIndexAccordingToOccupiedSlot = _openedStoreFrtontsByMember[storeLocatorKey].storeFronts.push(storeFrontId);
+        _isStoreFrontToStoreFrontIdMap[storeLocatorKey][storeFrontId] = newIndexAccordingToOccupiedSlot;
+
+        emit LogMemberAddedStoreFront(storeOwner, producerBase, storeFrontId);
     }
 
     function _returnStoreLocatorKey (address storeOwner, address memberBase) 

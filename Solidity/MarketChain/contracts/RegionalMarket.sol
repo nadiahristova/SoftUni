@@ -6,7 +6,7 @@ import "./BaseMarket.sol";
 import "./AdministrableByRegion.sol";
 
 // Under Construction
-contract RegionalMarket is AdministrableByRegion, BaseMarket {
+contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegion, BaseMarket {
 
     // DonationRelevant info
     struct MemberInfo {
@@ -266,8 +266,8 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
     function retrieveProfit () 
         external
-        payable
-    returns (bool) {
+        payable {
+
         address payable storeOwner = msg.sender;
 
         uint accumulatedProfitFromSales = _accumulatedProfit[storeOwner];
@@ -288,8 +288,6 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         storeOwner.transfer(profit);
 
         emit LogProfitRetrieved(storeOwner);
-
-        return true;
     }
 
     function donateToProvince(Location memory location) public payable {
@@ -321,6 +319,12 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         return (_member, _isAdmin, _owner);
     }
 
+    /// @dev A client purchases a product with invoice issued by the seller
+    /// @notice Invoices have expiration date
+    /// @param invoice Invoice details
+    /// @param nonce seller's nonce
+    /// @param signature Signed invoice
+    /// @return True on success, false otherwise
     function buyProduct (
             InvoiceDetails memory invoice,
             uint256 nonce, 
@@ -329,6 +333,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         payable
         onlyNaturalNumber(nonce)
         onlyValidInvoice(invoice)
+        onlyWhenInitialized
         onlyWhenMember(invoice.seller, true)
         onlyPartnerProducerBase(invoice.producerBase)
     returns(bool) {
