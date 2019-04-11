@@ -25,7 +25,9 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
     }
 
     struct Location {
+        //Two letter hex ISO Code for a given country
         bytes2 iSOCode; 
+        // Name of a province in hex.
         bytes30 province;
     }
 
@@ -34,9 +36,8 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
 
     ///@dev Assignes admin to a given region of a country
     ///@param accAddress Account address of admin candidate 
-    ///@param isoCode Two letter hex ISO Code for a given country.
-    ///@param province Name of a province in hex. 
-    ///@return Success when admin can be assigned to a given region.
+    ///@param location location managed by the admin
+    ///@return Success when admin is assigned to a given region.
     ///@notice Only owner can use this function. Max number of admins per region is restricted to 55. Max number of managed
     /// regions by admin is restricted to 5. ISO Code length is 2 letters upper case. Province name max length is 30 lower case text.
     function assignAdminToProvince(address accAddress, Location memory location) 
@@ -55,9 +56,12 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
         return true;
     }
 
-    ///@dev Returns whether an account is an admin
-    ///@param accAddress the address of the checked account 
-    ///@return True on success
+    ///@dev Removes admin rights for a given account address for a given region
+    ///@param accAddress Account address of admin  
+    ///@param location location managed by the admin
+    ///@return Success when the account is no longer admin for the given region.
+    ///@notice Only owner can use this function. Max number of admins per region is restricted to 55. Max number of managed
+    /// regions by admin is restricted to 5. ISO Code length is 2 letters upper case. Province name max length is 30 lower case text.
     function removeAdminFromProvince(address accAddress, Location memory location) 
         public 
         onlyValidAddress(accAddress) 
@@ -76,15 +80,24 @@ contract AdministrableByRegion is BaseContract, Ownable, Initializable {
 
     ///@dev Returns whether an account is an admin
     ///@param accAddress the address of the checked account 
-    ///@return Is given account an admin 
-    function isAdmin(address accAddress) public view returns (bool) {
+    ///@return True if admin, false otherwise 
+    function isAdmin(address accAddress) 
+        public 
+        view 
+        onlyValidAddress(accAddress)
+    returns (bool) {
         return _adminRepository.contains(accAddress);
     }
 
-    ///@dev Returns whether an account is an admin
-    ///@param accAddress the address of the checked account 
-    ///@return Is given account an admin 
-    function returnAdminsPerProvince(Location memory location) public view returns (address[] memory) {
+    ///@dev Returns admin accounts assigned at given province
+    ///@param location location of the area 
+    ///@return Dynamic array of account addresses admins for given region  
+    function returnAdminsPerProvince(Location memory location) 
+        public 
+        view 
+        onlyValidLocation(location)
+        onlyWhenInitialized 
+    returns (address[] memory) {
         return _adminRepository.values(_returnLocationKey(location));
     }
 

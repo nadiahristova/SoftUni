@@ -25,31 +25,34 @@ import "../interfaces/ProducerBaseInterface.sol";
 
 // Note: voting should be pausable
 
-// onlyWhenInitialized, onlyValidAddress
 contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, VotingMemberBase  {
     using SafeMath for uint256;
 
-    struct Store {
-        bytes32 name;
-        uint[] storeFronts;
-    }
+    uint _profit_fee; // percents
 
     mapping(bytes32 => Store) _openedStoreFrtontsByMember;
-    ///@dev maps storefront key to index of value of _openedStoreFrtontsByMember
-    ///@notice in case value 0 - this means that a storeFront is not opened
+
+    //dev - maps storefront key to index of value of _openedStoreFrtontsByMember
+    //notice - when value is 0 - this means storeFront with given id is does not exists yet
     mapping(bytes32 => mapping(uint => uint)) _isStoreFrontToStoreFrontIdMap;
     //mapping(address => mapping(address => bool)) _approvedClientBase; 
 
+    // account address to accumulated profit from the sales in wei
     mapping(address => uint) _accumulatedProfit;
 
-    uint constant MAX_STOREFRONTS_PER_STORE = 25;
-    uint constant INVENTORY_CAP_PER_STOREFRONT = 30;
-
-    uint _profit_fee; // percents
-
+    //address of the member base => associated/not
     mapping(address => bool) _associatedClientMemberBase;
     mapping(address => bool) _associatedProducerMemberBase;
 
+    struct Store {
+        // name of the store, can be used as a flag if 0x0 => store is not yet created
+        bytes32 name; 
+        // dynamic array of store front ids
+        uint[] storeFronts;
+    }
+
+    uint constant MAX_STOREFRONTS_PER_STORE = 25;
+    uint constant INVENTORY_CAP_PER_STOREFRONT = 30;
 
     event LogMemberRegistration(address indexed accAddress);
     event LogMemberLeaving(address indexed exMemberAddress);
@@ -84,11 +87,6 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         _;
     }
 
-    // modifier onlyMemberBaseCall () {
-    //     require(_associatedClientMemberBase[msg.sender] || _associatedProducerMemberBase[msg.sender]);
-    //     _;
-    // }
-
      modifier onlyWhenStoreOwner (address storeOwner, address producerBase, bool isOwner) {
         require((_openedStoreFrtontsByMember[_returnStoreLocatorKey(storeOwner, producerBase)].name != 0x0) == isOwner, '12');
         _;
@@ -99,11 +97,19 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         _;
     }
     
-    
     ///@dev Initializes constants needed for some ground rules and limitations
+    ///@param defaultCampaignTimePeriods fixed size array - first value: time duration of membership granting campaign, second: time duration of membership revocation campaign
+    ///@param profit_fee percents kept by the market from the sales 
+    ///@param decisiveVoteWeightProportion denominator used for determining how much of overall vote weight is needed for a given campaign to be successful
+    ///@param decisiveVoteCountProportion denominator used for determining how much of overall supporters member count is needed for a given campaign to be successful
+    ///@param initialOwnerVoteWeight vote weight of the owner by default
+    ///@param campaignNames names of the campaigns supported by this contract
+    ///@param campaignTimePeriods time span through which given campaign is active
+    ///@notice campaignNames and campaignTimePeriods should have the same length, profit fee is between 0 and 99 percents
     function _initialize (
             uint[2] memory defaultCampaignTimePeriods, 
-            uint profit_fee, uint decisiveVoteWeightProportion, 
+            uint profit_fee, 
+            uint decisiveVoteWeightProportion, 
             uint decisiveVoteCountProportion, 
             uint initialOwnerVoteWeight, 
             bytes32[] memory campaignNames, 
@@ -129,7 +135,11 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
 
     ///@dev Affiliate client base to the market environment
     ///@param memberBaseAddress Client Base Contract address
-    function affiliateClientBase (address memberBaseAddress) external onlyWhenInitialized onlyOwner {
+    function affiliateClientBase (address memberBaseAddress) 
+        external 
+        onlyValidAddress(memberBaseAddress)
+        onlyWhenInitialized 
+        onlyOwner {
 
         require(!_associatedClientMemberBase[memberBaseAddress],'9');
 
@@ -138,9 +148,13 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         emit LogClientBaseAssigned(memberBaseAddress);
     }
 
-    ///@dev Affiliate client base to the market environment
+    ///@dev Affiliate producer/salesmen base to the market environment
     ///@param memberBaseAddress Producer Base Contract address
-    function affiliateProducerBase (address memberBaseAddress) external onlyWhenInitialized onlyOwner {
+    function affiliateProducerBase (address memberBaseAddress) 
+        external 
+        onlyValidAddress(memberBaseAddress)
+        onlyWhenInitialized 
+        onlyOwner {
 
         require(!_associatedProducerMemberBase[memberBaseAddress],'9');
 
@@ -149,16 +163,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         emit LogProducerBaseAssigned(memberBaseAddress);
     }
     
-
-    // todo change so that an empty address can also register store
-    function openStore (address producerBase, bytes32 name) 
-        onlyMember
-        onlyPartnerProducerBase(producerBase)
-        onlyWhenStoreOwner(msg.sender, producerBase, false)
-        external { 
-        require(name != 0x0, '10'); // use name as a marker
-        address storeOwner = msg.sender;
-
+    function _openStore (address producerBase, address storeOwner,  bytes32 name) internal { 
         bytes32 storeFrontHashedKey = _returnStoreLocatorKey(storeOwner, producerBase);
 
         _openedStoreFrtontsByMember[storeFrontHashedKey].name = name;
@@ -166,21 +171,18 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         emit LogNewStoreOpened(storeOwner, producerBase);
     }
 
-
-    // function addStoreFront (address memberBase, uint storeFrontId) 
-    //     external 
-    //     onlyPartnerProducerBase(memberBase) // TODO maybe remove
-    //     onlyMember
-    //     onlyWhenStoreOwner(msg.sender, memberBase, true)
-    //     onlyWhenStoreFrontOwner(msg.sender, memberBase, storeFrontId, false)
-    // returns (bool) {
-
-    //     return _addStoreFront(msg.sender, storeFrontId, memberBase);
-    // }  
-
+    /// @dev Used by a producer affiliate for store front publishing
+    /// @notice Store owner has to be member of producer base affiliate and the market itself
+    /// @param storeOwner account address of the store owner
+    /// @param storeFrontId id used for identifying store front in the environment of producer base affiliate
+    /// @return True on success, false otherwise
     function memberBaseAddStoreFront (address storeOwner, uint storeFrontId) 
         public 
+        onlyValidAddress(storeOwner)
+        onlyNaturalNumber(storeFrontId)
+        onlyWhenInitialized
         onlyWhenMember(storeOwner, true)
+        onlyPartnerProducerBase(msg.sender)
         onlyWhenStoreOwner(storeOwner, msg.sender, true)
         onlyWhenStoreFrontOwner(storeOwner, msg.sender, storeFrontId, false)
     returns (bool) {
@@ -188,17 +190,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         _addStoreFront(storeOwner, storeFrontId, msg.sender);
 
         return true;
-    }  
-
-    function removeStoreFront (ProducerBaseInterface memberBase, uint256 storeFrontId) 
-        external
-        onlyMember
-        onlyWhenStoreOwner(msg.sender, address(memberBase), true)
-        onlyWhenStoreFrontOwner(msg.sender, address(memberBase), storeFrontId, true)
-    returns (bool) {
-
-        return _removeStoreFront(msg.sender, storeFrontId, address(memberBase));
-    }  
+    } 
 
     function notifyForStoreFrontDeletion (address storeOwner, uint storeFrontId) 
         public
@@ -285,7 +277,7 @@ contract BaseMarket is InvoiceProductPurchaseValidator, BaseMarketInterface, Vot
         emit LogMemberAddedStoreFront(storeOwner, producerBase, storeFrontId);
     }
 
-    function _removeStoreFront (address storeOwner, uint storeFrontId, address producerBase) private returns(bool) {
+    function _removeStoreFront (address storeOwner, uint storeFrontId, address producerBase) internal returns(bool) {
         bytes32 storeLocatorKey = _returnStoreLocatorKey(storeOwner, producerBase);
 
         uint storeFrontCount = _openedStoreFrtontsByMember[storeLocatorKey].storeFronts.length;

@@ -92,7 +92,44 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
 
         return _launchCampaign(accAddress, 2);
     }
+
+    /// @dev Opens store in the market environment
+    /// @param producerBase address of the producer base where the actual store data is managed 
+    /// @notice market should be affiliated with the producer base, 
+    /// sender should be member of the producer base and the market
+    function openStore (address producerBase, bytes32 name) 
+        onlyMember
+        onlyPartnerProducerBase(producerBase)
+        onlyWhenStoreOwner(msg.sender, producerBase, false)
+        external { 
+        require(name != 0x0, '10'); // use name as a marker
+        address storeOwner = msg.sender;
+
+        BaseMarket._openStore(producerBase, storeOwner, name);
+    }
+
+    /// @dev Removes store front from the market
+    /// @notice Can be done only by the store front owner
+    /// @param memberBase address of the producer base affiliate
+    /// @param storeFrontId id used for identifying store front in the environment of producer base affiliate
+    function removeStoreFront (address memberBase, uint256 storeFrontId) 
+        external
+        onlyValidAddress(memberBase)
+        onlyNaturalNumber(storeFrontId)
+        onlyWhenInitialized
+        onlyMember
+        onlyWhenStoreOwner(msg.sender, memberBase, true)
+        onlyWhenStoreFrontOwner(msg.sender, memberBase, storeFrontId, true)
+    {
+
+        BaseMarket._removeStoreFront(msg.sender, storeFrontId, memberBase);
+    }  
     
+    /// @dev Suggest given store owner for funding
+    /// @param storeOwner producer account address
+    /// @param memberBase address of the producer base the store owner is member of
+    /// @notice Can be executed only by the admin. Store owner has to be member of producer base affiliate
+    /// @return true if Bugs will eat it, false otherwise
     function suggestForFunding (address storeOwner, address memberBase) 
         external 
         onlyValidAddress(storeOwner)
@@ -101,7 +138,7 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         onlyAdmin 
         onlyPartnerProducerBase(memberBase)
         onlyWhenStoreOwner(storeOwner, memberBase, true)
-    returns(bool) {
+    {
         address admin = msg.sender;
 
         require(admin != storeOwner);
@@ -123,8 +160,6 @@ contract RegionalMarket is AdministrableByRegion, BaseMarket {
         _launchCampaign(storeOwner, 3);
 
         emit LogStoreOwnerSuggestedForFunding(storeOwner, admin, info.location.iSOCode, info.location.province);
-
-        return true;
     }
 
 

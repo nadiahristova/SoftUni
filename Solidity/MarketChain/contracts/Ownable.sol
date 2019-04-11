@@ -16,13 +16,15 @@ contract Ownable is BaseContract {
         require(msg.sender == owner, '2');
         _;
     }
-
-    modifier onlyNotOwner (address adr) {
-        require(adr != owner);
-        _;
-    }
     
-    function transferOwnership(address newOwner) onlyValidAddress(newOwner) public onlyOwner {
+    /// @dev Transfers ownershipto given address
+    /// @notice Only owner function
+    /// @param newOwner The account address of the potential new owner
+    function transferOwnership(address newOwner)
+        public 
+        onlyValidAddress(newOwner) 
+        onlyOwner {
+
         owner = newOwner;
 
         emit OwnershipTransferred(owner, newOwner);

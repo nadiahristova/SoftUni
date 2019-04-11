@@ -1,6 +1,5 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-
 import "./Ownable.sol";
 
 contract Initializable {
