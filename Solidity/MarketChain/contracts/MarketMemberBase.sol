@@ -1,6 +1,5 @@
 pragma solidity >=0.5.6 <0.6.0;
 
-import "./Pausable.sol";
 import "./VotingMemberBase.sol";
 
 import "../interfaces/MarketMemberBaseInterface.sol";
@@ -8,7 +7,7 @@ import "../interfaces/MarketMemberBaseInterface.sol";
 import "../libraries/PartnerRelationsKeeperLib.sol";
 
 
-contract MarketMemberBase is Pausable, VotingMemberBase, MarketMemberBaseInterface {
+contract MarketMemberBase is VotingMemberBase, MarketMemberBaseInterface {
     
     using PartnerRelationsKeeperLib for PartnerRelationsKeeperLib.Partners;
 
@@ -69,12 +68,12 @@ contract MarketMemberBase is Pausable, VotingMemberBase, MarketMemberBaseInterfa
     /// @dev Remove market partner
     /// @notice Only owner can remove market partner
     /// @param market Address of market partner
-    function removeMarketPartner (address market) 
-        external 
+    function removeMarketPartner (address market)
+        external
         onlyValidAddress(market)
         onlyOwner
         onlyWhenInitialized
-        onlyRegisteredPartner(market) 
+        onlyRegisteredPartner(market)
     returns(bool) {
 
         return _partnerMarkets._removePartner(market);

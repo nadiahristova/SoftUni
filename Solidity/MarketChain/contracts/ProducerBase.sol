@@ -111,7 +111,7 @@ contract ProducerBase is ProducerBaseInterface, MarketMemberBase, InvoiceProduct
     }
 
     /// @dev Registers member
-    /// @notice Only already existing membercan register other member
+    /// @notice Only already existing member can register other members
     /// @param accAddress Member address
     function registerMember(address accAddress) 
         external 

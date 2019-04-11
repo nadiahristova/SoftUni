@@ -6,4 +6,6 @@ contract VotingMemberBaseInterface is IVotingMemberBase {
     function hasActiveCampaigns (address accaddress) view public returns(bool);
 
     function isMember(address accAddress) view public returns(bool);
+
+    function requestMembership () public;
 }

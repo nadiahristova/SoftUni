@@ -3,6 +3,7 @@ pragma solidity >=0.5.6 <0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "./BaseMarket.sol";
+import "./Pausable.sol";
 import "./AdministrableByRegion.sol";
 import "./InvoiceProductPurchaseValidator.sol";
 
@@ -115,6 +116,8 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
     /// @notice market should be affiliated with the producer base, 
     /// sender should be member of the producer base and the market
     function openStore (address producerBase, bytes32 name) 
+        onlyWhenInitialized
+        whenNotPaused
         onlyMember
         onlyPartnerProducerBase(producerBase)
         onlyWhenStoreOwner(msg.sender, producerBase, false)
@@ -152,6 +155,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyValidAddress(storeOwner)
         onlyValidAddress(memberBase)
         onlyWhenInitialized 
+        whenNotPaused
         onlyAdmin 
         onlyPartnerProducerBase(memberBase)
         onlyWhenStoreOwner(storeOwner, memberBase, true)
@@ -274,6 +278,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         public
         onlyValidLocation(location)  
         onlyWhenInitialized
+        whenNotPaused
         onlyOwner {
         bytes32 regionKey = AdministrableByRegion._returnLocationKey(location);
         require(_fundings[regionKey].created == 0, 'Already activated');
@@ -343,7 +348,8 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         public 
         payable 
         onlyValidLocation(location)
-        onlyWhenInitialized {
+        onlyWhenInitialized
+        whenNotPaused {
         uint sendFunds = msg.value;
         address sender = msg.sender;
 
@@ -394,6 +400,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyNaturalNumber(nonce)
         onlyValidInvoice(invoice)
         onlyWhenInitialized
+        whenNotPaused
         onlyWhenMember(invoice.seller, true)
         onlyPartnerProducerBase(invoice.producerBase)
     returns(bool) {

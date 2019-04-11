@@ -4,8 +4,6 @@ import "../../libraries/VotingMemberBaseLib.sol";
 
 interface IVotingMemberBase {
 
-    function requestMembership () external;
-
     function launchMembershipGrantingCampaign (address accAddress) external returns(bool);
 
     function revokeMembership() external returns (MemberBaseLib.RevokeMembershipStatus);

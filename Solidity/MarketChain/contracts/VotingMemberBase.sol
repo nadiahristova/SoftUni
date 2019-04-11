@@ -1,6 +1,7 @@
 pragma solidity >=0.5.6 <0.6.0;
 
 import "./Ownable.sol";
+import "./Pausable.sol";
 import "./BaseContract.sol";
 import "./Initializable.sol";
 
@@ -8,7 +9,7 @@ import "../libraries/VotingMemberBaseLib.sol";
 
 import "../interfaces/VotingMemberBaseInterface.sol";
 
-contract VotingMemberBase is BaseContract, Ownable, Initializable, VotingMemberBaseInterface {
+contract VotingMemberBase is BaseContract, Ownable, Initializable, Pausable, VotingMemberBaseInterface {
     
     using VotingMemberBaseLib for VotingMemberBaseLib.Members;
 
@@ -22,7 +23,6 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, VotingMemberB
     mapping (uint => CampaignDetails) _availableCampaigns;
 
     VotingMemberBaseLib.Members _memberBase;
-
 
     uint constant MAX_VOTES_PER_CAMPAIGN = 125;
     uint constant INITIAL_VOTE_WEIGHT = 0;
@@ -83,8 +83,9 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, VotingMemberB
     /// @dev Account requests membeship
     /// @return true if Bugs will eat it, false otherwise
     function requestMembership () 
-        external 
+        public 
         onlyWhenInitialized 
+        whenNotPaused
         onlyWhenMember(msg.sender, false) 
     {
         address requester = msg.sender;
@@ -105,6 +106,7 @@ contract VotingMemberBase is BaseContract, Ownable, Initializable, VotingMemberB
         external 
         onlyValidAddress(accAddress)
         onlyWhenInitialized
+        whenNotPaused
         onlyMember 
         onlyWhenMember(accAddress, false)
     returns(bool) {
