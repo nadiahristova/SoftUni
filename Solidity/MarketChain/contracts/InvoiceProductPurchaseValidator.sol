@@ -4,37 +4,39 @@ pragma experimental ABIEncoderV2;
 
 import "../libraries/ECDSA.sol";
 
-contract InvoiceProductPurchaseValidator {
+import "../interfaces/InvoicePurchaserInterface.sol";
+
+contract InvoiceProductPurchaseValidator is InvoicePurchaserInterface {
     using ECDSA for bytes32;
     
     mapping (address => mapping(uint => bool)) seenNonces; 
 
-    struct InvoiceDetails {
-        address seller;
-        address buyer;
-        address producerBase;
-        uint256 storeFrontId;
-        uint256 productId;
-        uint256 amount;
-        uint256 pricePerUnit;
-        uint256 validUntil;
-    }
+    // struct InvoiceDetails {
+    //     address seller;
+    //     address buyer;
+    //     address producerBase;
+    //     uint256 storeFrontId;
+    //     uint256 productId;
+    //     uint256 amount;
+    //     uint256 pricePerUnit;
+    //     uint256 validUntil;
+    // }
 
-    modifier onlyValidInvoice(InvoiceDetails memory invoice) {
-        require(invoice.seller != address(0)
-            && invoice.producerBase != address(0)
-            && invoice.buyer != address(0)
-            && invoice.amount > 0 
-            && invoice.pricePerUnit >= 0
-            && invoice.validUntil >= now, '31');
-        _;
-    }
+    // modifier onlyValidInvoice(InvoiceDetails memory invoice) {
+    //     require(invoice.seller != address(0)
+    //         && invoice.producerBase != address(0)
+    //         && invoice.buyer != address(0)
+    //         && invoice.amount > 0 
+    //         && invoice.pricePerUnit >= 0
+    //         && invoice.validUntil >= now, '31');
+    //     _;
+    // }
 
     function _validateProductPurchase (
             InvoiceDetails memory invoice,
             uint256 nonce, 
             bytes memory signature) 
-        internal 
+        public 
     returns (bool) {
 
         require (!seenNonces[invoice.seller][nonce], '15');

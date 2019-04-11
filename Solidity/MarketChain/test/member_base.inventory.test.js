@@ -146,11 +146,11 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
     })
 
     it("should NOT be able to enable already enabled store front", async () => {
-        const expected_removedSFId = new BN(1);
+        const expected_SFId = new BN(1);
 
         await member_base.addStoreFront({ from: storeOwner });
 
-        await shouldFail.reverting(member_base.enableStoreFront(expected_removedSFId, { from: storeOwner }), MSG.ENABLED_STORE_FRONT);
+        await shouldFail.reverting(member_base.enableStoreFront(expected_SFId, { from: storeOwner }), MSG.ENABLED_STORE_FRONT);
     })
 
     it("should be able to enable already disabled store front", async () => {

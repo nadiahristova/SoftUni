@@ -1,5 +1,6 @@
 pragma solidity >=0.5.6 <0.6.0;
 
+import "./Pausable.sol";
 import "./VotingMemberBase.sol";
 
 import "../interfaces/MarketMemberBaseInterface.sol";
@@ -7,7 +8,7 @@ import "../interfaces/MarketMemberBaseInterface.sol";
 import "../libraries/PartnerRelationsKeeperLib.sol";
 
 
-contract MarketMemberBase is VotingMemberBase, MarketMemberBaseInterface {
+contract MarketMemberBase is Pausable, VotingMemberBase, MarketMemberBaseInterface {
     
     using PartnerRelationsKeeperLib for PartnerRelationsKeeperLib.Partners;
 
@@ -73,9 +74,10 @@ contract MarketMemberBase is VotingMemberBase, MarketMemberBaseInterface {
         onlyValidAddress(market)
         onlyOwner
         onlyWhenInitialized
-        onlyRegisteredPartner(market) {
+        onlyRegisteredPartner(market) 
+    returns(bool) {
 
-        require(_partnerMarkets._removePartner(market));
+        return _partnerMarkets._removePartner(market);
     }
 
     /// @dev Resets active voting campaign for given user

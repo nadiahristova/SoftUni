@@ -4,7 +4,7 @@ interface IMarketMemberBase {
 
     function addMarketPartner (address market) external;
 
-    function removeMarketPartner (address market) external;
+    function removeMarketPartner (address market) external returns(bool);
 
     function removeVotingCampaign(address accAddress, uint campaignId) external;
 

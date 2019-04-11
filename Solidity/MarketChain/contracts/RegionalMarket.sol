@@ -107,7 +107,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyWhenMember(accAddress, true)
     returns(bool) {
 
-        return _launchCampaign(accAddress, 2);
+        return VotingMemberBase._launchCampaign(accAddress, 2);
     }
 
     /// @dev Opens store in the market environment
@@ -174,7 +174,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
 
         _additionalInfo[storeOwner].isValidFundingCandidate = true;
 
-        _launchCampaign(storeOwner, 3);
+        VotingMemberBase._launchCampaign(storeOwner, 3);
 
         emit LogStoreOwnerSuggestedForFunding(storeOwner, admin, info.location.iSOCode, info.location.province);
     }
@@ -275,7 +275,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyValidLocation(location)  
         onlyWhenInitialized
         onlyOwner {
-        bytes32 regionKey = _returnLocationKey(location);
+        bytes32 regionKey = AdministrableByRegion._returnLocationKey(location);
         require(_fundings[regionKey].created == 0, 'Already activated');
 
         _fundings[regionKey].created = now;
@@ -292,7 +292,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyValidLocation(location)  
         onlyWhenInitialized
     returns(address[] memory) {
-        return _fundings[_returnLocationKey(location)].candidates;
+        return _fundings[AdministrableByRegion._returnLocationKey(location)].candidates;
     }
 
     /// @dev Return gathered funds per country region
@@ -303,7 +303,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         view 
         onlyWhenInitialized
     returns(uint) {
-        return _fundsPerRegion[_returnLocationKey(location)];
+        return _fundsPerRegion[AdministrableByRegion._returnLocationKey(location)];
     }
 
     /// @dev Used by the participants in a funding campaign to retrieve funds
@@ -325,7 +325,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         // save market fee for donation
         uint marketFee = accumulatedProfitFromSales - profit;
 
-        bytes32 regionKey = _returnLocationKey(_additionalInfo[storeOwner].location);
+        bytes32 regionKey = AdministrableByRegion._returnLocationKey(_additionalInfo[storeOwner].location);
 
         _fundsPerRegion[regionKey] += marketFee;
 
@@ -352,14 +352,14 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         require(AdministrableByRegion.returnAdminsPerProvince(location).length > 0, 'Not supported');
 
         if(isMember(sender) && sendFunds >= 1 ether) {
-            _upMemberVoteWeight(sender, 5);
+            VotingMemberBase._upMemberVoteWeight(sender, 5);
         }
 
-        uint currentAvailableFunds = _fundsPerRegion[_returnLocationKey(location)];
+        uint currentAvailableFunds = _fundsPerRegion[AdministrableByRegion._returnLocationKey(location)];
 
         currentAvailableFunds += sendFunds;
 
-        _fundsPerRegion[_returnLocationKey(location)] = currentAvailableFunds;
+        _fundsPerRegion[AdministrableByRegion._returnLocationKey(location)] = currentAvailableFunds;
 
         emit LogRegisteredDonationForRegion(location.iSOCode, location.province, sendFunds, currentAvailableFunds);
     }
@@ -373,7 +373,7 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
         onlyValidAddress(accAddress) 
         onlyWhenInitialized
     returns (bool isMember, bool isAdmin,bool isOwner){
-        (bool _member, bool _owner) = _getMembershipInfo(accAddress);
+        (bool _member, bool _owner) = VotingMemberBase._getMembershipInfo(accAddress);
         bool _isAdmin = _adminRepository.contains(accAddress);
 
         return (_member, _isAdmin, _owner);

@@ -12,7 +12,7 @@ import "../interfaces/ProducerBaseInterface.sol";
 
 
 // todo upgradable member base
-contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
+contract ProducerBase is ProducerBaseInterface, MarketMemberBase, InvoiceProductPurchaseValidator {
 
     using InventoryLib for InventoryLib.StoreFronts;
     using InventoryLib for InventoryLib.ProductStock;
@@ -21,9 +21,9 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     InventoryLib.ProductStock _inventory;
 
     uint constant MAX_STOREFRONTS_PER_STORE = 25;
-    uint constant INVENTORY_CAP_PER_STOREFRONT = 255;//check option for readonly
+    uint constant INVENTORY_CAP_PER_STOREFRONT = 255;
 
-    uint constant TIME_BETWEEN_UPDATES = 5 minutes;// move to init or make one more layer on top of product base
+    uint constant TIME_BETWEEN_UPDATES = 5 minutes;
 
 
     modifier onlyExistingStoreFront (uint storeFrontId) {
@@ -62,6 +62,11 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
 
     event LogPurchaseRegistered(address client, address producer, address market, uint256 productId);
 
+    ///@dev Initializes constants needed for some ground rules and limitations
+    ///@param defaultCampaignTimePeriods fixed size array - first value: time duration of membership granting campaign, second: time duration of membership revocation campaign
+    ///@param decisiveVoteWeightProportion denominator used for determining how much of overall vote weight is needed for a campaign to be successful
+    ///@param decisiveVoteCountProportion denominator used for determining how much of overall supporters member count is needed for a given campaign to be successful
+    ///@param initialOwnerVoteWeight vote weight of the owner by default
     function initialize (
             uint[2] memory defaultCampaignTimePeriods, 
             uint decisiveVoteWeightProportion, 
@@ -83,43 +88,43 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyValidAddress(accAddress)
         onlyWhenInitialized
         onlyOwner
-        onlyWhenMember(accAddress, true)
-    returns (bool) {
+        onlyWhenMember(accAddress, true) {
 
-        require(_memberBase._revokeMembershipForced(accAddress));
+        _memberBase._revokeMembershipForced(accAddress);
 
-        require(_revokeAllMarketMembership(accAddress));
-
-        return true;
+        MarketMemberBase._revokeAllMarketMembership(accAddress);
     } 
 
-    /// @dev Launches not basic campaign for given member
+    /// @dev Launches campaign for membership revocation
     /// @notice Only owner can do this, campaign id should be > 2
     /// @param accAddress Member address
     /// @return true if campaign was launched, false otherwise
     function launchMembershipRevocationCampaign (address accAddress) 
-        public 
+        external 
         onlyValidAddress(accAddress)
         onlyWhenInitialized
         onlyOwner 
         onlyWhenMember(accAddress, true)
     returns(bool) {
 
-        return _launchCampaign(accAddress, 2);
+        return VotingMemberBase._launchCampaign(accAddress, 2);
     }
 
+    /// @dev Registers member
+    /// @notice Only already existing membercan register other member
+    /// @param accAddress Member address
     function registerMember(address accAddress) 
         external 
         onlyWhenInitialized
         onlyMember
-        onlyWhenMember(accAddress, false)
-    returns (bool) {
+        onlyWhenMember(accAddress, false) {
 
-        _registerMember(accAddress);
-
-        return true;
+        VotingMemberBase._registerMember(accAddress);
     }
 
+    /// @dev Support member in campaign
+    /// @param accAddress Account Address of the member
+    /// @param votingCampaignId Id of the campaign
     function supportMember( // support campaign
             address accAddress,
             uint248 votingCampaignId)
@@ -127,85 +132,99 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyValidAddress(accAddress) 
         onlyNaturalNumber(votingCampaignId)
         onlyWhenInitialized
-        onlyMember
-    {
+        onlyMember {
+
         address supporter = msg.sender;
         
         require(supporter != accAddress);
 
-        _supportMember(accAddress, votingCampaignId);
+        VotingMemberBase._supportMember(accAddress, votingCampaignId);
     } 
 
     /** Store Front Logic */
-    function addStoreFront() onlyWhenInitialized onlyMember external returns (bool) {
+    /// @dev Member opens new store front
+    function addStoreFront() onlyWhenInitialized onlyMember external {
         
         address storeOwner = msg.sender;
 
-        require(_storeFronts._addStoreFront(storeOwner, MAX_STOREFRONTS_PER_STORE));
+        _storeFronts._addStoreFront(storeOwner, MAX_STOREFRONTS_PER_STORE);
 
-        _upMemberVoteWeight(storeOwner, 2);
-
-        return true;
+        VotingMemberBase._upMemberVoteWeight(storeOwner, 2);
     }
 
-    //notify markets that store front is added, removed !!!!
+    /// @dev Remove store front from store
+    /// @param storeFrontId Id of the store front
     function removeStoreFront(uint storeFrontId) 
         external 
         onlyNaturalNumber(storeFrontId)
         onlyWhenInitialized
         onlyMember 
-        onlyExistingStoreFront(storeFrontId)
-    {
+        onlyExistingStoreFront(storeFrontId) {
+
         address storeOwner = msg.sender;
 
         _storeFronts._removeStoreFront(storeOwner, storeFrontId);
 
-        _downMemberVoteWeight(storeOwner, 2);
+        VotingMemberBase._downMemberVoteWeight(storeOwner, 2);
     }
 
+    /// @dev Disable store front from store
+    /// @param storeFrontId Id of the store front
     function disableStoreFront(uint storeFrontId) 
         external 
         onlyNaturalNumber(storeFrontId)
         onlyWhenInitialized
         onlyMember 
         onlyExistingStoreFront(storeFrontId)
-        onlyOnNotDisabledStoreFront(storeFrontId)
-    {
+        onlyOnNotDisabledStoreFront(storeFrontId) {
+
         address storeOwner = msg.sender;
 
         _storeFronts._disableStoreFront(storeOwner, storeFrontId);
     }
 
+
+    /// @dev Enable store front from store
+    /// @param storeFrontId Id of the store front
     function enableStoreFront(uint storeFrontId) 
         external 
         onlyNaturalNumber(storeFrontId)
         onlyMember
-        onlyExistingStoreFront(storeFrontId)
-    {
+        onlyExistingStoreFront(storeFrontId) {
+
         address storeOwner = msg.sender;
-        
-        require(_storeFronts._isStoreFrontDiabled(storeOwner, storeFrontId));
 
         _storeFronts._enableStoreFront(storeOwner, storeFrontId);
     }
 
+    /// @dev Publish existing store front to market 
+    /// @param market Contract address of the market
+    /// @param storeFrontId Id of the store front
     function publishStoreFrontToMarket(address market, uint storeFrontId) 
             external
             onlyMember  
             onlyExistingStoreFront(storeFrontId)
             onlyOnNotDisabledStoreFront(storeFrontId)
-            onlyOnValidMarketMembership(msg.sender, market)
-    {
+            onlyOnValidMarketMembership(msg.sender, market) {
+
         address storeOwner = msg.sender;
 
         require(BaseMarketInterface(market).memberBaseAddStoreFront(storeOwner, storeFrontId));
 
-        _upMemberVoteWeight(storeOwner, 5);
+        VotingMemberBase._upMemberVoteWeight(storeOwner, 5);
 
         emit LogStoreFrontShared(storeOwner, storeFrontId, market);
     }
 
     /** Product Logic */
+
+    /// @dev Add product to store front
+    /// @param storeFrontId Id of the store front
+    /// @param specificationId Id of full specification and category of product
+    /// @param pricePerUnit Price per product unit
+    /// @param amount Amount of units
+    /// @param hasNegotiablePrice Can price of the product be negotiated
+    /// @return true if Bugs will eat it, false otherwise
     function addProductToStoreFront(
             uint storeFrontId,
             uint specificationId, 
@@ -217,8 +236,7 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyValidItemEntry(pricePerUnit, amount)
         onlyMember
         onlyExistingStoreFront(storeFrontId)
-        onlyOnNotDisabledStoreFront(storeFrontId)
-    returns(bool) {
+        onlyOnNotDisabledStoreFront(storeFrontId) {
         //require(recognisedProducts[productDescriptionId]);
 
         address storeOwner = msg.sender; 
@@ -226,13 +244,14 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         uint256 newProductId = _inventory._addProductToStoreFront(storeOwner, storeFrontId, specificationId, 
             pricePerUnit, amount, hasNegotiablePrice, INVENTORY_CAP_PER_STOREFRONT);
 
-        _upMemberVoteWeight(storeOwner, 1);
+        VotingMemberBase._upMemberVoteWeight(storeOwner, 1);
 
         emit LogProductAddedToStoreFront(storeOwner, storeFrontId, newProductId);
-        
-        return true;
     }
 
+    /// @dev Remove product from store front
+    /// @param storeFrontId Id of the store front
+    /// @param productId Product Id
     function removeProductFromStoreFront(
             uint storeFrontId,
             uint productId) 
@@ -243,17 +262,23 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyMember
         onlyExistingStoreFront(storeFrontId)
         onlyOnNotDisabledStoreFront(storeFrontId)
-        onlyExistingProduct(storeFrontId, productId)
-    {
+        onlyExistingProduct(storeFrontId, productId) {
+
         address storeOwner = msg.sender;
         
         _inventory._removeProductFromStoreFront(storeOwner, storeFrontId, productId);
 
-        _downMemberVoteWeight(storeOwner, 1);
+        VotingMemberBase._downMemberVoteWeight(storeOwner, 1);
 
         emit LogProductRemovedFromStoreFront(storeOwner, storeFrontId, productId);
     }
 
+    /// @dev Updates product information
+    /// @param storeFrontId Id of the store front
+    /// @param specificationId Id of full specification and category of product
+    /// @param pricePerUnit Price per product unit
+    /// @param amount Amount of units
+    /// @param hasNegotiablePrice Can price of the product be negotiated
     function updateProduct(
             uint storeFrontId,
             uint productId, 
@@ -268,11 +293,18 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         onlyMember
         onlyExistingStoreFront(storeFrontId)
         onlyOnNotDisabledStoreFront(storeFrontId)
-        onlyExistingProduct(storeFrontId, productId)
-    {
+        onlyExistingProduct(storeFrontId, productId) {
+
         _inventory._updateProduct(productId, pricePerUnit, amountProduced, hasNegotiablePrice, TIME_BETWEEN_UPDATES);
     }
 
+
+    /// @dev Market registers purchase in the member base
+    /// @notice Invoices have expiration date
+    /// @param invoice Invoice details
+    /// @param nonce seller's nonce
+    /// @param signature Signed invoice
+    /// @return True on success, false otherwise
     function registerPurchaseWithInvoice (
             InvoiceDetails memory invoice,
             uint256 nonce, 
@@ -284,21 +316,26 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
     returns (bool) {
 
         require(_storeFronts._isStoreFrontExisting(invoice.seller, invoice.storeFrontId) 
-            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId), '24');
+            && !_storeFronts._isStoreFrontDiabled(invoice.seller, invoice.storeFrontId));
             
-        require(_inventory._isProductExisting(invoice.productId), '25');
+        require(_inventory._isProductExisting(invoice.productId), '7');
 
-        require(_validateProductPurchase(invoice, nonce, signature), '26');
+        require(_validateProductPurchase(invoice, nonce, signature));
 
         _inventory._decreaseAmount(invoice.productId, invoice.amount);
 
-        _upMemberVoteWeight(invoice.seller, 5);
+        VotingMemberBase._upMemberVoteWeight(invoice.seller, 5);
 
         emit LogPurchaseRegistered(invoice.buyer, invoice.seller, msg.sender, invoice.productId);
 
         return true;
     }
 
+    /// @dev Retrieve all store fronts by page number
+    /// @notice Max store fronts per page number is 10. Pages begin from 0.
+    /// @param storeOwner Account address of the store owner
+    /// @param pageNum Page number
+    /// @return Array of up to 10 store fronts
     function getStoreFrontsByPageNum (address storeOwner, uint pageNum) 
         public 
         view 
@@ -309,6 +346,10 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _storeFronts._getStoreFronts(storeOwner, pageNum);
     }
 
+    /// @dev Retrieve store front information by store front id
+    /// @param storeOwner Account address of the store owner
+    /// @param storeFrontId Id of the store front
+    /// @return Store Front information
     function getStoreFrontById (address storeOwner, uint storeFrontId) 
         public 
         view 
@@ -319,11 +360,17 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _storeFronts._getStoreFrontById(storeOwner, storeFrontId);
     }
 
-     function getProductsByPageNum (address storeOwner, uint storeFrontId, uint pageNum) 
+    /// @dev Retrieve all products by page number
+    /// @param storeOwner Account address of the store owner
+    /// @param storeFrontId Id of the store front
+    /// @param pageNum Number of the page
+    /// @return Array of up to 10 products
+    function getProductsByPageNum (address storeOwner, uint storeFrontId, uint pageNum) 
         public 
         view 
         onlyNaturalNumber(storeFrontId)
         onlyNaturalNumber(pageNum)
+        onlyValidAddress(storeOwner)
         onlyWhenInitialized
     returns(InventoryLib.Product[] memory) {
         require(_storeFronts._isStoreFrontExisting(storeOwner, storeFrontId), '6');
@@ -331,6 +378,11 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _inventory._getProductsByPageNum(storeFrontId, pageNum);
     }
 
+    /// @dev Retrieve all products Ids by page number
+    /// @param storeOwner Account address of the store owner
+    /// @param storeFrontId Id of the store front
+    /// @param pageNum Number of the page
+    /// @return Array of up to 10 product Ids
     function getProductIdsByPageNum (address storeOwner, uint storeFrontId, uint pageNum) 
         public 
         view 
@@ -343,12 +395,18 @@ contract ProducerBase is MarketMemberBase, InvoiceProductPurchaseValidator {
         return _inventory._getProductIdsByPageNum(storeFrontId, pageNum);
     }
 
+    /// @dev Retrieve product information by it's id
+    /// @param productId id of the product
+    /// @return Information associated with product
     function getProductById (uint productId) onlyNaturalNumber(productId) public view returns(InventoryLib.Product memory) {
         return _inventory._products[productId];
     }
 
-    function getMembershipInfo(address accAddress) public view returns (bool isMember, bool isOwner){
-        (isMember, isOwner) = _getMembershipInfo(accAddress);
+    /// @dev Retrieve membership info
+    /// @param accAddress Account address of the owner
+    /// @return Is member, is the owner
+    function getMembershipInfo(address accAddress) external view returns (bool isMember, bool isOwner){
+        (isMember, isOwner) = VotingMemberBase._getMembershipInfo(accAddress);
     }
 
     function () payable external {

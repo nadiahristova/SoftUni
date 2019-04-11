@@ -124,6 +124,10 @@ library InventoryLib {
         Store storage sf = self.stores[storeOwner];
         
         uint sfIndex = sf.storeFrontsMap[storeFrontId] - 1;
+
+        bool isDisabled = sf.storeFronts[sfIndex].isDisabled;
+
+        require(isDisabled);
         
         delete sf.storeFronts[sfIndex].isDisabled;
 
