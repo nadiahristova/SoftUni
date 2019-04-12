@@ -4,6 +4,7 @@ import { HomeComponent } from '../../home/home.component';
 import { UserProfileComponent } from '../../user-profile/user-profile.component';
 import { TableListComponent } from '../../table-list/table-list.component';
 import { CommunityComponent } from 'app/community/community.component';
+import { MarketPlaceComponent } from '../../market-place/market-place.component'
 
 export const AdminLayoutRoutes: Routes = [
     // {
@@ -52,4 +53,5 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'user-profile',   component: UserProfileComponent },
     { path: 'table-list',     component: TableListComponent },
     { path: 'community',      component: CommunityComponent },
+    { path: 'market',      component: MarketPlaceComponent },
 ];

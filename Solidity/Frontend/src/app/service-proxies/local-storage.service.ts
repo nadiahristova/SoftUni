@@ -4,6 +4,8 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 const STORAGE_KEY_ENTITY = 'logged_entity'
 const STORAGE_KEY_PENDING = 'pending_mem_requests'
 const STORAGE_KEY_PENDING_MARKET = 'pending_mem_requests_market'
+const STORE_OWNERS = 'store_owners'
+const OFFERS = 'offers'
 
 
 // export interface MemberBaseInfo {
@@ -23,6 +25,7 @@ export interface MembershipInfo {
 export class LocalStorageService {
     
     constructor(@Inject(LOCAL_STORAGE) private storage: StorageService) { }
+
 
     public addOrUpdateCurrentUserMembershipInfo(
       id: string, _is_member: boolean | undefined, 
@@ -54,6 +57,20 @@ export class LocalStorageService {
     public setLoggedInEntityForCurrentUser(address: string) {
       
       this.storage.set(STORAGE_KEY_ENTITY, address)
+    }
+
+    public addStoreOwner(address: string){
+      const requests = this.getStoreOwners()
+
+      requests.push(address)
+      
+      this.storage.set(STORE_OWNERS, JSON.stringify(requests))
+    }
+
+    public getStoreOwners(){
+      let req = this.storage.get(STORE_OWNERS) 
+
+      return req ? JSON.parse(req) : [];
     }
 
     public getPendingMembershipRequests() {
@@ -96,6 +113,21 @@ export class LocalStorageService {
       requests.push(address)
       
       this.storage.set(STORAGE_KEY_PENDING_MARKET, JSON.stringify(requests))
+    }
+
+    public getOffers() {
+      let req = this.storage.get(OFFERS) 
+
+      return req ? JSON.parse(req) : [];
+    }
+
+    public addOffer(of: any) {
+      
+      const requests = this.getOffers()
+
+      requests.push(of)
+      
+      this.storage.set(OFFERS, JSON.stringify(requests))
     }
 
     public removePendingMembershipRequestsMArket(address: string) {

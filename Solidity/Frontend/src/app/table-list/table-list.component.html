@@ -2,7 +2,8 @@
   <div class="container-fluid">
       <div class="row">
           <div class="col-md-12">
-                <form #signOrderForm="ngForm" (ngSubmit)="signOrder(signOrderForm)">
+
+                <!-- <form #signOrderForm="ngForm" (ngSubmit)="signOrder(signOrderForm)">
                     <div class="form-group">
                         <label>Approve an order by signing:</label> 
                         <input type="text" class="form-control" name="buyer" id="tr-member-input1" placeholder="Buyer" ngModel>
@@ -11,14 +12,14 @@
                         <input type="text" class="form-control" name="productId" id="tr-member-input4" placeholder="Product Id" ngModel >
                         <input type="text" class="form-control" name="amount" id="tr-member-input5" placeholder="Amount" ngModel >
                         <input type="text" class="form-control" name="pricePerUnit" id="tr-member-input6" placeholder="Price per unit" ngModel >
-                        <input type="text" class="form-control" name="validUntil" id="tr-member-input7" placeholder="Valid until" ngModel >
+                        <input type="text" class="form-control" name="validUntil" id="tr-member-input7" placeholder="Valid until" ngModel > -->
 
                         <!-- <mat-form-field>
                                 <input matInput [matDatepicker]="validUntil" placeholder="Valid until">
                                 <mat-datepicker-toggle matSuffix [for]="validUntil"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
                         </mat-form-field> -->
-                    </div>
+                    <!-- </div>
                     <button type="submit" value="submit" class="btn btn-danger btn-round">Sign order</button>
                 </form>
                 <input type="text" ng-readonly="checked" value="{{nonce}}" ng-readonly="all"/>
@@ -36,286 +37,189 @@
                             <input type="text" class="form-control" name="validUntil" id="tr-member-input7" placeholder="Valid until" ngModel >
                             <input type="text" class="form-control" name="amountPayed" id="tr-member-input7" placeholder="Payments in wei" ngModel >
                             <input type="text" class="form-control" name="nonce" id="tr-member-input7" placeholder="Nonce" ngModel >
-                            <input type="text" class="form-control" name="signature" id="tr-member-input7" placeholder="Signature of Order" ngModel >
+                            <input type="text" class="form-control" name="signature" id="tr-member-input7" placeholder="Signature of Order" ngModel > -->
 
                             <!-- <mat-form-field>
                                     <input matInput [matDatepicker]="validUntil" placeholder="Valid until">
                                     <mat-datepicker-toggle matSuffix [for]="validUntil"></mat-datepicker-toggle>
                                     <mat-datepicker #picker></mat-datepicker>
                             </mat-form-field> -->
-                        </div>
+                        <!-- </div>
                         <button type="submit" value="submit" class="btn btn-danger btn-round">Buy Product</button>
                     </form>
-                <button class="btn btn-danger btn-round" (click) = "getProduct()">get product</button>
-              <!-- <div *ngIf="false" class="card">
+                <button class="btn btn-danger btn-round" (click) = "getProduct()">get product</button> -->
+
+
+
+              <div *ngIf="marketDeployed[0]" class="card">
                   <div class="card-header card-header-danger">
-                      <h4 class="card-title ">Simple Table</h4>
-                      <p class="card-category"> Here is a subtitle for this table</p>
+                    <h4 class="card-title ">My Store Fronts
+                            <button type="button" matTooltip="Open Store Front" [matTooltipPosition]="'below'" 
+                            class ='badge badge-danger btn-link btn-s btn-just-icon' (click)="openStoreFront(producerBaseDeployed[0])">
+                                +
+                            </button>
+                    </h4>
+                    <!-- <p class="card-category"> All Store Fronts published 
+                          @<span matTooltip="{{marketDeployed[0].address}}" [matTooltipPosition]="'above'" class="badge badge-danger">{{marketDeployed[0].address}}</span>       
+                    </p> -->
                   </div>
                   <div class="card-body">
                       <div class="table-responsive">
                           <table class="table">
                               <thead class=" text-primary">
                                   <th>
-                                      ID
+                                      Store Front
                                   </th>
                                   <th>
-                                      Name
+                                      Publish to
                                   </th>
                                   <th>
-                                      Country
-                                  </th>
-                                  <th>
-                                      City
-                                  </th>
-                                  <th>
-                                      Salary
+                                      Created At
                                   </th>
                               </thead>
-                              <tbody>
-                                  <tr>
+                              <tbody *ngIf="storeFronts" >
+
+                                <tr *ngFor="let sf of storeFronts" >
                                       <td>
-                                          1
+                                          <a matTooltip="View Products" [matTooltipPosition]="'below'"  class="btn btn-primary btn-link" (click)="viewProducts(producerBaseDeployed[0], sf.id)">{{sf.id}}</a>
                                       </td>
                                       <td>
-                                          Dakota Rice
+                                        <form #publishStoreFrontForm = "ngForm" (ngSubmit) = "publishStoreFront(sf.id, publishStoreFrontForm)">
+                                                <!-- <div class="form-group"> -->
+                                                <input type="text" class="form-control" name="marketAddress" placeholder="Market Address" ngModel required length="42">
+                                                <!-- </div> -->
+                                                <button mat-raised-button type="submit" value="submit" matTooltip="Publish Store Front" [matTooltipPosition]="'below'" 
+                                                    class="btn btn-danger btn-link btn-just-icon">
+                                                    <i class="material-icons">publish</i>
+                                                </button>
+                                        </form>
                                       </td>
                                       <td>
-                                          Niger
+                                          {{sf.createdAt}}
                                       </td>
-                                      <td>
-                                          Oud-Turnhout
-                                      </td>
-                                      <td class="text-primary">
-                                          $36,738
+                                      <!-- <td>
+                                            <button type="button" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                            class ='badge badge-danger btn-link btn-s btn-just-icon' (click)="setUpAddProductForm(sf.id, 0)">
+                                                +
+                                            </button>
+                                    </td> -->
+                                      <td class="text-primary" >
+                                          <button  mat-raised-button class="btn btn-danger btn-link" (click)="enDisStoreFront(producerBaseDeployed[0], sf.id, sf.isDisabled)">
+                                            {{ sf.isDisabled ? 'Enable' : 'Disable' }}
+                                          </button>
                                       </td>
                                   </tr>
-                                  <tr>
-                                      <td>
-                                          2
-                                      </td>
-                                      <td>
-                                          Minerva Hooper
-                                      </td>
-                                      <td>
-                                          Curaçao
-                                      </td>
-                                      <td>
-                                          Sinaai-Waas
-                                      </td>
-                                      <td class="text-primary">
-                                          $23,789
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          3
-                                      </td>
-                                      <td>
-                                          Sage Rodriguez
-                                      </td>
-                                      <td>
-                                          Netherlands
-                                      </td>
-                                      <td>
-                                          Baileux
-                                      </td>
-                                      <td class="text-primary">
-                                          $56,142
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          4
-                                      </td>
-                                      <td>
-                                          Philip Chaney
-                                      </td>
-                                      <td>
-                                          Korea, South
-                                      </td>
-                                      <td>
-                                          Overland Park
-                                      </td>
-                                      <td class="text-primary">
-                                          $38,735
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          5
-                                      </td>
-                                      <td>
-                                          Doris Greene
-                                      </td>
-                                      <td>
-                                          Malawi
-                                      </td>
-                                      <td>
-                                          Feldkirchen in Kärnten
-                                      </td>
-                                      <td class="text-primary">
-                                          $63,542
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          6
-                                      </td>
-                                      <td>
-                                          Mason Porter
-                                      </td>
-                                      <td>
-                                          Chile
-                                      </td>
-                                      <td>
-                                          Gloucester
-                                      </td>
-                                      <td class="text-primary">
-                                          $78,615
-                                      </td>
-                                  </tr>
+
                               </tbody>
                           </table>
                       </div>
-                  </div>
-              </div> -->
-          </div>
-          <!-- <div  *ngIf="false"  class="col-md-12">
-              <div class="card card-plain">
-                  <div class="card-header card-header-danger">
-                      <h4 class="card-title mt-0"> Table on Plain Background</h4>
-                      <p class="card-category"> Here is a subtitle for this table</p>
-                  </div>
-                  <div class="card-body">
-                      <div class="table-responsive">
-                          <table class="table table-hover">
-                              <thead class="">
-                                  <th>
-                                      ID
-                                  </th>
-                                  <th>
-                                      Name
-                                  </th>
-                                  <th>
-                                      Country
-                                  </th>
-                                  <th>
-                                      City
-                                  </th>
-                                  <th>
-                                      Salary
-                                  </th>
-                              </thead>
-                              <tbody>
-                                  <tr>
-                                      <td>
-                                          1
-                                      </td>
-                                      <td>
-                                          Dakota Rice
-                                      </td>
-                                      <td>
-                                          Niger
-                                      </td>
-                                      <td>
-                                          Oud-Turnhout
-                                      </td>
-                                      <td>
-                                          $36,738
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          2
-                                      </td>
-                                      <td>
-                                          Minerva Hooper
-                                      </td>
-                                      <td>
-                                          Curaçao
-                                      </td>
-                                      <td>
-                                          Sinaai-Waas
-                                      </td>
-                                      <td>
-                                          $23,789
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          3
-                                      </td>
-                                      <td>
-                                          Sage Rodriguez
-                                      </td>
-                                      <td>
-                                          Netherlands
-                                      </td>
-                                      <td>
-                                          Baileux
-                                      </td>
-                                      <td>
-                                          $56,142
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          4
-                                      </td>
-                                      <td>
-                                          Philip Chaney
-                                      </td>
-                                      <td>
-                                          Korea, South
-                                      </td>
-                                      <td>
-                                          Overland Park
-                                      </td>
-                                      <td>
-                                          $38,735
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          5
-                                      </td>
-                                      <td>
-                                          Doris Greene
-                                      </td>
-                                      <td>
-                                          Malawi
-                                      </td>
-                                      <td>
-                                          Feldkirchen in Kärnten
-                                      </td>
-                                      <td>
-                                          $63,542
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          6
-                                      </td>
-                                      <td>
-                                          Mason Porter
-                                      </td>
-                                      <td>
-                                          Chile
-                                      </td>
-                                      <td>
-                                          Gloucester
-                                      </td>
-                                      <td>
-                                          $78,615
-                                      </td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
+                      <button class ='example-full-width badge badge-danger btn-link' (click)="retrieveAllStoreFronts(producerBaseDeployed[0])" >>></button>
+                      <mat-form-field class="example-full-width">
+                        <input matInput [(ngModel)]="pageNum" placeholder="page">
+                      </mat-form-field>
                   </div>
               </div>
-          </div> -->
+          </div>
+       
+         <div *ngIf="chosenStoreFront"  class="col-md-12">
+              <div class="card card-plain">
+                  <div class="card-header card-header-danger">
+                      <h4 class="card-title mt-0"> Products @ Store Front {{chosenStoreFront}}</h4>
+                      <!-- <p class="card-category"> Here is a subtitle for this table</p> -->
+                  </div>
+                  <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-10 col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead >
+                                            <th>
+                                                    Specification Id
+                                            </th>
+                                            <th>
+                                                    Edited At
+                                            </th>
+                                            <th>
+                                                    Amount
+                                            </th>
+                                            <th>
+                                                    Price Per Unit
+                                            </th>
+                                            <th>
+                                                    Has Negotiable Price
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let pr of productTable; let i = index">
+                                                <td>
+                                                    {{pr.specificationId}}                                                
+                                                </td>
+                                                <td>
+                                                    {{pr.editedAt}}
+                                                </td>
+                                                <td>
+                                                    {{pr.amount}}
+                                                </td>
+                                                <td>
+                                                    {{pr.pricePerUnit}}
+                                                </td>
+                                                <td>
+                                                    {{pr.hasNegotiablePrice}}
+                                                </td>
+                                                <td>
+                                                    <button  mat-raised-button class="btn btn-danger btn-link" (click)="showEditForm(i)">
+                                                            edit
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                                <div class="col-lg-2 col-md-12">
+                                        <div class="card-footer">
+                                                <form *ngIf="!editBtnMode" #addProductForm = "ngForm" (ngSubmit) = "addProduct(addProductForm)">
+                                                        <div class="form-group">
+                                                            <!-- <label>Add Product to Store Front:</label>  -->
+                                                            <input type="text" class="form-control" name="specificationId" placeholder="Specification Id" ngModel required>
+                                                            <input type="text" class="form-control" name="pricePerUnit" placeholder="Price Per Unit" ngModel required>
+                                                            <input type="text" class="form-control" name="amount" placeholder="Amount" ngModel required>
+                                                            
+                                                            <input type="checkbox" class="form-control-lg" id="pr_has_NegotiablePrice" name="hasNegotiablePrice" ngModel required>
+                                                            <label for="pr_has_NegotiablePrice">Has negotiable price</label>
+                                                        </div>
+                                                        <button mat-raised-button type="submit" value="submit" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                                            class="btn btn-danger btn-link">
+                                                            add product
+                                                        </button>
+                                                </form>
+                                                <form  *ngIf="editBtnMode" #editProductForm = "ngForm" (ngSubmit) = "editProduct(editProductForm)">
+                                                        <div class="form-group">
+                                                            <!-- <label>Add Product to Store Front:</label>  -->
+                                                            <input type="text" class="form-control"  [(ngModel)]="edittedProduct.specificationId" name="specificationId" placeholder="Specification Id" required>
+                                                            <input type="text" class="form-control" [(ngModel)]="edittedProduct.pricePerUnit" name = "pricePerUnit" placeholder="Price Per Unit" required>
+                                                            <input type="text" class="form-control" [(ngModel)]="edittedProduct.amount" name = "amount" placeholder="Amount" required>
+                                                            
+                                                            <input type="checkbox" class="form-control-lg" [(ngModel)]="edittedProduct.hasNegotiablePrice" id="pr_has_NegotiablePrice" name="hasNegotiablePrice" required>
+                                                            <label for="pr_has_NegotiablePrice">Has negotiable price</label>
+                                                        </div>
+                                                        <button mat-raised-button type="submit" value="submit" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                                            class="btn btn-danger btn-link">
+                                                            edit product
+                                                        </button>
+                                                </form>
+                                        </div>
+                                </div>
+                            </div>
+                            <button class ='example-full-width badge badge-danger btn-link' (click)="viewProducts(producerBaseDeployed[0], chosenStoreFront)" >>></button>
+                            <mat-form-field class="example-full-width">
+                                    <input matInput [(ngModel)]="productPageNum" placeholder="page">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+          </div> 
       </div>
   </div>
 </div>

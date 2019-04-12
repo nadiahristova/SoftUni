@@ -111,6 +111,10 @@ export class HomeComponent implements OnInit {
 
       this.membershipData[memberBase.address] = { is_member: isMember, is_owner: isOwner, is_admin: isAdmin, is_pending: false }
 
+      // if(isMember){
+      //   this.localStoreage.addStoreOwner(account);
+      // }
+
       if (!transaction) {
         this.setStatus('Transaction failed! Cannot validate membership');
       } else if (isMember) {

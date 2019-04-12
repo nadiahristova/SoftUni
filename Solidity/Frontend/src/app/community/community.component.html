@@ -39,12 +39,12 @@
                               </h4>
                           </div> 
                           <div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <button mat-raised-button type="button" matTooltip="Open Store Front" [matTooltipPosition]="'below'" 
                             class ='btn btn-warning btn-link btn-lg btn-just-icon' (click)="openStoreFront(pb)">
                                 <i class="material-icons">fiber_new</i>
                             </button>
-                        </div>
+                        </div> -->
                         <div>
                             <form #addPartnerForm = "ngForm" (ngSubmit) = "addPartner(pb, addPartnerForm)">
                                 <div class="form-group">
@@ -69,7 +69,7 @@
                                 </button>
                             </form>
                         </div>
-                        <form #enDisStoreFrontForm = "ngForm" (ngSubmit) = "enDisStoreFront(pb, enDisStoreFrontForm)">
+                        <!-- <form #enDisStoreFrontForm = "ngForm" (ngSubmit) = "enDisStoreFront(pb, enDisStoreFrontForm)">
                             <div class="form-group">
                                 <label>Enable/Disable Store Front:</label> 
                                 <br/>
@@ -81,9 +81,9 @@
                                 class="btn btn-warning btn-link btn-just-icon">
                                 <i class="material-icons">done</i>
                             </button>
-                        </form>
+                        </form> -->
                         <hr/>
-                        <form #publishStoreFrontForm = "ngForm" (ngSubmit) = "publishStoreFront(pb, publishStoreFrontForm)">
+                        <!-- <form #publishStoreFrontForm = "ngForm" (ngSubmit) = "publishStoreFront(pb, publishStoreFrontForm)">
                                 <div class="form-group">
                                     <label>Publish Store Front to Market:</label> 
                                     <input type="text" class="form-control" name="storeFrontId" placeholder="Store Front Id" ngModel required>
@@ -93,9 +93,9 @@
                                     class="btn btn-warning btn-link btn-just-icon">
                                     <i class="material-icons">publish</i>
                                 </button>
-                            </form>
+                            </form> -->
                           </div>
-                          <form #addProductForm = "ngForm" (ngSubmit) = "addProduct(pb, addProductForm)">
+                          <!-- <form #addProductForm = "ngForm" (ngSubmit) = "addProduct(pb, addProductForm)">
                                 <div class="form-group">
                                     <label>Add Product to Store Front:</label> 
                                     <input type="text" class="form-control" name="storeFrontId" placeholder="Store Front Id" ngModel required>
@@ -110,7 +110,7 @@
                                     class="btn btn-warning btn-link btn-just-icon">
                                     <i class="material-icons">fiber_new</i>
                                 </button>
-                          </form>
+                          </form> -->
                       </div>
                       <div class="card-footer">
                           <div class="stats">

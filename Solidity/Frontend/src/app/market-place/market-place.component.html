@@ -1,0 +1,257 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div *ngIf="marketDeployed[0]" class="card">
+                    <div class="card-header card-header-danger">
+                      <h4 class="card-title ">Store Fronts</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class=" text-primary">
+                                    <th>
+                                        Store Front
+                                    </th>
+                                    <th>
+                                        Store Owner
+                                    </th>
+                                    <th>
+                                        Guild
+                                    </th>
+                                    <th>
+                                        Published to
+                                    </th>
+                                    <th>
+                                        Created At
+                                    </th>
+                                </thead>
+                                <tbody *ngIf="storeFrontTable" >
+  
+                                  <tr *ngFor="let sf of storeFrontTable" >
+                                        <td>
+                                            <a matTooltip="View Products" [matTooltipPosition]="'below'" class="btn btn-primary btn-link" 
+                                              (click)="viewProducts(sf.id, sf.owner, sf.producerIndex)">{{sf.id}}</a>
+                                        </td>
+                                        <td>
+                                            {{sf.owner}}
+                                        </td>
+                                        <td>
+                                            {{producerBaseDeployed[sf.producerIndex].address}}
+                                        </td>
+                                        <td>
+                                            {{marketDeployed[sf.marketIndex].address}}
+                                        </td>
+                                        <td>
+                                            {{sf.createdAt}}
+                                        </td>
+                                    </tr>
+  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         
+          <div *ngIf="chosenStoreFront"  class="col-md-12">
+                <div class="card card-plain">
+                    <div class="card-header card-header-danger">
+                        <h4 class="card-title mt-0"> Products @ Store Front {{chosenStoreFront}}</h4>
+                        <p>Owned by: {{chosenOwner}}</p>
+                    </div>
+                    <div class="card-body">
+                          <div class="container-fluid">
+                              <div class="row">
+                                  <div class="col-lg-10 col-md-12">
+                                  <div class="table-responsive">
+                                      <table class="table table-hover">
+                                          <thead >
+                                              <th>
+                                                      Specification Id
+                                              </th>
+                                              <th>
+                                                      Amount
+                                              </th>
+                                              <th>
+                                                      Price Per Unit
+                                              </th>
+                                              <th>
+                                                      Has Negotiable Price
+                                              </th>
+                                          </thead>
+                                          <tbody>
+                                              <tr *ngFor="let pr of productTable; let i = index">
+                                                  <td>
+                                                      {{pr.specificationId}}                                                
+                                                  </td>
+                                                  <td>
+                                                      {{pr.amount}}
+                                                  </td>
+                                                  <td>
+                                                      {{pr.pricePerUnit}}
+                                                  </td>
+                                                  <td>
+                                                      {{pr.hasNegotiablePrice}}
+                                                  </td>
+                                                  <td>
+                                                      <button mat-raised-button (click) = "makeOfferEnable(pr.id)" matTooltip="Make Offer" [matTooltipPosition]="'below'" 
+                                                          class="btn btn-danger btn-link">
+                                                          Make Offer
+                                                      </button>
+                                                  </td>
+                                              </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                                  </div>
+                                  <div class="col-lg-2 col-md-12">
+                                          <div class="card-footer">
+                                                  <form *ngIf="makeOffer" #makeOfferForm = "ngForm" (ngSubmit) = "saveOffer(makeOfferForm)">
+                                                          <label>Make offer</label>
+                                                          <div class="form-group">
+                                                              <input type="text" class="form-control" name="pricePerUnit" placeholder="Price Per Unit" ngModel required>
+                                                              <input type="text" class="form-control" name="amount" placeholder="Amount" ngModel required>
+                                                          </div>
+                                                          <button mat-raised-button type="submit" value="submit" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                                              class="btn btn-danger btn-link">
+                                                              Submit
+                                                          </button>
+                                                  </form>
+                                          </div>
+                                  </div>
+                                </div>
+                          </div>
+                          <button class ='example-full-width badge badge-danger btn-link' (click)="viewProducts(chosenStoreFront, chosenOwner, chosenProducerIndex)" >>></button>
+                          <mat-form-field class="example-full-width">
+                                  <input matInput [(ngModel)]="productPageNum" placeholder="page">
+                          </mat-form-field>
+                      </div>
+                  </div>
+          </div> 
+
+          <div *ngIf="myOffers && myOffers.length > 0" class="col-md-12">
+              <div class="card card-plain">
+                  <div class="card-header card-header-danger">
+                      <h4 class="card-title mt-0">My offers</h4>
+                  </div>
+                  <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                              <div class="col-lg-10 col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead >
+                                            <th>
+                                                Buyer
+                                            </th>
+                                            <th>
+                                                Product Id
+                                            </th>
+                                            <th>
+                                                Amount
+                                            </th>
+                                            <th>
+                                                Price Per Unit
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let offer of myOffers; let i = index">
+                                                <td>
+                                                    {{offer.buyer}}                                                
+                                                </td>
+                                                <td>
+                                                    {{offer.productId}}
+                                                </td>
+                                                <td>
+                                                    {{offer.amount}}
+                                                </td>
+                                                <td>
+                                                    {{offer.pricePerUnit}}
+                                                </td>
+                                                <td>
+                                                  <form #acceptForm = "ngForm" (ngSubmit) = "signOrder(offer, acceptForm)">
+                                                      <div class="form-group">
+                                                          <input type="text" class="form-control" name="validUntil" placeholder="Valid until" ngModel required>
+                                                      </div>
+                                                      <button mat-raised-button type="submit" value="submit" matTooltip="Add Product" [matTooltipPosition]="'below'" 
+                                                          class="btn btn-danger btn-link">
+                                                          Accept
+                                                      </button>
+                                                  </form>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+          </div> 
+
+          <div *ngIf="mySuccessfulOffers && mySuccessfulOffers.length > 0" class="col-md-12">
+              <div class="card card-plain">
+                  <div class="card-header card-header-danger">
+                      <h4 class="card-title mt-0">Accepted offers</h4>
+                  </div>
+                  <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                              <div class="col-lg-10 col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead >
+                                            <th>
+                                                Seller
+                                            </th>
+                                            <th>
+                                                Product Id
+                                            </th>
+                                            <th>
+                                                Amount
+                                            </th>
+                                            <th>
+                                                Price Per Unit
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let offer of mySuccessfulOffers; let i = index">
+                                                <td>
+                                                    {{offer.seller}}                                                
+                                                </td>
+                                                <td>
+                                                    {{offer.productId}}
+                                                </td>
+                                                <td>
+                                                    {{offer.amount}}
+                                                </td>
+                                                <td>
+                                                    {{offer.pricePerUnit}}
+                                                </td>
+                                                <td>
+                                                  <form #buyForm = "ngForm" (ngSubmit) = "buy(offer, buyForm)">
+                                                      <div class="form-group">
+                                                          <input type="text" class="form-control" name="amountPayed" placeholder="Payment" ngModel required>
+                                                      </div>
+                                                      <button mat-raised-button type="submit" value="submit" matTooltip="Buy Product" [matTooltipPosition]="'below'" 
+                                                          class="btn btn-danger btn-link">
+                                                          Pay
+                                                      </button>
+                                                  </form>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+          </div> 
+        </div>
+    </div>
+  </div>
+  

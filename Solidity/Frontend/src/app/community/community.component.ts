@@ -228,6 +228,8 @@ console.log(default_account)
         this.setStatus('Transaction failed!');
       } else {
         this.setStatus('Transaction succeeded!');
+
+        this.localStoreage.addStoreOwner(default_account)
       }
     } catch (e) {
       console.log(e);
@@ -235,85 +237,85 @@ console.log(default_account)
     }
   }
 
-  async openStoreFront(memberBase) {
-    try {
-      const default_account = this.web3Service.getDefaultAccount()
+  // async openStoreFront(memberBase) {
+  //   try {
+  //     const default_account = this.web3Service.getDefaultAccount()
 
-      const transaction = await memberBase.addStoreFront({ from: default_account });
+  //     const transaction = await memberBase.addStoreFront({ from: default_account });
 
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        this.setStatus('Transaction succeeded!');
-        let transactionLogs = transaction.logs 
+  //     if (!transaction) {
+  //       this.setStatus('Transaction failed!');
+  //     } else {
+  //       this.setStatus('Transaction succeeded!');
+  //       let transactionLogs = transaction.logs 
 
-        transactionLogs.forEach(log => {
-          if(log.event == "LogStoreFrontCreated"){
-            this.showNotification('bottom','center', 'success', "New store Front with Id: " + log.args.storeFrontId.toString() + " has been added to the store successfuly.")
-          }
-        });
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error; see log');
-    }
-  }
+  //       transactionLogs.forEach(log => {
+  //         if(log.event == "LogStoreFrontCreated"){
+  //           this.showNotification('bottom','center', 'success', "New store Front with Id: " + log.args.storeFrontId.toString() + " has been added to the store successfuly.")
+  //         }
+  //       });
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     this.setStatus('Error; see log');
+  //   }
+  // }
 
-  async enDisStoreFront(market, formData) {
-    let storeFrontId = formData.value.storeFrontId
-    let enDis = formData.value.enable
+  // async enDisStoreFront(market, formData) {
+  //   let storeFrontId = formData.value.storeFrontId
+  //   let enDis = formData.value.enable
 
-    console.log(enDis)
+  //   console.log(enDis)
 
-    formData.reset();
+  //   formData.reset();
     
-    try {
-      const default_account = this.web3Service.getDefaultAccount()
+  //   try {
+  //     const default_account = this.web3Service.getDefaultAccount()
 
-      let transaction;
+  //     let transaction;
 
-      if(enDis == true) {
-        transaction = await market.enableStoreFront(storeFrontId, { from: default_account });
-      } else {
-        transaction = await market.disableStoreFront(storeFrontId, { from: default_account });
-      }
+  //     if(enDis == true) {
+  //       transaction = await market.enableStoreFront(storeFrontId, { from: default_account });
+  //     } else {
+  //       transaction = await market.disableStoreFront(storeFrontId, { from: default_account });
+  //     }
 
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        if(enDis == true) {
-          this.setStatus('Transaction succeeded! Store Front enabled');
-        } else {
-          this.setStatus('Transaction succeeded! Store Front disabled');
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error; see log');
-    }
-  }
+  //     if (!transaction) {
+  //       this.setStatus('Transaction failed!');
+  //     } else {
+  //       if(enDis == true) {
+  //         this.setStatus('Transaction succeeded! Store Front enabled');
+  //       } else {
+  //         this.setStatus('Transaction succeeded! Store Front disabled');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     this.setStatus('Error; see log');
+  //   }
+  // }
 
-  async publishStoreFront(memberBase, formData){
-    let storeFrontId = formData.value.storeFrontId
-    let marketAddress = formData.value.marketAddress
+  // async publishStoreFront(memberBase, formData){
+  //   let storeFrontId = formData.value.storeFrontId
+  //   let marketAddress = formData.value.marketAddress
 
-    formData.reset();
+  //   formData.reset();
 
-    try {
-      const default_account = this.web3Service.getDefaultAccount()
+  //   try {
+  //     const default_account = this.web3Service.getDefaultAccount()
 
-      let  transaction = await memberBase.publishStoreFrontToMarket(marketAddress, storeFrontId, { from: default_account });
+  //     let  transaction = await memberBase.publishStoreFrontToMarket(marketAddress, storeFrontId, { from: default_account });
 
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        this.setStatus('Transaction succeeded! Store Front published');
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error; see log');
-    }
-  }
+  //     if (!transaction) {
+  //       this.setStatus('Transaction failed!');
+  //     } else {
+  //       this.setStatus('Transaction succeeded! Store Front published');
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     this.setStatus('Error; see log');
+  //   }
+  // }
 
   async addPartner(memberBase, formData) {
     let marketAddress = formData.value.marketAddress
@@ -377,38 +379,38 @@ console.log(default_account)
       }
     }
 
-  async addProduct(memberBase, formData) {
+  // async addProduct(memberBase, formData) {
 
-    let storeFronId = formData.value.storeFrontId
-    let specificationId = formData.value.specificationId
-    let pricePerUnit = parseInt(formData.value.pricePerUnit)
-    let amount = parseInt(formData.value.amount)
-    let hasNegotiablePrice = formData.value.hasNegotiablePrice == 'true'
+  //   let storeFronId = formData.value.storeFrontId
+  //   let specificationId = formData.value.specificationId
+  //   let pricePerUnit = parseInt(formData.value.pricePerUnit)
+  //   let amount = parseInt(formData.value.amount)
+  //   let hasNegotiablePrice = formData.value.hasNegotiablePrice == 'true'
 
-    formData.reset();
+  //   formData.reset();
 
-    try {
-      const default_account = this.web3Service.getDefaultAccount()
+  //   try {
+  //     const default_account = this.web3Service.getDefaultAccount()
 
-      let  transaction = await memberBase.addProductToStoreFront(storeFronId, specificationId, pricePerUnit, amount, hasNegotiablePrice, { from: default_account });
+  //     let  transaction = await memberBase.addProductToStoreFront(storeFronId, specificationId, pricePerUnit, amount, hasNegotiablePrice, { from: default_account });
 
-      if (!transaction) {
-        this.setStatus('Transaction failed!');
-      } else {
-        let transactionLogs = transaction.logs 
-        console.log(transactionLogs)
+  //     if (!transaction) {
+  //       this.setStatus('Transaction failed!');
+  //     } else {
+  //       let transactionLogs = transaction.logs 
+  //       console.log(transactionLogs)
         
-        transactionLogs.forEach(log => {
-          if(log.event == "LogProductAddedToStoreFront"){
-            this.showNotification('bottom','center', 'success', "New product with Id: " + log.args.productId.toString() + " has been added to the store successfuly.")
-          }
-        });
-      }
-    } catch (e) {
-      console.log(e);
-      this.setStatus('Error; see log');
-    }
-  }
+  //       transactionLogs.forEach(log => {
+  //         if(log.event == "LogProductAddedToStoreFront"){
+  //           this.showNotification('bottom','center', 'success', "New product with Id: " + log.args.productId.toString() + " has been added to the store successfuly.")
+  //         }
+  //       });
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     this.setStatus('Error; see log');
+  //   }
+  // }
 
   private async signOrder(seller, buyer, productId, amount, pricePerUnit, validUntil, nonce) {
     var hash = "0x" + abi.soliditySHA3(

@@ -7,6 +7,7 @@ import { UserProfileComponent } from '../../user-profile/user-profile.component'
 import { TableListComponent } from '../../table-list/table-list.component';
 import { HomeComponent } from '../../home/home.component';
 import { CommunityComponent } from '../../community/community.component'
+import { MarketPlaceComponent } from '../../market-place/market-place.component'
 import {MatNativeDateModule, MatDatepickerModule} from '@angular/material';
 import { MatSnackBarModule, MatDialogModule  } from '@angular/material';
 
@@ -40,7 +41,8 @@ import {
     HomeComponent,
     UserProfileComponent,
     TableListComponent,
-    CommunityComponent
+    CommunityComponent,
+    MarketPlaceComponent
   ]
 })
 
