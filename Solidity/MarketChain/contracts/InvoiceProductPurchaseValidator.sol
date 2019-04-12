@@ -9,7 +9,7 @@ import "../interfaces/InvoicePurchaserInterface.sol";
 contract InvoiceProductPurchaseValidator is InvoicePurchaserInterface {
     using ECDSA for bytes32;
     
-    mapping (address => mapping(uint => bool)) seenNonces; 
+    //mapping (address => mapping(uint => bool)) seenNonces; 
 
     // struct InvoiceDetails {
     //     address seller;

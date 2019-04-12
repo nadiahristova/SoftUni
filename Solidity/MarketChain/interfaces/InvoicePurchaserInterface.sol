@@ -22,4 +22,6 @@ contract InvoicePurchaserInterface {
             && invoice.validUntil >= now, '31');
         _;
     }
+    
+    mapping (address => mapping(uint => bool)) seenNonces; 
 }

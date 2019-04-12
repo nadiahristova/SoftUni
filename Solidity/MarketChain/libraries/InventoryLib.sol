@@ -33,6 +33,7 @@ library InventoryLib {
 
     struct Product {
         //address producer;
+        uint256 id;
         uint256 specificationId;
         //uint256 standartId;
         uint256 editedAt;
@@ -169,6 +170,7 @@ library InventoryLib {
         uint newProductId = self._catalogManager._addItemToInventory(storeFrontId, maxNumProductsForStoreFront);
 
         self._products[newProductId] = Product({
+                id: newProductId,
                 specificationId: specificationId, 
                 amount: amount, 
                 editedAt: now,
@@ -207,23 +209,30 @@ library InventoryLib {
 
         require(product.editedAt + timeBetweenUpdates < now, '13');
 
+        bool editted = false;
+
         if(product.amount != amountProduced) {
             self._products[productId].amount = amountProduced;
+            editted = true;
 
             emit LogProductProducedAmountUpdated(productId, product.amount, amountProduced);
         }
       
         if(product.pricePerUnit != pricePerUnit) {
             self._products[productId].pricePerUnit = uint248(pricePerUnit);
+            editted = true;
 
             emit LogProductPricePerUnitUpdated(productId, product.pricePerUnit, pricePerUnit);
         }
 
         if(product.hasNegotiablePrice != hasNegotiablePrice) {
             self._products[productId].hasNegotiablePrice = hasNegotiablePrice;
+            editted = true;
 
             emit LogProductPriceNegotiabilityUpdated(productId, hasNegotiablePrice);
         }
+
+        require(editted);
 
         self._products[productId].editedAt = now;
     }
@@ -257,7 +266,7 @@ library InventoryLib {
 
         Product[] memory productsInPage = new Product[](prIdCount);
 
-        for(uint index = 0; index <= prIdCount; index++){
+        for(uint index = 0; index < prIdCount; index++){
             productsInPage[index] = self._products[productIdsInPage[index]];
         }
 

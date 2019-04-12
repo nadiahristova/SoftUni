@@ -339,6 +339,33 @@ contract('ProducerBase', function ([owner, storeOwner, storeOwner2, not_a_member
         assert.equal(areArraysIdentical(expected_Product_Ids_P1, received_Product_Ids_P1), true, 'Product ids for second page are not correct')
     })
 
+    it("should be able to retrieve products in correct order by paging ", async () => {
+        const expected_SFId = 1;
+        const expected_product_info = default_product;
+
+        await member_base.addStoreFront({ from: storeOwner });
+
+        let expected_Product_Ids_P0 = [...Array(11).keys()]
+        expected_Product_Ids_P0.shift()
+
+        let expected_Product_Ids_P1 = Array(10).fill(0)
+        expected_Product_Ids_P1[0] = 11
+        expected_Product_Ids_P1[1] = 12
+
+        for(let i = 0; i < 12; i++) {
+            await shared_func.addProduct(expected_SFId, storeOwner, member_base, default_product);
+        }
+
+        const result_P0 = await member_base.getProductsByPageNum(storeOwner, expected_SFId, 0); // create store front
+        const received_Product_Ids_P0 = result_P0.map(getFirstIndexValue)
+
+        const result_P1 = await member_base.getProductsByPageNum(storeOwner, expected_SFId, 1); // create store front
+        const received_Product_Ids_P1 = result_P1.map(getFirstIndexValue)
+
+        assert.equal(areArraysIdentical(expected_Product_Ids_P0, received_Product_Ids_P0), true, 'Products for first page are not in correct order')
+        assert.equal(areArraysIdentical(expected_Product_Ids_P1, received_Product_Ids_P1), true, 'Products for second page are not in correct order')
+    })
+
     it("should be able to keep track of product ids corretly with deletion", async () => {
         const expected_SFId = 1;
         const expected_product_info = default_product;

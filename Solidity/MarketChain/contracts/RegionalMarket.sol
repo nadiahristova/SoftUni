@@ -409,14 +409,18 @@ contract RegionalMarket is InvoiceProductPurchaseValidator, AdministrableByRegio
 
         require(invoice.buyer == buyer, '30');
         
-        // todo make it through delegate call
         require(_validateProductPurchase(invoice, nonce, signature), '22');
+
+        // todo make it through delegate call
+        // (bool successDelegate, bytes memory delegateCallData) = address(invoice.producerBase).delegatecall(abi.encodeWithSignature("_validateProductPurchase(InvoicePurchaserInterface.InvoiceDetails, uint256, bytes)", invoice, nonce, signature)); 
+        // require(successDelegate, "Delegate failed");
 
         uint productPrice = invoice.amount.mul(invoice.pricePerUnit);
 
         uint256 excessPayment = msg.value.sub(productPrice);// Safe Math is assuring that msg.value >= productPrice
 
         BaseMarket._registerSale(invoice.seller, productPrice);
+        delete productPrice;
 
         require(ProducerBaseInterface(invoice.producerBase).registerPurchaseWithInvoice(invoice, nonce, signature), '23');// validate storeFrontId and product Id
 
